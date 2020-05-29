@@ -1,5 +1,4 @@
-#pragma once 
-#include "../stdafx.h"
+#pragma once
 
 interface Direct3DDevice9ExWrapper : public IDirect3DDevice9Ex
 {

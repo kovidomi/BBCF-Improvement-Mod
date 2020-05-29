@@ -1,5 +1,6 @@
 #pragma once
-#include "../stdafx.h" 
+
+#include "d3d9.h"
 
 interface Direct3D9ExWrapper : public IDirect3D9Ex
 {

@@ -1,11 +1,10 @@
-#include "../include/crashdump.h"
+#include "crashdump.h"
+
+#include <ctime>
 #include <dbghelp.h>
+#include <memory>
 #include <shlobj.h>
 #include <tchar.h>
-#include <time.h>
-#include "../include/containers.h"
-#include <TlHelp32.h>
-#include <memory>
 
 LONG WINAPI UnhandledExFilter(PEXCEPTION_POINTERS ExPtr)
 {
@@ -18,15 +17,6 @@ LONG WINAPI UnhandledExFilter(PEXCEPTION_POINTERS ExPtr)
 	TCHAR buf[MAX_PATH], buf2[MAX_PATH];
 
 	if (pMiniDumpWriteDump) {
-		//SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, buf);
-		//int rnd;
-		//__asm push edx
-		//__asm rdtsc
-		//__asm pop edx
-		//__asm mov rnd, eax
-		//rnd &= 0xFFFF;
-		//wsprintf(buf2, _T("%s\\Crash_%x.dmp"), buf, rnd);
-
 		time_t timer;
 		char timebuffer[26];
 		struct tm* tm_info;

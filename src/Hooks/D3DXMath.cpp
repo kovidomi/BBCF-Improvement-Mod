@@ -1,4 +1,4 @@
-#include "../../include/D3D9ExWrapper/D3DXMath.h"
+#include "D3DXMath.h"
 #include <detours.h>
 
 #pragma comment(lib, "detours.lib")

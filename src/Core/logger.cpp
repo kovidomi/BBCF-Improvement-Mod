@@ -1,8 +1,9 @@
-#include "../include/logger.h"
-#include <time.h>
-#include <fstream>
+#include "logger.h"
 
-bool checkHookSuccess(PBYTE addr, const char* funcName)
+#include <ctime>
+#include <sstream>
+
+bool hookSucceeded(PBYTE addr, const char* funcName)
 {
 	if (!addr)
 	{
@@ -14,7 +15,24 @@ bool checkHookSuccess(PBYTE addr, const char* funcName)
 	return true;
 }
 
-#ifndef RELEASE_VER
+char* getFullDate()
+{
+	time_t timer;
+	char* buffer = (char*)malloc(sizeof(char) * 26);
+	if (!buffer)
+	{
+		return NULL;
+	}
+	struct tm* tm_info;
+
+	time(&timer);
+	tm_info = localtime(&timer);
+
+	strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+	return buffer;
+}
+
+#ifdef ENABLE_LOGGING
 
 FILE* g_oFile;
 
@@ -28,23 +46,6 @@ inline void logger(const char* message, ...)
 	va_end(args);
 
 	fflush(g_oFile);
-}
-
-char* getFullDate()
-{
-	time_t timer;
-	char* buffer = (char *)malloc(sizeof(char)* 26);
-	if (!buffer)
-	{
-		return NULL;
-	}
-	struct tm* tm_info;
-
-	time(&timer);
-	tm_info = localtime(&timer);
-
-	strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
-	return buffer;
 }
 
 void openLogger()
@@ -85,17 +86,16 @@ void closeLogger()
 void logSettingsIni()
 {
 	LOG(1, "settings.ini config:\n");
-	LOG(1, "\t- ToggleButton: %s\n", Settings::settingsIni.togglebutton.c_str());
-	LOG(1, "\t- NotificationPopups: %d\n", Settings::settingsIni.notificationpopups);
-	LOG(1, "\t- RenderingWidth: %d\n", Settings::settingsIni.renderwidth);
-	LOG(1, "\t- RenderingHeight: %d\n", Settings::settingsIni.renderheight);
-	LOG(1, "\t- Viewport: %d\n", Settings::settingsIni.viewport);
-	LOG(1, "\t- AntiAliasing: %d\n", Settings::settingsIni.antialiasing);
-	LOG(1, "\t- V-Sync: %d\n", Settings::settingsIni.vsync);
-	LOG(1, "\t- MenuSize: %d\n", Settings::settingsIni.menusize);
-	LOG(1, "\t- Regionlock: %d\n", Settings::settingsIni.regionlock);
-	LOG(1, "\t- CpuUsageFix: %d\n", Settings::settingsIni.cpuusagefix);
-	LOG(1, "\t- CheckUpdates: %d\n", Settings::settingsIni.checkupdates);
+
+	std::ostringstream oss;
+
+	//X-Macro
+#define SETTING(_type, _var, _inistring, _defaultval) \
+	oss << "\t- " << _inistring << " = " << Settings::settingsIni.##_var << "\n";
+#include "settings.def"
+#undef SETTING
+
+	LOG(1, oss.str().c_str());
 }
 
 void logD3DPParams(D3DPRESENT_PARAMETERS* pPresentationParameters, bool isOriginalSettings)
@@ -119,8 +119,8 @@ void logD3DPParams(D3DPRESENT_PARAMETERS* pPresentationParameters, bool isOrigin
 	LOG(1, "\t- FullScreen_RefreshRateInHz: %u\n", pPresentationParameters->FullScreen_RefreshRateInHz);
 	LOG(1, "\t- hDeviceWindow: 0x%p\n", pPresentationParameters->hDeviceWindow);
 	LOG(1, "\t- Windowed: %d\n", pPresentationParameters->Windowed);
-	LOG(1, "\t- Flags: %d\n", pPresentationParameters->Flags);
-	LOG(1, "\t- PresentationInterval: %u\n", pPresentationParameters->PresentationInterval);
+	LOG(1, "\t- Flags: 0x%p\n", pPresentationParameters->Flags);
+	LOG(1, "\t- PresentationInterval: 0x%p\n", pPresentationParameters->PresentationInterval);
 }
 
 #else

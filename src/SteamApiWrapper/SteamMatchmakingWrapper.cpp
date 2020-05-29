@@ -89,13 +89,11 @@ void SteamMatchmakingWrapper::AddRequestLobbyListDistanceFilter(ELobbyDistanceFi
 		filter = k_ELobbyDistanceFilterDefault;
 		break;
 	}
-	if (eLobbyDistanceFilter != filter)
-	{
 
-		LOG(7, "\teLobbyDistanceFilter modified from %d to %d\n", (int)eLobbyDistanceFilter, (int)filter);
-		return m_SteamMatchmaking->AddRequestLobbyListDistanceFilter(filter);
-	}
-	return m_SteamMatchmaking->AddRequestLobbyListDistanceFilter(eLobbyDistanceFilter);
+	if (eLobbyDistanceFilter != filter)
+		LOG(2, "\teLobbyDistanceFilter modified from %d to %d\n", (int)eLobbyDistanceFilter, (int)filter);
+
+	return m_SteamMatchmaking->AddRequestLobbyListDistanceFilter(filter);
 }
 
 void SteamMatchmakingWrapper::AddRequestLobbyListResultCountFilter(int cMaxResults)

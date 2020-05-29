@@ -1,9 +1,13 @@
-#include "../../include/D3D9ExWrapper/ID3D9EXWrapper_Device.h"
-#include "../../include/ImGui/ImGuiSystem.h"
+#include "d3d9.h"
+#include "ID3D9EXWrapper_Device.h"
+
+#include "Core/logger.h"
+#include "Game/containers.h"
+#include "Hooks/additional_hooks.h"
+#include "ImGui/ImGuiSystem.h"
+
 #include <steam_api.h>
 #pragma comment(lib, "steam_api.lib")
-#include "../../include/additional_hooks.h"
-#include "../../include/containers.h"
 
 Direct3DDevice9ExWrapper::Direct3DDevice9ExWrapper(IDirect3DDevice9Ex **ppReturnedDeviceInterface, D3DPRESENT_PARAMETERS *pPresentParam, IDirect3D9Ex *pIDirect3D9Ex)
 {

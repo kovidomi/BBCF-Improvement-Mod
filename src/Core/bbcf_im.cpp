@@ -1,11 +1,18 @@
-#include "../include/bbcf_im.h"
+#include "bbcf_im.h"
+#include "crashdump.h"
+#include "logger.h"
+#include "settings.h"
+
+#include "D3D9EXWrapper/d3d9.h"
+#include "D3D9EXWrapper/ID3D9EXWrapper.h"
+#include "Game/containers.h"
+#include "Hooks/additional_hooks.h"
+#include "Hooks/hook_manager.h"
+#include "ImGui/ImGuiSystem.h"
+#include "PaletteManager/custom_palette.h"
+
+#include <Windows.h>
 #include <detours.h>
-#include "../include/D3D9ExWrapper/ID3D9EXWrapper.h"
-#include "../include/additional_hooks.h"
-#include "../include/ImGui/ImGuiSystem.h"
-#include "../include/containers.h"
-#include "../include/custom_palette.h"
-#include "../include/crashdump.h"
 
 // The original to call
 typedef HRESULT(__stdcall *Direct3DCreate9Ex_t)(UINT SDKVersion, IDirect3D9Ex**);
