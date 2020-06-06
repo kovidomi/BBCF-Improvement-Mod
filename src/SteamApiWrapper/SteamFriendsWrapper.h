@@ -1,6 +1,7 @@
 #pragma once
-#include "../stdafx.h"
 #include <isteamfriends.h>
+
+#include <Windows.h>
 
 interface SteamFriendsWrapper : public ISteamFriends
 {

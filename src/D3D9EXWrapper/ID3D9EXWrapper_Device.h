@@ -1,4 +1,5 @@
 #pragma once
+#include "d3d9.h"
 
 interface Direct3DDevice9ExWrapper : public IDirect3DDevice9Ex
 {

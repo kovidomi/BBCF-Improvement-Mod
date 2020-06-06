@@ -1,6 +1,6 @@
 #pragma once
-#include "stdafx.h"
-#include "../include/network_manager.h"
+#include "network_manager.h"
+
 #include <steam_api.h>
 
 void Send_BBCFIM_ID(CSteamID opponentSteamID);

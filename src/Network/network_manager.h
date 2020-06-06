@@ -1,5 +1,6 @@
 #pragma once
 #include "SteamApiWrapper/SteamNetworkingWrapper.h"
+
 #include <steam_api.h>
 
 struct im_packet_t

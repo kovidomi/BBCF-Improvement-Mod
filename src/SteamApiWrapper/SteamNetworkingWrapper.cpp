@@ -1,9 +1,11 @@
-#include "../../include/SteamApiWrapper/SteamNetworkingWrapper.h"
-#include "../../include/utils.h"
-#include "../../include/containers.h"
-#include "../../include/gamestates_defines.h"
-#include "../../include/ImGui/ImGuiSystem.h"
-#include "../../include/bbcf_im_networking.h"
+#include "SteamNetworkingWrapper.h"
+
+#include "Core/logger.h"
+#include "Core/utils.h"
+#include "Game/containers.h"
+#include "Game/gamestates_defines.h"
+#include "ImGui/ImGuiSystem.h"
+#include "Network/bbcf_im_networking.h"
 
 SteamNetworkingWrapper::SteamNetworkingWrapper(ISteamNetworking** pSteamNetworking)
 {
@@ -12,7 +14,7 @@ SteamNetworkingWrapper::SteamNetworkingWrapper(ISteamNetworking** pSteamNetworki
 
 	m_SteamNetworking = *pSteamNetworking;
 	void* thisAddress = this;
-	WriteToMemory((uintptr_t)pSteamNetworking, (char*)&thisAddress, 4); //basically *pSteamNetworking = this;
+	WriteToProtectedMemory((uintptr_t)pSteamNetworking, (char*)&thisAddress, 4); //basically *pSteamNetworking = this;
 
 	LOG(2, "\t- after: *pSteamNetworking: 0x%p, m_SteamNetworking: 0x%p\n", *pSteamNetworking, m_SteamNetworking);
 }
@@ -29,7 +31,7 @@ bool SteamNetworkingWrapper::SendP2PPacket(CSteamID steamIDRemote, const void *p
 	//totalSentPackets++;
 	//LOG(7, "\tsteamIDRemote: 0x%x, empty:0x%x, count: %d\n", steamIDRemote, totalSentPackets);
 
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	if (ret)
 	{
 		//	static uint32 totalSentPackets = 0;
@@ -85,10 +87,10 @@ bool SteamNetworkingWrapper::ReadP2PPacket(void *pubDest, uint32 cubDest, uint32
 			if (!isPlayerInList)
 			{
 				LOG(2, "Added 0x%x to playerList\n", *psteamIDRemote);
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 				ImGuiSystem::AddLog("[debug] 0x%x ('%s') added to the playersList\n", *psteamIDRemote, 
 					Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*psteamIDRemote));
-#endif // !RELEASE_VER
+#endif
 				Containers::gameVals.playersInMatch.push_back(*psteamIDRemote);
 				Send_BBCFIM_ID(*psteamIDRemote);
 			}
@@ -103,7 +105,7 @@ bool SteamNetworkingWrapper::ReadP2PPacket(void *pubDest, uint32 cubDest, uint32
 	//totalReadPackets++;
 	//LOG(7, "\tsteamIDRemote: 0x%x, empty:0x%x, count: %d\n", *psteamIDRemote, totalReadPackets);
 
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	if (ret)
 	{
 		//DWORD returnAddress = 0;

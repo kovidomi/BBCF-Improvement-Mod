@@ -1,5 +1,6 @@
-#include "../include/steamapi_helper.h"
-#include "../include/ImGui/ImGuiSystem.h"
+#include "steamapi_helper.h"
+
+#include "ImGui/ImGuiSystem.h"
 
 //note: commented out functions are not working
 
@@ -29,7 +30,7 @@ void SteamApiHelper::OnUpdateNumberOfCurrentPlayers(NumberOfCurrentPlayers_t *pC
 		return;
 	}
 	//printf("Number of players currently playing: %d\n", pCallback->m_cPlayers);
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	ImGuiSystem::AddLog("[debug] Updated the current number of ingame players: %d\n", pCallback->m_cPlayers);
 #endif
 	current_players = pCallback->m_cPlayers;

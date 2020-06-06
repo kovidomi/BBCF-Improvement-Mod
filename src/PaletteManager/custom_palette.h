@@ -1,5 +1,8 @@
 #pragma once
-#include "../include/network_manager.h"
+
+#include "Network/network_manager.h"
+
+#include <string>
 
 #define PALETTE_DATALEN 1020
 #define HPAL_HEADER_LEN 0x24

@@ -15,8 +15,6 @@
     <ClCompile Include="depends\imgui\imgui_demo.cpp" />
     <ClCompile Include="depends\imgui\imgui_draw.cpp" />
     <ClCompile Include="depends\imgui\imgui_impl_dx9.cpp" />
-    <ClCompile Include="src\Hooks\additional_hooks.cpp" />
-    <ClCompile Include="src\Core\bbcf_im.cpp" />
     <ClCompile Include="src\Hooks\hooks_bbcf.cpp" />
     <ClCompile Include="src\Hooks\hooks_detours.cpp" />
     <ClCompile Include="src\Hooks\hooks_steamApiWrapper.cpp" />
@@ -25,7 +23,7 @@
     <ClCompile Include="src\Core\crashdump.cpp" />
     <ClCompile Include="src\Game\custom_gamemodes.cpp" />
     <ClCompile Include="src\PaletteManager\custom_palette.cpp" />
-    <ClCompile Include="src\Hooks\D3DXMath.cpp" />
+    <ClCompile Include="src\D3D9EXWrapper\D3DXMath.cpp" />
     <ClCompile Include="src\D3D9EXWrapper\ID3D9EXWrapper.cpp" />
     <ClCompile Include="src\D3D9EXWrapper\ID3D9EXWrapper_Device.cpp" />
     <ClCompile Include="src\D3D9EXWrapper\ID3D9Wrapper_Sprite.cpp" />
@@ -58,8 +56,6 @@
     <ClInclude Include="depends\imgui\stb_truetype.h" />
     <ClInclude Include="src\Core\info.h" />
     <ClInclude Include="src\D3D9EXWrapper\d3d9.h" />
-    <ClInclude Include="src\Hooks\additional_hooks.h" />
-    <ClInclude Include="src\Core\bbcf_im.h" />
     <ClInclude Include="src\Hooks\hooks_bbcf.h" />
     <ClInclude Include="src\Hooks\hooks_detours.h" />
     <ClInclude Include="src\Hooks\hooks_steamApiWrapper.h" />
@@ -69,7 +65,7 @@
     <ClInclude Include="src\Core\crashdump.h" />
     <ClInclude Include="src\Game\custom_gamemodes.h" />
     <ClInclude Include="src\PaletteManager\custom_palette.h" />
-    <ClInclude Include="src\Hooks\D3DXMath.h" />
+    <ClInclude Include="src\D3D9EXWrapper\D3DXMath.h" />
     <ClInclude Include="src\D3D9EXWrapper\ID3D9EXWrapper.h" />
     <ClInclude Include="src\D3D9EXWrapper\ID3D9EXWrapper_Device.h" />
     <ClInclude Include="src\D3D9EXWrapper\ID3D9Wrapper_Sprite.h" />

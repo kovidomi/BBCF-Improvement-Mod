@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 // Generated using ReClass 2015
 
 class CChar;

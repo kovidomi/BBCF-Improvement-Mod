@@ -1,8 +1,12 @@
-//#include 
-#include "../include/update_check.h"
+#include "update_check.h"
+
+#include "Core/info.h"
+#include "Core/logger.h"
+#include "ImGui/ImGuiSystem.h"
+
 #include <WinHttpClient.h>
 #include <regex>
-#include "../include/ImGui/ImGuiSystem.h"
+
 
 //10 seconds timout
 #define TIMEOUT 10000
@@ -50,7 +54,7 @@ void CheckUpdate()
 	//ImGuiSystem::AddLog(m[1].str().c_str());
 	//ImGuiSystem::AddLog("\n");
 	//ImGuiSystem::AddLog("installed: ");
-	//ImGuiSystem::AddLog(version_num);
+	//ImGuiSystem::AddLog(MOD_VERSION_NUM);
 	
 	if (m[1].str() == "")
 	{
@@ -58,7 +62,7 @@ void CheckUpdate()
 		return;
 	}
 
-	if (strcmp(m[1].str().c_str(), version_num) != 0)
+	if (strcmp(m[1].str().c_str(), MOD_VERSION_NUM) != 0)
 	{
 		newVersionNum = m[1].str();
 		LOG(2, "New version found: %s\n", newVersionNum.c_str());

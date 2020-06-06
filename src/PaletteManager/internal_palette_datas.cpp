@@ -1,6 +1,10 @@
-#include "../include/internal_palette_datas.h"
-#include "../include/containers.h"
-#include "../include/custom_palette.h"
+#include "internal_palette_datas.h"
+
+#include "custom_palette.h"
+
+#include "Core/logger.h"
+#include "Game/containers.h"
+
 #include <vector>
 
 char *placeholder_palettes[36]

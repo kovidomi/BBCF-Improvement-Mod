@@ -1,4 +1,5 @@
 #include "ID3D9EXWrapper.h"
+
 #include "ID3D9EXWrapper_Device.h"
 
 #include "Core/logger.h"

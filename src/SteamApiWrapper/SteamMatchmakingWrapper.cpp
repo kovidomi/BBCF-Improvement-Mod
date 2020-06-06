@@ -1,7 +1,9 @@
-#include "../../include/SteamApiWrapper/SteamMatchmakingWrapper.h"
-#include "../../include/utils.h"
-#include "../../include/containers.h"
-#include "../../include/gamestates_defines.h"
+#include "SteamMatchmakingWrapper.h"
+
+#include "Core/logger.h"
+#include "Core/utils.h"
+#include "Game/containers.h"
+#include "Game/gamestates_defines.h"
 
 SteamMatchmakingWrapper::SteamMatchmakingWrapper(ISteamMatchmaking** pSteamMatchmaking)
 {
@@ -10,7 +12,7 @@ SteamMatchmakingWrapper::SteamMatchmakingWrapper(ISteamMatchmaking** pSteamMatch
 
 	m_SteamMatchmaking = *pSteamMatchmaking;
 	void* thisAddress = this;
-	WriteToMemory((uintptr_t)pSteamMatchmaking, (char*)&thisAddress, 4); //basically *pSteamMatchmaking = this;
+	WriteToProtectedMemory((uintptr_t)pSteamMatchmaking, (char*)&thisAddress, 4); //basically *pSteamMatchmaking = this;
 
 	LOG(2, "\t- after: *pSteamMatchmaking: 0x%p, m_SteamMatchmaking: 0x%p\n", *pSteamMatchmaking, m_SteamMatchmaking);
 }

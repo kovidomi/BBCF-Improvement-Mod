@@ -1,9 +1,11 @@
-#include "../include/network_manager.h"
-#include "../include/ImGui/ImGuiSystem.h"
-#include "../include/custom_palette.h"
-#include "../include/utils.h"
-#include "../include/bbcf_im_networking.h"
-#include "../include/containers.h"
+#include "network_manager.h"
+
+#include "Core/logger.h"
+#include "Core/utils.h"
+#include "Game/containers.h"
+#include "ImGui/ImGuiSystem.h"
+#include "Network/bbcf_im_networking.h"
+#include "PaletteManager/custom_palette.h"
 
 NetworkManager::NetworkManager(SteamNetworkingWrapper *SteamNetworking)
 {

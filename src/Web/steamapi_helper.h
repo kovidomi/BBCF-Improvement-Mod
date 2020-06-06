@@ -1,5 +1,4 @@
 #pragma once
-#include "stdafx.h"
 #include <steam_api.h>
 
 //note: commented out functions are not working

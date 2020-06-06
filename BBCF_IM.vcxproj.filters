@@ -73,9 +73,6 @@
     <ClCompile Include="depends\imgui\imgui_demo.cpp" />
     <ClCompile Include="depends\imgui\imgui_draw.cpp" />
     <ClCompile Include="depends\imgui\imgui_impl_dx9.cpp" />
-    <ClCompile Include="src\Core\bbcf_im.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\utils.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -86,9 +83,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\containers.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Hooks\additional_hooks.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Web\steamapi_helper.cpp">
@@ -112,9 +106,6 @@
     <ClCompile Include="src\Network\network_manager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hooks\D3DXMath.cpp">
-      <Filter>src\D3D9EXWrapper</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\dllmain.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -127,6 +118,9 @@
     <ClCompile Include="src\Hooks\hooks_detours.cpp" />
     <ClCompile Include="src\Hooks\hooks_steamApiWrapper.cpp" />
     <ClCompile Include="src\Hooks\hooks_bbcf.cpp" />
+    <ClCompile Include="src\D3D9EXWrapper\D3DXMath.cpp">
+      <Filter>src\D3D9EXWrapper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="depends\imgui\imgui.h" />
@@ -172,9 +166,6 @@
     <ClInclude Include="src\SteamApiWrapper\SteamUtilsWrapper.h">
       <Filter>include\SteamApiWrapper</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\bbcf_im.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\utils.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -185,9 +176,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\containers.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Hooks\additional_hooks.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="src\Web\update_check.h">
@@ -218,9 +206,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="src\D3D9EXWrapper\d3d9.h" />
-    <ClInclude Include="src\Hooks\D3DXMath.h">
-      <Filter>include\D3D9ExWrapper</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\info.h" />
     <ClInclude Include="src\Core\Settings.h">
       <Filter>include</Filter>
@@ -231,6 +216,9 @@
     <ClInclude Include="src\Hooks\hooks_detours.h" />
     <ClInclude Include="src\Hooks\hooks_steamApiWrapper.h" />
     <ClInclude Include="src\Hooks\hooks_bbcf.h" />
+    <ClInclude Include="src\D3D9EXWrapper\D3DXMath.h">
+      <Filter>include\D3D9ExWrapper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="export\dinput8.def">

@@ -1,8 +1,13 @@
-#include "../include/custom_gamemodes.h"
-#include "../include/containers.h"
-#include "../include/hook_manager.h"
-#include "../include/gamestates_defines.h"
-#include "../include/ImGui/ImGuiSystem.h"
+#include "custom_gamemodes.h"
+
+#include "cchar.h"
+
+#include "Core/logger.h"
+#include "Game/containers.h"
+#include "Game/gamestates_defines.h"
+#include "Hooks/HookManager.h"
+#include "ImGui/ImGuiSystem.h"
+
 #include <imgui.h>
 
 std::vector<GameMode_t> GameModes = std::vector<GameMode_t>();
@@ -121,10 +126,10 @@ void ResetAllHooks()
 			HookManager::DeactivateHook(GameModes[i].hook_labels[j]);
 
 	int result = HookManager::OverWriteBytes((char*)steroid_HeatModifyJmpBackAddr, (char*)steroid_HeatModifyJmpBackAddr + 0x28, "\x98\x3A\x00\x00", "xxxx", "\x10\x27\x00\x00"); //change heat limits of 15000 back to 10000
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	if (result != 3)
 		LOG(2, "Error, steroid_HeatModify OverWriteBytes didnt reset all 3 addresses, only %d!!\n", result);
-#endif // !RELEASE_VER
+#endif
 }
 
 void EndCustomGamemode()
@@ -152,19 +157,19 @@ void InitSteroidMode()
 	HookManager::ActivateHook("steroid_HealthModify");
 
 	int result = HookManager::OverWriteBytes((char*)steroid_HeatModifyJmpBackAddr, (char*)steroid_HeatModifyJmpBackAddr + 0x28, "\x10\x27\x00\x00", "xxxx", "\x98\x3A\x00\x00"); //change heat limits of 10000 to 15000
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	if (result != 3)
 		LOG(2, "Error, steroid_HeatModify OverWriteBytes didnt reset all 3 addresses!!\n");
-#endif // !RELEASE_VER
+#endif
 }
 
 void __declspec(naked)steroid_OverdriveCharge()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "steroid_OverdriveCharge\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int addedOverdriveValue = 0;
 
@@ -190,11 +195,11 @@ EXIT:
 
 void __declspec(naked)steroid_HeatModify()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "steroid_HeatModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int addedHeatValue = 0;
 	_asm
@@ -250,11 +255,11 @@ EXIT:
 
 void __declspec(naked)steroid_HealthModify()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "steroid_HealthModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int newHP = 0;
 	static int previousHP = 0;
@@ -296,11 +301,11 @@ void InitVampireMode()
 void __declspec(naked)vampire_HealthModify()
 {
 	//handles the lifesteal for all chars
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "vampire_HealthModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int newHP = 0;
 	//static int previousHP = 0;
@@ -375,11 +380,11 @@ EXIT:
 void __declspec(naked)vampire_HealthDrain()
 {
 	//handles the % hp loss per second
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "vampire_HealthDrain\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static float vampirism_timer = 0.0;
 	static int previous_real_timer = 0;
@@ -444,11 +449,11 @@ void InitExVampireMode()
 void __declspec(naked)exVampire_HealthModify()
 {
 	//handles the lifesteal for all chars
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "exVampire_HealthModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int newHP = 0;
 	//static int previousHP = 0;
@@ -523,11 +528,11 @@ void __declspec(naked)exVampire_HealthModify()
 void __declspec(naked)exVampire_HealthDrain()
 {
 	//handles the % hp loss per second
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "exVampire_HealthDrain\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static float vampirism_timer = 0.0;
 	static int previous_real_timer = 0;
@@ -600,11 +605,11 @@ void InitOnePunchMode()
 
 void __declspec(naked)onepunch_HealthModify()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "onepunch_HealthModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int newHP = 0;
 
@@ -643,11 +648,11 @@ void InitTwoPunchMode()
 
 void __declspec(naked)twopunch_HealthModify()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "twopunch_HealthModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int newHP = 0;
 	static CChar* thisPlayerObj = 0;
@@ -707,11 +712,11 @@ void InitFivePunchMode()
 
 void __declspec(naked)fivepunch_HealthModify()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "fivepunch_HealthModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int newHP = 0;
 	static CChar* thisPlayerObj = 0;
@@ -775,11 +780,11 @@ void Inittugofwar()
 
 void __declspec(naked)tugofwar_HealthModify()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "tugofwar_HealthModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	static int newHP = 0;
 	static CChar* thisPlayerObj = 0;
@@ -849,11 +854,11 @@ void InitInfiniteHeatMode()
 
 void __declspec(naked)infiniteheat_HeatModify()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "infiniteheat_HeatModify\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	__asm
 	{
@@ -882,11 +887,11 @@ void InitOverdriveMode()
 
 void __declspec(naked)overdrive_FreezeOverdriveTimeleft()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "overdrive_FreezeOverdriveTimeleft\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 
 	__asm
 	{
@@ -897,11 +902,11 @@ void __declspec(naked)overdrive_FreezeOverdriveTimeleft()
 
 void __declspec(naked)overdrive_KeepTimerGoing()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	LOG(7, "overdrive_KeepTimerGoing\n");
 	__asm popad
-#endif // !RELEASE_VER
+#endif
 	__asm
 	{
 		nop

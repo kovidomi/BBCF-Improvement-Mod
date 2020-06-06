@@ -1,17 +1,23 @@
 #pragma once
-#include "stdafx.h"
-#include "SteamApiWrapper\SteamFriendsWrapper.h"
-#include "SteamApiWrapper\SteamMatchmakingWrapper.h"
-#include "SteamApiWrapper\SteamNetworkingWrapper.h"
-#include "SteamApiWrapper\SteamUserStatsWrapper.h"
-#include "SteamApiWrapper\SteamUserWrapper.h"
-#include "SteamApiWrapper\SteamUtilsWrapper.h"
-#include "steamapi_helper.h"
+
+#include "cchar.h"
+
+#include "D3D9EXWrapper/d3d9.h"
+#include "D3D9EXWrapper/ID3D9EXWrapper_Device.h"
+#include "Network/network_manager.h"
+#include "SteamApiWrapper/SteamFriendsWrapper.h"
+#include "SteamApiWrapper/SteamMatchmakingWrapper.h"
+#include "SteamApiWrapper/SteamNetworkingWrapper.h"
+#include "SteamApiWrapper/SteamUserStatsWrapper.h"
+#include "SteamApiWrapper/SteamUserWrapper.h"
+#include "SteamApiWrapper/SteamUtilsWrapper.h"
+#include "Web/steamapi_helper.h"
+
 #include <steam_api.h>
-#include "D3D9EXWrapper\ID3D9EXWrapper_Device.h"
-#include "../include/network_manager.h"
-#include "../include/cchar.h"
+#include <string>
 #include <vector>
+
+
 
 //forward declaration
 class NetworkManager;

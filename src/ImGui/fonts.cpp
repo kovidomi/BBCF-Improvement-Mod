@@ -1,7 +1,7 @@
 // File: 'ProggyTiny.ttf' (35656 bytes)
 // Exported using binary_to_compressed_c.cpp
 
-#include "../../include/ImGui/fonts.h"
+#include "fonts.h"
 
 static const char TinyFont_compressed_data_base85[10950+1] =
     "7])#######LJg=:'/###[),##/l:$#Q6>##5[n42<Vh8H4,>>#/e>11NNV=Bv(*:.F?uu#(gRU.o0XGH`$vhLG1hxt9?W`#,5LsCm<]vf.r$<$u7k;hb';9C'mm?]XmKVeU2cD4Eo3R/"

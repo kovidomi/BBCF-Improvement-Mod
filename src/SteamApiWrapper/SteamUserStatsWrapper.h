@@ -1,6 +1,7 @@
 #pragma once
-#include "../stdafx.h"
 #include <isteamuserstats.h>
+
+#include <Windows.h>
 
 interface SteamUserStatsWrapper : public ISteamUserStats
 {

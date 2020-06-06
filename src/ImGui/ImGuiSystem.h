@@ -1,8 +1,5 @@
 #pragma once
-#include "../stdafx.h"
-
-// reminder to myself, pitfall of using imgui in your project:
-// ALWAYS ADD THE IMGUI SOURCE FILES TO YOUR PROJECT OR YOU WILL GET UNRESOLVED EXTERNAL SYMBOL ERRORS
+#include "D3D9EXWrapper/d3d9.h"
 
 struct ImGuiLog;
 

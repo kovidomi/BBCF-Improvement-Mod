@@ -1,9 +1,14 @@
-#include "../include/bbcf_im_networking.h"
-#include "../include/containers.h"
-#include "../include/settings.h"
-#include "../include/ImGui/ImGuiSystem.h"
-#include "../include/custom_gamemodes.h"
-#include "../include/gamestates_defines.h"
+#include "bbcf_im_networking.h"
+
+#include "Core/info.h"
+#include "Core/logger.h"
+#include "Core/Settings.h"
+#include "Game/containers.h"
+#include "Game/custom_gamemodes.h"
+#include "Game/gamestates_defines.h"
+#include "ImGui/ImGuiSystem.h"
+
+int internal_version_num = MOD_VERSION_NUM_INTERNAL;
 
 void Send_BBCFIM_ID(CSteamID opponentSteamID)
 {
@@ -14,17 +19,17 @@ void Send_BBCFIM_ID(CSteamID opponentSteamID)
 
 	packet.type = packetType_IMID;
 	packet.playernum = Containers::gameVals.thisPlayerNum;
-	packet.datalen = sizeof(int) + (strlen(version_num) + 1);
+	packet.datalen = sizeof(int) + (strlen(MOD_VERSION_NUM) + 1);
 
 	packet.part = 1;
 	memcpy(&packet.data[0], &internal_version_num, sizeof(int));
-	memcpy(&packet.data[4], version_num, strlen(version_num) + 1);
+	memcpy(&packet.data[4], MOD_VERSION_NUM, strlen(MOD_VERSION_NUM) + 1);
 
 	Containers::g_interfaces.pNetworkManager->SendPacket(&opponentSteamID, &packet);
 
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	ImGuiSystem::AddLog("[debug] BBCFIM_ID packet sent to: '%s'\n", Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(opponentSteamID));
-#endif // !RELEASE_VER
+#endif
 }
 
 void Receive_BBCFIM_ID(im_packet_internal_t *packet)
@@ -40,7 +45,7 @@ void Receive_BBCFIM_ID(im_packet_internal_t *packet)
 
 	char opponentVersionNum[10];
 	std::string text;
-	memcpy(opponentVersionNum, &packet->data[4], strlen(version_num) + 1);
+	memcpy(opponentVersionNum, &packet->data[4], strlen(MOD_VERSION_NUM) + 1);
 
 	//we are spectators
 	if (Containers::gameVals.thisPlayerNum == 0)
@@ -93,9 +98,9 @@ void Send_customGamemode_request(CSteamID opponentSteamID)
 
 	Containers::g_interfaces.pNetworkManager->SendPacket(&opponentSteamID, &packet);
 
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	ImGuiSystem::AddLog("[debug] customGameMode packet sent to: '%s'\n", Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(opponentSteamID));
-#endif // !RELEASE_VER
+#endif
 }
 
 void Receive_customGamemode_request(im_packet_internal_t *packet)

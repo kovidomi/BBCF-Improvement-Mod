@@ -1,19 +1,22 @@
-#include "../include/custom_palette.h"
-#include "../include/utils.h"
-#include "../include/SteamApiWrapper/SteamNetworkingWrapper.h"
-#include "../include/settings.h"
-#include "../include/hook_manager.h"
-#include <steam_api.h>
-#include "../include/ImGui/ImGuiSystem.h"
-#include "../include/containers.h"
-#include "../include/internal_palette_datas.h"
-#include <sstream>
-#include <fstream>
-#include <vector>
+#include "custom_palette.h"
+
+#include "Core/logger.h"
+#include "Core/Settings.h"
+#include "Core/utils.h"
+#include "Game/containers.h"
+#include "Game/custom_gamemodes.h"
+#include "Game/gamestates_defines.h"
+#include "Hooks/HookManager.h"
+#include "ImGui/ImGuiSystem.h"
+#include "PaletteManager/internal_palette_datas.h"
+#include "SteamApiWrapper/SteamNetworkingWrapper.h"
+
 #include <atlstr.h>
-#include <string>
-#include "../include/custom_gamemodes.h"
-#include "../include/gamestates_defines.h"
+#include <fstream>
+#include <sstream>
+#include <steam_api.h>
+#include <vector>
+
 #pragma comment(lib, "steam_api.lib")
 
 LPCWSTR ingame_chars[36]
@@ -642,7 +645,7 @@ void __declspec(naked)GetP1CharIDVersusScreenMP()
 
 void __declspec(naked)GetCPUsCharIDVersusScreenSP()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	__asm mov debug_id, eax
 	LOG(2, "GetCPUsCharIDVersusScreenSP, id:%d\n", debug_id);
@@ -665,7 +668,7 @@ EXIT:
 
 void __declspec(naked)GetPlayersCharIDVersusScreenSP()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	__asm mov debug_id, eax
 	LOG(2, "GetPlayersCharIDVersusScreenSP, id:%d\n", debug_id);
@@ -930,7 +933,7 @@ void HandleSavedPackets()
 	LOG(2, "HandleSavedPackets\n");
 	while (Containers::tempVals.tempPackets.size() > 0)
 	{
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 		LOG(2, "Processing previously saved tempPackets...\n");
 		ImGuiSystem::AddLog("[debug] Processing previously saved tempPacket\n");
 #endif
@@ -1022,7 +1025,7 @@ void LoadEffectPacket(im_packet_internal_t *packet)
 
 	//if(strcmp((char*)packet->data, CURPALETTE) == 0)
 
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	//ImGuiSystem::AddLog("[debug] Custom effect packet part%d received from player%d (%s)\n",
 	//	packet->part, packet->playernum, Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
 	ImGuiSystem::AddLog("[debug] Custom effect packet part%d received from player%d \n", packet->part, packet->playernum);
@@ -1067,7 +1070,7 @@ void LoadBloomPacket(im_packet_internal_t *packet)
 		return;
 	}
 
-//#ifndef RELEASE_VER
+//#ifdef _DEBUG
 //	ImGuiSystem::AddLog("[debug] Custom bloom packet part%d received from player%d (%s)\n",
 //		packet->part, packet->playernum, Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
 //#endif
@@ -1123,7 +1126,7 @@ void SendCustomEffectBloom()
 	packet.data[0] = isBloomOn;
 
 	bool ret = Containers::g_interfaces.pNetworkManager->SendPacket(Containers::gameVals.opponentSteamID, &packet);
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	if (ret)
 	{
 		//ImGuiSystem::AddLog("[system] Custom bloom packet sent to player%d (%s)\n",
@@ -1211,7 +1214,7 @@ void SendCustomEffects()
 		memcpy(&packet.data[0], CurPalEffectPart, PALETTE_DATALEN);
 
 		bool ret = Containers::g_interfaces.pNetworkManager->SendPacket(Containers::gameVals.opponentSteamID, &packet);
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 		if (ret)
 		{
 			//ImGuiSystem::AddLog("[debug] Custom effect packets sent to player%d (%s)\n",
@@ -1243,7 +1246,7 @@ void SendCustomDatas()
 void __declspec(naked) GetPlayersPaletteIndexSPPointer()
 {
 	static int counter = 0;
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	__asm 
 	{
@@ -1282,7 +1285,7 @@ EXIT:
 //single player
 void __declspec(naked) GetCPUsPaletteIndexSPPointer()
 {
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	__asm pushad
 	__asm
 	{
