@@ -7,14 +7,10 @@
 #include "D3D9EXWrapper/ID3DXWrapper_Effect.h"
 #include "D3D9EXWrapper/ID3D9EXWrapper.h"
 #include "Game/containers.h"
-#include "SteamApiWrapper/SteamMatchmakingWrapper.h"
-#include "SteamApiWrapper/SteamNetworkingWrapper.h"
 
 #include <detours.h>
-#include <steam_api.h>
 
 #pragma comment(lib, "detours.lib")
-#pragma comment(lib, "steam_api.lib")
 
 typedef HRESULT(__stdcall* Direct3DCreate9Ex_t)(UINT SDKVersion, IDirect3D9Ex**);
 typedef HRESULT(APIENTRY* D3DXCreateEffect_t)(LPDIRECT3DDEVICE9, LPCVOID, UINT, CONST D3DXMACRO*, LPD3DXINCLUDE, DWORD, LPD3DXEFFECTPOOL, LPD3DXEFFECT*, LPD3DXBUFFER*);

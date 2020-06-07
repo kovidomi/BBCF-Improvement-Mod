@@ -4,8 +4,8 @@
 #include "Core/logger.h"
 #include "Core/Settings.h"
 #include "Game/containers.h"
-#include "Game/custom_gamemodes.h"
-#include "Game/gamestates_defines.h"
+#include "Game/custom_gameModes.h"
+#include "Game/gamestates.h"
 #include "ImGui/ImGuiSystem.h"
 
 int internal_version_num = MOD_VERSION_NUM_INTERNAL;
@@ -82,9 +82,9 @@ void Receive_BBCFIM_ID(im_packet_internal_t *packet)
 	ImGuiSystem::AddLog("[system] %s", text.c_str());
 }
 
-void Send_customGamemode_request(CSteamID opponentSteamID)
+void Send_customGameMode_request(CSteamID opponentSteamID)
 {
-	LOG(2, "Send_customGamemode_request\n");
+	LOG(2, "Send_customGameMode_request\n");
 
 	EP2PSend sendtype = k_EP2PSendUnreliable;
 	im_packet_t packet;
@@ -103,9 +103,9 @@ void Send_customGamemode_request(CSteamID opponentSteamID)
 #endif
 }
 
-void Receive_customGamemode_request(im_packet_internal_t *packet)
+void Receive_customGameMode_request(im_packet_internal_t *packet)
 {
-	LOG(2, "Receive_customGamemode_request\n");
+	LOG(2, "Receive_customGameMode_request\n");
 
 	std::string text;
 
@@ -129,7 +129,7 @@ void Receive_customGamemode_request(im_packet_internal_t *packet)
 		text = "Opponent ";
 	}
 
-	//gamemodes are different
+	//GameModes are different
 	if (opponent_activatedGameMode != activatedGameMode || P1_activatedGameMode != P2_activatedGameMode)
 	{
 		text += "has set a custom game mode";

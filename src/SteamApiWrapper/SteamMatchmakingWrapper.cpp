@@ -3,7 +3,7 @@
 #include "Core/logger.h"
 #include "Core/utils.h"
 #include "Game/containers.h"
-#include "Game/gamestates_defines.h"
+#include "Game/gamestates.h"
 
 SteamMatchmakingWrapper::SteamMatchmakingWrapper(ISteamMatchmaking** pSteamMatchmaking)
 {

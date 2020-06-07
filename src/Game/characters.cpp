@@ -1,0 +1,41 @@
+#include "characters.h"
+
+LPCWSTR ingame_chars[36]
+{
+	L"Ragna",		//00
+	L"Jin",			//01
+	L"Noel",		//02
+	L"Rachel",		//03
+	L"Taokaka",		//04
+	L"Tager",		//05
+	L"Litchi",		//06
+	L"Arakune",		//07
+	L"Bang",		//08
+	L"Carl",		//09
+	L"Hakumen",		//10
+	L"Nu",			//11
+	L"Tsubaki",		//12
+	L"Hazama",		//13
+	L"Mu",			//14
+	L"Makoto",		//15
+	L"Valkenhayn",	//16
+	L"Platinum",	//17
+	L"Relius",		//18
+	L"Izayoi",		//19
+	L"Amane",		//20
+	L"Bullet",		//21
+	L"Azrael",		//22
+	L"Kagura",		//23
+	L"Kokonoe",		//24
+	L"Terumi",		//25
+	L"Celica",		//26
+	L"Lambda",		//27
+	L"Hibiki",		//28
+	L"Nine",		//29
+	L"Naoto",		//30
+	L"Izanami",		//31
+	L"Susanoo",		//32
+	L"Es",			//33
+	L"Mai",			//34
+	L"Jubei"		//35
+};

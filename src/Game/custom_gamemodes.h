@@ -8,6 +8,16 @@ extern int P1_activatedGameMode;
 extern int P2_activatedGameMode;
 extern std::vector<GameMode_t> GameModes;
 
+extern float steroid_hp_multiplier;
+extern float steroid_overdriveChargeMultiplier;
+extern int steroid_maximumHeat;
+extern float steroid_heatModifyMultiplier;
+extern float steroid_heatLowHPChargeMultiplier;
+extern float vampire_healing_percent;
+extern float vampire_health_loss_percent_per_sec;
+extern float exVampire_healing_percent;
+extern float exVampire_health_loss_percent_per_sec;
+
 enum customGameModes
 {
 	customGameMode_none,
@@ -31,7 +41,8 @@ struct GameMode_t
 	std::vector<char*> hook_labels;
 };
 
-void CustomGamemodeHooks();
-void SetCustomGamemode(int mode);
-void InitCustomGamemode();
-void EndCustomGamemode();
+void InitCustomGameModesVector();
+void CustomGameModeHooks();
+void SetCustomGameMode(int mode);
+void InitCustomGameMode();
+void EndCustomGameMode();

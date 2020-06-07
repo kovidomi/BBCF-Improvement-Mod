@@ -1,24 +1,16 @@
 #include "hooks_bbcf.h"
 
+#include "hooks_palette.h"
+#include "hooks_steamApiWrapper.h"
+
 #include "Core/logger.h"
 #include "Core/utils.h"
-#include "D3D9EXWrapper/ID3D9Wrapper_Sprite.h"
-#include "D3D9ExWrapper/ID3DXWrapper_Effect.h"
 #include "Game/containers.h"
-#include "Game/custom_gamemodes.h"
-#include "Game/gamestates_defines.h"
+#include "Game/custom_gameModes.h"
+#include "Game/gamestates.h"
 #include "Hooks/HookManager.h"
 #include "ImGui/ImGuiSystem.h"
 #include "PaletteManager/custom_palette.h"
-#include "SteamApiWrapper/SteamMatchmakingWrapper.h"
-#include "SteamApiWrapper/SteamNetworkingWrapper.h"
-
-#include <atlstr.h>
-#include <detours.h>
-#include <steam_api.h>
-
-#pragma comment(lib, "detours.lib")
-#pragma comment(lib, "steam_api.lib")
 
 DWORD GetGameStateTitleScreenJmpBackAddr = 0;
 void __declspec(naked)GetGameStateTitleScreen()
@@ -34,6 +26,9 @@ void __declspec(naked)GetGameStateTitleScreen()
 		lea ebx, Containers::gameVals.pGameState
 		mov[ebx], edi
 	}
+
+	placeHooks_steamApiWrapper();
+
 	ImGuiSystem::Init(
 		Containers::gameProc.hWndGameWindow,
 		Containers::g_interfaces.pD3D9ExWrapper);
@@ -72,7 +67,7 @@ void ResetBackToMenu()
 	Containers::tempVals.paledit_show_sel_by_highlight = false;
 	Containers::tempVals.paledit_show_placeholder = false;
 
-	EndCustomGamemode();
+	EndCustomGameMode();
 }
 
 DWORD GetGameStateMenuScreenJmpBackAddr = 0;
@@ -89,6 +84,9 @@ void __declspec(naked)GetGameStateMenuScreen()
 		lea ebx, Containers::gameVals.pGameState
 		mov[ebx], eax
 	}
+
+	placeHooks_steamApiWrapper();
+	
 	ImGuiSystem::Init(
 		Containers::gameProc.hWndGameWindow,
 		Containers::g_interfaces.pD3D9ExWrapper);
@@ -213,7 +211,7 @@ void __declspec(naked)GetGameStateReplayMenuScreen()
 	Containers::gameVals.startMatchPalettesInit = false;
 	Containers::tempVals.PlayersCharIDVersusScreenCounter = 0;
 
-	EndCustomGamemode();
+	EndCustomGameMode();
 	__asm popad
 
 	__asm
@@ -502,42 +500,6 @@ bool placeHooks_bbcf()
 {
 	LOG(2, "placeHooks_bbcf\n");
 
-	//EXTRA HOOKS THAT ARE ONLY ACCESSIBLE AFTER GAME RESTARTS AND D3D9 IS UP
-	HookPaletteFunctions();
-
-	//hook steammatchmaking
-	if (Containers::tempVals.ppSteamMatchmaking)
-	{
-		Containers::g_interfaces.pSteamMatchmakingWrapper = new SteamMatchmakingWrapper(Containers::tempVals.ppSteamMatchmaking);
-	}
-
-	//hook steamnetworking
-	if (Containers::tempVals.ppSteamNetworking)
-	{
-		Containers::g_interfaces.pSteamNetworkingWrapper = new SteamNetworkingWrapper(Containers::tempVals.ppSteamNetworking);
-		Containers::g_interfaces.pNetworkManager = new NetworkManager(Containers::g_interfaces.pSteamNetworkingWrapper);
-	}
-
-	if (Containers::tempVals.ppSteamFriends)
-	{
-		Containers::g_interfaces.pSteamFriendsWrapper = new SteamFriendsWrapper(Containers::tempVals.ppSteamFriends);
-	}
-
-	if (Containers::tempVals.ppSteamUser)
-	{
-		Containers::g_interfaces.pSteamUserWrapper = new SteamUserWrapper(Containers::tempVals.ppSteamUser);
-	}
-
-	if (Containers::tempVals.ppSteamUserStats)
-	{
-		Containers::g_interfaces.pSteamUserStatsWrapper = new SteamUserStatsWrapper(Containers::tempVals.ppSteamUserStats);
-	}
-
-	if (Containers::tempVals.ppSteamUtils)
-	{
-		Containers::g_interfaces.pSteamUtilsWrapper = new SteamUtilsWrapper(Containers::tempVals.ppSteamUtils);
-	}
-
 	if (Settings::settingsIni.cpuusagefix)
 		CpuUsageFixJmpBackAddr = HookManager::SetHook(
 			"CpuBottleneckFix_new", 
@@ -659,11 +621,14 @@ bool placeHooks_bbcf()
 		GetP1ScreenPosX);
 
 	HookManager::RegisterHook(
-		"GetMoneyAddr", "\xff\x35\x00\x00\x00\x00\x8d\x45\xb4\x68\x00\x00\x00\x00\x50",
-		"xx????xxxx????x", 6);
+		"GetMoneyAddr",
+		"\xff\x35\x00\x00\x00\x00\x8d\x45\xb4\x68\x00\x00\x00\x00\x50",
+		"xx????xxxx????x",
+		6);
 	Containers::gameVals.pGameMoney = (int*)HookManager::GetBytesFromAddr("GetMoneyAddr", 2, 4);
 
-	CustomGamemodeHooks();
+	placeHooks_palette();
+	CustomGameModeHooks();
 
 	return true;
 }

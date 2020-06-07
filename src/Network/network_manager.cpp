@@ -85,7 +85,7 @@ void NetworkManager::PacketProcesser(im_packet_internal_t* packet)
 
 	LOG(2, "NetworkManager::PacketProcesser\n");
 
-	if (packet->code != 0x98) //do not compare with '\x98', it doesnt work
+	if (packet->code != 0x98)
 	{
 		LOG(2, "Opponent is using incompatible version of BBCFIM\n");
 		ImGuiSystem::AddLog("[error] Opponent is using incompatible version of BBCFIM\n");
@@ -113,7 +113,7 @@ void NetworkManager::PacketProcesser(im_packet_internal_t* packet)
 		LoadBloomPacket(packet);
 		break;
 	case packetType_gamemode:
-		Receive_customGamemode_request(packet);
+		Receive_customGameMode_request(packet);
 		break;
 	default:
 		LOG(2, "packet type not found\n");

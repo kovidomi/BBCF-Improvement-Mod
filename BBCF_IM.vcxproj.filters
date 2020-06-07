@@ -85,13 +85,7 @@
     <ClCompile Include="src\Game\containers.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Web\steamapi_helper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Web\update_check.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\custom_gamemodes.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PaletteManager\internal_palette_datas.cpp">
@@ -121,6 +115,13 @@
     <ClCompile Include="src\D3D9EXWrapper\D3DXMath.cpp">
       <Filter>src\D3D9EXWrapper</Filter>
     </ClCompile>
+    <ClCompile Include="src\SteamApiWrapper\SteamApiHelper.cpp" />
+    <ClCompile Include="src\Hooks\hooks_customGameModes.cpp" />
+    <ClCompile Include="src\Game\characters.cpp" />
+    <ClCompile Include="src\Game\custom_gameModes.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hooks\hooks_palette.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="depends\imgui\imgui.h" />
@@ -181,15 +182,6 @@
     <ClInclude Include="src\Web\update_check.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\Web\steamapi_helper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\custom_gamemodes.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\gamestates_defines.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\cchar.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -219,6 +211,16 @@
     <ClInclude Include="src\D3D9EXWrapper\D3DXMath.h">
       <Filter>include\D3D9ExWrapper</Filter>
     </ClInclude>
+    <ClInclude Include="src\SteamApiWrapper\SteamApiHelper.h" />
+    <ClInclude Include="src\Game\gamestates.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\hooks_customGameModes.h" />
+    <ClInclude Include="src\Game\characters.h" />
+    <ClInclude Include="src\Game\custom_gameModes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\hooks_palette.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="export\dinput8.def">

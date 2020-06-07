@@ -3,7 +3,7 @@
 #include "Core/logger.h"
 #include "Core/utils.h"
 #include "Game/containers.h"
-#include "Game/gamestates_defines.h"
+#include "Game/gamestates.h"
 #include "ImGui/ImGuiSystem.h"
 #include "Network/bbcf_im_networking.h"
 

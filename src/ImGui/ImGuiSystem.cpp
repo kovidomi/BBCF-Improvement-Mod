@@ -1,15 +1,16 @@
 #include "ImGuiSystem.h"
 
 #include "Core/info.h"
+#include "Core/logger.h"
 #include "Core/utils.h"
+#include "Game/characters.h"
 #include "Game/containers.h"
-#include "Game/custom_gamemodes.h"
-#include "Game/gamestates_defines.h"
+#include "Game/custom_gameModes.h"
+#include "Game/gamestates.h"
 #include "ImGui/fonts.h"
 #include "Network/bbcf_im_networking.h"
 #include "PaletteManager/custom_palette.h"
 #include "PaletteManager/internal_palette_datas.h"
-#include "Web/steamapi_helper.h"
 #include "Web/update_check.h"
 
 #include <ctime>
@@ -18,7 +19,6 @@
 #include <sstream>
 #include <string>
 #include "Shlwapi.h"
-#include "Core/logger.h"
 
 #define MAX_LOG_MSG_LEN 1024
 
@@ -1609,7 +1609,7 @@ void ImGuiSystem::ShowGameplaySettingsMenu()
 		//ImGui::Text("\t"); ImGui::SameLine(); ImGui::TextDisabled("NOT ON REPLAY MENU SCREEN");
 	}
 	else if (*Containers::gameVals.pGameMode != GAME_MODE_VERSUS && *Containers::gameVals.pGameMode != GAME_MODE_ONLINE && 
-		*Containers::gameVals.pGameMode != GAME_MODE_TRAINING && *Containers::gameVals.pGameState != GAME_STATE_REPLAY_MENU)//we use gamestate for replay menu, since gamemode sets to 0, if we return to the replay menu via the pause menu
+		*Containers::gameVals.pGameMode != GAME_MODE_TRAINING && *Containers::gameVals.pGameState != GAME_STATE_REPLAY_MENU)//we use gamestate for replay menu, since GameMode sets to 0, if we return to the replay menu via the pause menu
 	{
 		ImGui::Text("\t"); ImGui::SameLine(); ImGui::RadioButton(selectedGameMode.c_str(), true);
 		ImGui::Text("\t"); ImGui::SameLine(); ImGui::TextDisabled("NOT IN ONLINE, TRAINING, OR VERSUS MODES");
@@ -1630,7 +1630,7 @@ void ImGuiSystem::ShowGameplaySettingsMenu()
 			else
 			{
 				if (ImGui::RadioButton(selectedGameMode.c_str(), &activatedGameMode, GameModes[i].id) && Containers::gameVals.opponentSteamID != 0)
-					Send_customGamemode_request(*Containers::gameVals.opponentSteamID);
+					Send_customGameMode_request(*Containers::gameVals.opponentSteamID);
 			}
 			if (ImGui::IsItemHovered() && GameModes[i].desc)
 			{
