@@ -75,9 +75,7 @@ void __declspec(naked)GetOpponentSteamIDAtCharSelect()
 DWORD GetCharObjPointersJmpBackAddr = 0;
 void __declspec(naked)GetCharObjPointers()
 {
-	__asm pushad
-	LOG(2, "GetCharObjPointers\n");
-	__asm popad
+	LOG_ASM(2, "GetCharObjPointers\n");
 
 	__asm
 	{
@@ -176,9 +174,7 @@ void __declspec(naked)CPUsPaletteIndexAndCharIDArcadeFix()
 DWORD GetIsP1CPUJmpBackAddr = 0;
 void __declspec(naked)GetIsP1CPU()
 {
-	__asm pushad
-	LOG(2, "GetIsP1CPU\n");
-	__asm popad
+	LOG_ASM(2, "GetIsP1CPU\n");
 
 	__asm
 	{
@@ -296,9 +292,8 @@ void __declspec(naked)GetP2CharIDTrainingModeCharIDChange()
 
 void __declspec(naked)GetP2CharIDVersusScreenMP()
 {
-	__asm pushad
-	LOG(2, "GetP2CharIDVersusScreenMP\n");
-	__asm popad
+	LOG_ASM(2, "GetP2CharIDVersusScreenMP\n");
+
 	__asm
 	{
 		mov Containers::gameVals.P2_selectedCharID, ecx
@@ -311,9 +306,7 @@ void __declspec(naked)GetP2CharIDVersusScreenMP()
 
 void __declspec(naked)GetP1CharIDVersusScreenMP()
 {
-	__asm pushad
-	LOG(2, "GetP1CharIDVersusScreenMP\n");
-	__asm popad
+	LOG_ASM(2, "GetP1CharIDVersusScreenMP\n");
 
 	__asm
 	{
@@ -375,9 +368,7 @@ void __declspec(naked)GetPlayersCharIDVersusScreenSP()
 
 void __declspec(naked)GetP1P2CharSelectPalettePointerIndexes()
 {
-	__asm pushad
-	LOG(2, "GetP1P2CharSelectPalettePointerIndexes\n");
-	__asm popad
+	LOG_ASM(2, "GetP1P2CharSelectPalettePointerIndexes\n");
 
 	__asm
 	{
@@ -436,9 +427,7 @@ void __declspec(naked)GetP1P2CharIDCharSelectSP()
 
 void __declspec(naked)GetGameStateCharacterSelect()
 {
-	__asm pushad
-	LOG(2, "GetGameStateCharacterSelect\n");
-	__asm popad
+	LOG_ASM(2, "GetGameStateCharacterSelect\n");
 
 	__asm pushad
 
@@ -498,9 +487,8 @@ void __declspec(naked)MatchIntroStartsPlayingFunc()
 
 void __declspec(naked)GetOwnSteamID()
 {
-	__asm pushad
-	LOG(2, "GetOwnSteamID\n");
-	__asm popad
+	LOG_ASM(2, "GetOwnSteamID\n");
+
 	__asm
 	{
 		mov[edi], eax
@@ -508,9 +496,9 @@ void __declspec(naked)GetOwnSteamID()
 		jne EXIT
 		mov Containers::gameVals.ownSteamID, edi
 	}
-	__asm pushad
-	LOG(2, "OwnSteamID: 0x%x\n", *Containers::gameVals.ownSteamID);
-	__asm popad
+
+	LOG_ASM(2, "OwnSteamID: 0x%x\n", *Containers::gameVals.ownSteamID);
+
 	__asm
 	{
 	EXIT:
@@ -610,9 +598,7 @@ void __declspec(naked) GetCPUsPaletteIndexSPPointer()
 
 void __declspec(naked) GetP1PaletteIndexMPPointer()
 {
-	__asm pushad
-	LOG(2, "GetP1PaletteIndexMPPointer\n");
-	__asm popad
+	LOG_ASM(2, "GetP1PaletteIndexMPPointer\n");
 
 	__asm
 	{
@@ -629,9 +615,7 @@ void __declspec(naked) GetP1PaletteIndexMPPointer()
 
 void __declspec(naked) GetP2PaletteIndexMPPointer()
 {
-	__asm pushad
-	LOG(2, "GetP2PaletteIndexMPPointer\n");
-	__asm popad
+	LOG_ASM(2, "GetP2PaletteIndexMPPointer\n");
 
 	__asm
 	{
@@ -650,9 +634,7 @@ void __declspec(naked) GrabP1P2PalettePointers()
 {
 	static int counter = 0;
 
-	__asm pushad
-	LOG(2, "GrabP1P2PalettePointers\n");
-	__asm popad
+	LOG_ASM(2, "GrabP1P2PalettePointers\n");
 
 	__asm
 	{

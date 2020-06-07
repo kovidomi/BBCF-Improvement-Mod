@@ -41,11 +41,7 @@ DWORD overdrive_KeepTimerGoingJmpBackAddr = 0;
 
 void __declspec(naked)steroid_OverdriveCharge()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "steroid_OverdriveCharge\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "steroid_OverdriveCharge\n");
 
 	static int addedOverdriveValue = 0;
 
@@ -71,11 +67,7 @@ void __declspec(naked)steroid_OverdriveCharge()
 
 void __declspec(naked)steroid_HeatModify()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "steroid_HeatModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "steroid_HeatModify\n")
 
 	static int addedHeatValue = 0;
 	_asm
@@ -131,11 +123,7 @@ void __declspec(naked)steroid_HeatModify()
 
 void __declspec(naked)steroid_HealthModify()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "steroid_HealthModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "steroid_HealthModify\n");
 
 	static int newHP = 0;
 	static int previousHP = 0;
@@ -168,11 +156,7 @@ void __declspec(naked)steroid_HealthModify()
 void __declspec(naked)vampire_HealthModify()
 {
 	//handles the lifesteal for all chars
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "vampire_HealthModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "vampire_HealthModify\n");
 
 	static int newHP = 0;
 	//static int previousHP = 0;
@@ -247,11 +231,7 @@ void __declspec(naked)vampire_HealthModify()
 void __declspec(naked)vampire_HealthDrain()
 {
 	//handles the % hp loss per second
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "vampire_HealthDrain\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "vampire_HealthDrain\n");
 
 	static float vampirism_timer = 0.0;
 	static int previous_real_timer = 0;
@@ -307,11 +287,7 @@ void __declspec(naked)vampire_HealthDrain()
 void __declspec(naked)exVampire_HealthModify()
 {
 	//handles the lifesteal for all chars
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "exVampire_HealthModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "exVampire_HealthModify\n");
 
 	static int newHP = 0;
 	//static int previousHP = 0;
@@ -386,11 +362,7 @@ void __declspec(naked)exVampire_HealthModify()
 void __declspec(naked)exVampire_HealthDrain()
 {
 	//handles the % hp loss per second
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "exVampire_HealthDrain\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "exVampire_HealthDrain\n");
 
 	static float vampirism_timer = 0.0;
 	static int previous_real_timer = 0;
@@ -445,11 +417,7 @@ void __declspec(naked)exVampire_HealthDrain()
 
 void __declspec(naked)onepunch_HealthModify()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "onepunch_HealthModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "onepunch_HealthModify\n");
 
 	static int newHP = 0;
 
@@ -469,11 +437,7 @@ void __declspec(naked)onepunch_HealthModify()
 
 void __declspec(naked)twopunch_HealthModify()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "twopunch_HealthModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "twopunch_HealthModify\n");
 
 	static int newHP = 0;
 	static CChar* thisPlayerObj = 0;
@@ -514,11 +478,7 @@ void __declspec(naked)twopunch_HealthModify()
 
 void __declspec(naked)fivepunch_HealthModify()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "fivepunch_HealthModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "fivepunch_HealthModify\n");
 
 	static int newHP = 0;
 	static CChar* thisPlayerObj = 0;
@@ -559,11 +519,7 @@ void __declspec(naked)fivepunch_HealthModify()
 
 void __declspec(naked)tugofwar_HealthModify()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "tugofwar_HealthModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "tugofwar_HealthModify\n");
 
 	static int newHP = 0;
 	static CChar* thisPlayerObj = 0;
@@ -620,11 +576,7 @@ void __declspec(naked)tugofwar_HealthModify()
 
 void __declspec(naked)infiniteheat_HeatModify()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "infiniteheat_HeatModify\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "infiniteheat_HeatModify\n");
 
 	__asm
 	{
@@ -636,11 +588,7 @@ void __declspec(naked)infiniteheat_HeatModify()
 
 void __declspec(naked)overdrive_FreezeOverdriveTimeleft()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "overdrive_FreezeOverdriveTimeleft\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "overdrive_FreezeOverdriveTimeleft\n");
 
 	__asm
 	{
@@ -651,11 +599,8 @@ void __declspec(naked)overdrive_FreezeOverdriveTimeleft()
 
 void __declspec(naked)overdrive_KeepTimerGoing()
 {
-#ifdef _DEBUG
-	__asm pushad
-	LOG(7, "overdrive_KeepTimerGoing\n");
-	__asm popad
-#endif
+	LOG_ASM(7, "overdrive_KeepTimerGoing\n");
+
 	__asm
 	{
 		nop

@@ -104,9 +104,7 @@ void __declspec(naked)GetGameStateMenuScreen()
 DWORD GetGameStateLobbyJmpBackAddress = 0;
 void __declspec(naked)GetGameStateLobby()
 {
-	__asm pushad
-	LOG(2, "GetGameStateLobby\n");
-	__asm popad
+	LOG_ASM(2, "GetGameStateLobby\n");
 
 	__asm pushad
 
@@ -184,9 +182,7 @@ void __declspec(naked)GetGameStateVictoryScreen()
 DWORD GetGameStateVersusScreenJmpBackAddr = 0;
 void __declspec(naked)GetGameStateVersusScreen()
 {
-	__asm pushad
-	LOG(2, "GetGameStateVersusScreen\n");
-	__asm popad
+	LOG_ASM(2, "GetGameStateVersusScreen\n");
 
 	Containers::tempVals.PlayersCharIDVersusScreenCounter = 0;
 
@@ -230,9 +226,8 @@ void __declspec(naked)PassMsgToImGui()
 		mov edi, [ebp + 0Ch]
 		mov ebx, ecx
 	}
-	__asm pushad
-	LOG(7, "PassMsgToImGui\n");
-	__asm popad
+
+	LOG_ASM(7, "PassMsgToImGui\n");
 
 	__asm
 	{
@@ -268,9 +263,8 @@ DWORD PacketProcessingFuncJmpBackAddr = 0;
 void __declspec(naked)PacketProcessingFunc()
 {
 	im_packet_internal_t* packet;
-	__asm pushad
-	LOG(7, "PacketProcessingFunc\n");
-	__asm popad
+
+	LOG_ASM(7, "PacketProcessingFunc\n");
 
 	__asm mov packet, ecx;
 
@@ -307,9 +301,7 @@ void __declspec(naked)PacketProcessingFunc()
 DWORD GetPlayerAvatarBaseAddr = 0;
 void __declspec(naked)GetPlayerAvatarBaseFunc()
 {
-	__asm pushad
-	LOG(2, "GetPlayerAvatarBaseFunc\n");
-	__asm popad
+	LOG_ASM(2, "GetPlayerAvatarBaseFunc\n");
 
 	__asm
 	{
@@ -360,9 +352,7 @@ void __declspec(naked)CpuUsageFix()
 DWORD GetGameModeIndexPointerJmpBackAddr = 0;
 void __declspec(naked)GetGameModeIndexPointer()
 {
-	__asm pushad
-	LOG(2, "GetGameModeIndexPointer\n");
-	__asm popad
+	LOG_ASM(2, "GetGameModeIndexPointer\n");
 
 	__asm
 	{
@@ -378,9 +368,7 @@ void __declspec(naked)GetGameModeIndexPointer()
 DWORD GetSetMatchVariablesJmpBackAddr = 0;
 void __declspec(naked)GetSetMatchVariables()
 {
-	__asm pushad
-	LOG(2, "GetSetMatchVariables\n");
-	__asm popad
+	LOG_ASM(2, "GetSetMatchVariables\n");
 
 	__asm
 	{
@@ -405,9 +393,7 @@ void __declspec(naked)GetSetMatchVariables()
 DWORD MatchStateFightStartJmpBackAddr = 0;
 void __declspec(naked)MatchStateFightStart()
 {
-	__asm pushad
-	LOG(2, "MatchStateFightStart\n");
-	__asm popad
+	LOG_ASM(2, "MatchStateFightStart\n");
 
 	__asm pushad
 	if (activatedGameMode == customGameMode_overdrive)
@@ -426,9 +412,7 @@ void __declspec(naked)MatchStateFightStart()
 DWORD GetStageSelectAddrJmpBackAddr = 0;
 void __declspec(naked)GetStageSelectAddr()
 {
-	__asm pushad
-	LOG(2, "GetStageSelectAddr\n");
-	__asm popad
+	LOG_ASM(2, "GetStageSelectAddr\n");
 
 	__asm
 	{
@@ -449,9 +433,7 @@ void __declspec(naked)GetStageSelectAddr()
 DWORD GetMusicSelectAddrJmpBackAddr = 0;
 void __declspec(naked)GetMusicSelectAddr()
 {
-	__asm pushad
-	LOG(2, "GetMusicSelectAddr\n");
-	__asm popad
+	LOG_ASM(2, "GetMusicSelectAddr\n");
 
 	__asm
 	{
@@ -469,9 +451,7 @@ void __declspec(naked)GetMusicSelectAddr()
 DWORD GetP1ScreenPosXJmpBackAddr = 0;
 void __declspec(naked)GetP1ScreenPosX()
 {
-	//__asm pushad
-	//LOG(2, "GetP1ScreenPosX\n");
-	//__asm popad
+	//LOG_ASM(2, "GetP1ScreenPosX\n");
 
 	__asm
 	{
@@ -481,9 +461,9 @@ void __declspec(naked)GetP1ScreenPosX()
 		add esi, 1C0h
 		mov Containers::gameVals.P1ScreenPosX, esi
 	}
-	//__asm pushad
-	//LOG(2, "Containers::gameVals.P1ScreenPosX: 0x%x\n", Containers::gameVals.P1ScreenPosX);
-	//__asm popad
+
+	//LOG_ASM(2, "Containers::gameVals.P1ScreenPosX: 0x%x\n", Containers::gameVals.P1ScreenPosX);
+
 	__asm
 	{
 		add esi, 4
