@@ -30,18 +30,10 @@ To compile, you should only need to load the sln file and compile as-is. No chan
 Copy the compiled binary, settings.ini, and palettes.ini file from the bin/ folder into the game's root folder.
 
 ## Requirements:
-- Visual Studio 2017 (toolset v141) (Windows SDK 10.0.17763.0)
+- Visual Studio 2019 (toolset v142) (Windows SDK 10)
 - Detours 1.5
 - DirectX SDK
 - Steamworks SDK (v1.42)
-
-
-## Support
-If you feel like throwing some dollars my way feel free to, it enables me spending more time working on the mod.
-
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=C8EDR78DJ8PU2)
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=C8EDR78DJ8PU2)
 
 ## Thanks to the people who have helped the mod along the way:
 * Neptune
