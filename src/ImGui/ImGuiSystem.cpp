@@ -1,24 +1,24 @@
-#include "../../include/ImGui/ImGuiSystem.h"
+#include "ImGuiSystem.h"
+
+#include "Core/info.h"
+#include "Core/logger.h"
+#include "Core/utils.h"
+#include "Game/characters.h"
+#include "Game/containers.h"
+#include "Game/custom_gameModes.h"
+#include "Game/gamestates.h"
+#include "ImGui/fonts.h"
+#include "Network/bbcf_im_networking.h"
+#include "PaletteManager/custom_palette.h"
+#include "PaletteManager/internal_palette_datas.h"
+#include "Web/update_check.h"
+
+#include <ctime>
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
-#include <string>
-#include <stdlib.h>
 #include <sstream>
-#include <time.h>
+#include <string>
 #include "Shlwapi.h"
-#include "../../include/ImGui/fonts.h"
-#include "../../include/utils.h"
-#include "../../include/update_check.h"
-#include "../../include/containers.h"
-#include "../../include/custom_palette.h"
-#include "../../include/steamapi_helper.h"
-#include "../../include/custom_gamemodes.h"
-#include "../../include/gamestates_defines.h"
-#include "../../include/bbcf_im_networking.h"
-#include "../../include/internal_palette_datas.h"
-
-// reminder to myself, pitfall of using imgui in your project:
-// ALWAYS ADD THE IMGUI SOURCE FILES TO YOUR PROJECT OR YOU WILL GET UNRESOLVED EXTERNAL SYMBOL ERRORS
 
 #define MAX_LOG_MSG_LEN 1024
 
@@ -141,8 +141,8 @@ void ImGuiSystem::SetMainWindowTitle(const char *text)
 	else
 	{
 		main_title = "BBCF Improvement Mod ";
-		main_title += version_num;
-#ifndef RELEASE_VER
+		main_title += MOD_VERSION_NUM;
+#ifdef _DEBUG
 		main_title += " (DEBUG)";
 #endif
 	}
@@ -197,8 +197,7 @@ bool ImGuiSystem::Init(void *hwnd, IDirect3DDevice9 *device)
 	Initialized = true;
 	ImGuiSystem::AddLog("[system] Initialization starting...\n");
 
-
-	toggle_key = Settings::getToggleButtonValue();
+	toggle_key = Settings::getButtonValue(Settings::settingsIni.togglebutton);
 	ImGuiSystem::AddLog("[system] Toggling key set to '%s'\n", Settings::settingsIni.togglebutton.c_str());
 
 	LoadPaletteFiles();
@@ -419,7 +418,7 @@ void ImGuiSystem::HandleImGuiWindows()
 			ImGui::Text("= %d", Settings::settingsIni.checkupdates); 
 			ImGui::Separator();
 		}
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 		if (ImGui::Button("Debug"))
 			show_debug_window ^= 1;
 #endif
@@ -446,7 +445,7 @@ void ImGuiSystem::HandleImGuiWindows()
 	}
 
 	// 3. Show the windows!
-#ifndef RELEASE_VER
+#ifdef _DEBUG
 	if (show_demo_window)
 	{
 		ImGui::SetNextWindowPos(ImVec2(550, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
@@ -895,7 +894,7 @@ void ImGuiSystem::WriteLogToFile()
 
 	if (time)
 	{
-		fprintf(file, "BBCFIM %s -- %s\n", version_num, time);
+		fprintf(file, "BBCFIM %s -- %s\n", MOD_VERSION_NUM, time);
 		free(time);
 	}
 	else
@@ -924,7 +923,7 @@ void ImGuiSystem::WriteLogToFile()
 void ImGuiSystem::ShowLogWindow(bool* p_open)
 {
 	// Demo: add random items (if Ctrl is held)
-//#ifndef RELEASE_VER
+//#ifdef _DEBUG
 //	static float last_time = -1.0f;
 //	float time = ImGui::GetTime();
 //	if (time - last_time >= 0.20f && ImGui::GetIO().KeyCtrl)
@@ -1610,7 +1609,7 @@ void ImGuiSystem::ShowGameplaySettingsMenu()
 		//ImGui::Text("\t"); ImGui::SameLine(); ImGui::TextDisabled("NOT ON REPLAY MENU SCREEN");
 	}
 	else if (*Containers::gameVals.pGameMode != GAME_MODE_VERSUS && *Containers::gameVals.pGameMode != GAME_MODE_ONLINE && 
-		*Containers::gameVals.pGameMode != GAME_MODE_TRAINING && *Containers::gameVals.pGameState != GAME_STATE_REPLAY_MENU)//we use gamestate for replay menu, since gamemode sets to 0, if we return to the replay menu via the pause menu
+		*Containers::gameVals.pGameMode != GAME_MODE_TRAINING && *Containers::gameVals.pGameState != GAME_STATE_REPLAY_MENU)//we use gamestate for replay menu, since GameMode sets to 0, if we return to the replay menu via the pause menu
 	{
 		ImGui::Text("\t"); ImGui::SameLine(); ImGui::RadioButton(selectedGameMode.c_str(), true);
 		ImGui::Text("\t"); ImGui::SameLine(); ImGui::TextDisabled("NOT IN ONLINE, TRAINING, OR VERSUS MODES");
@@ -1631,7 +1630,7 @@ void ImGuiSystem::ShowGameplaySettingsMenu()
 			else
 			{
 				if (ImGui::RadioButton(selectedGameMode.c_str(), &activatedGameMode, GameModes[i].id) && Containers::gameVals.opponentSteamID != 0)
-					Send_customGamemode_request(*Containers::gameVals.opponentSteamID);
+					Send_customGameMode_request(*Containers::gameVals.opponentSteamID);
 			}
 			if (ImGui::IsItemHovered() && GameModes[i].desc)
 			{

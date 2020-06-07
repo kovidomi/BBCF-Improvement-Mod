@@ -1,9 +1,13 @@
-#include "../../include/D3D9ExWrapper/ID3D9EXWrapper_Device.h"
-#include "../../include/ImGui/ImGuiSystem.h"
+#include "ID3D9EXWrapper_Device.h"
+
+#include "Core/logger.h"
+#include "Game/containers.h"
+#include "Hooks/hooks_bbcf.h"
+#include "ImGui/ImGuiSystem.h"
+
 #include <steam_api.h>
+
 #pragma comment(lib, "steam_api.lib")
-#include "../../include/additional_hooks.h"
-#include "../../include/containers.h"
 
 Direct3DDevice9ExWrapper::Direct3DDevice9ExWrapper(IDirect3DDevice9Ex **ppReturnedDeviceInterface, D3DPRESENT_PARAMETERS *pPresentParam, IDirect3D9Ex *pIDirect3D9Ex)
 {
@@ -15,8 +19,9 @@ Direct3DDevice9ExWrapper::Direct3DDevice9ExWrapper(IDirect3DDevice9Ex **ppReturn
 
 	//grab pointer
 	Containers::g_interfaces.pD3D9ExWrapper = *ppReturnedDeviceInterface;
+
 	//place all other hooks that can only be placed after steamDRM unpacks the .exe in memory!!!
-	additional_hooks_manual();
+	placeHooks_bbcf();
 }
 
 Direct3DDevice9ExWrapper::~Direct3DDevice9ExWrapper() {}
@@ -325,86 +330,11 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::BeginScene()
 	return m_Direct3DDevice9Ex->BeginScene();
 }
 
-struct hitbox_data
-{
-	bool isHurtbox;
-	float offFromOrigX;
-	float offFromOrigY;
-	float width;
-	float height;
-};
-
-#include "../../include/gamestates_defines.h"
-void draw_hitbox(IDirect3DDevice9Ex *m_Direct3DDevice9Ex, hitbox_data *hb, float flip)
-{
-	if (Containers::gameVals.P1ScreenPosX != 0 || Containers::gameVals.P1ScreenPosY != 0)
-	{
-		auto inner_color = D3DCOLOR_ARGB(255, 0, 0, 0);
-		auto outer_color = D3DCOLOR_ARGB(255, 0, 0, 0);
-
-		struct vertex
-		{
-			float x, y, z, rhw;
-			DWORD color;
-		};
-
-		float p1_x = *Containers::gameVals.P1ScreenPosX;
-		float p1_y = *Containers::gameVals.P1ScreenPosY;
-		D3DXVECTOR3 sp1, sp2, sp3, sp4;
-
-		sp1 = D3DXVECTOR3(p1_x - hb->offFromOrigX * flip, 0.F, p1_y - hb->offFromOrigY);
-		sp2 = D3DXVECTOR3(sp1.x + hb->width * flip, 0.F, sp1.y - hb->height);
-		sp3 = D3DXVECTOR3(sp2.x * flip, 0.F, sp2.y - hb->height);
-		sp4 = D3DXVECTOR3(sp1.x * flip, 0.F, sp1.y - hb->height);
-
-		m_Direct3DDevice9Ex->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-		m_Direct3DDevice9Ex->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		m_Direct3DDevice9Ex->SetPixelShader(nullptr);
-		m_Direct3DDevice9Ex->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-		m_Direct3DDevice9Ex->SetTexture(0, nullptr);
-
-		vertex vertices[] =
-		{
-			{ sp1.x, sp1.y, 0.F, 0.F, inner_color },
-			{ sp2.x, sp2.y, 0.F, 0.F, inner_color },
-			{ sp3.x, sp3.y, 0.F, 0.F, inner_color },
-			{ sp4.x, sp4.y, 0.F, 0.F, inner_color },
-		};
-
-		m_Direct3DDevice9Ex->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertices, sizeof(vertex));
-
-		vertex outline[] =
-		{
-			{ sp1.x, sp1.y, 0.F, 0.F, outer_color },
-			{ sp2.x, sp2.y, 0.F, 0.F, outer_color },
-			{ sp4.x, sp4.y, 0.F, 0.F, outer_color },
-			{ sp3.x, sp3.y, 0.F, 0.F, outer_color },
-			{ sp1.x, sp1.y, 0.F, 0.F, outer_color },
-		};
-
-		m_Direct3DDevice9Ex->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, outline, sizeof(vertex));
-	}
-}
-
 HRESULT APIENTRY Direct3DDevice9ExWrapper::EndScene()
 {
 	LOG(7, "EndScene\n");
 
 	ImGuiSystem::Render();
-
-#ifndef RELEASE_VER
-	if (ImGuiSystem::DrawHitbox)
-	{
-		int hitboxes = Containers::gameVals.P1CharObjPointer->total_hitboxes;
-		hitbox_data *hd = (hitbox_data*)Containers::gameVals.P1CharObjPointer->collision_data;
-
-		for (int i = 0; i < hitboxes; i++)
-		{
-			draw_hitbox(m_Direct3DDevice9Ex, hd, 1.0f);
-			hd += sizeof(hitbox_data);
-		}
-	}
-#endif // !RELEASE_VER
 
 	return m_Direct3DDevice9Ex->EndScene();
 }
@@ -418,47 +348,6 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::Clear(DWORD Count, CONST D3DRECT* pRe
 HRESULT APIENTRY Direct3DDevice9ExWrapper::SetTransform(D3DTRANSFORMSTATETYPE State, CONST D3DMATRIX* pMatrix)
 {
 	LOG(7, "SetTransform %ld &pMatrix: 0x%p &*pMatrix: 0x%p pMatrix: 0x%p\n", State, &pMatrix, &*pMatrix, pMatrix);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pMatrix->_11, pMatrix->_12, pMatrix->_13, pMatrix->_14);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pMatrix->_21, pMatrix->_22, pMatrix->_23, pMatrix->_24);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pMatrix->_31, pMatrix->_32, pMatrix->_33, pMatrix->_34);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pMatrix->_41, pMatrix->_42, pMatrix->_43, pMatrix->_44);
-	//D3DMATRIX pproj;
-	//GetTransform(D3DTS_PROJECTION, &pproj);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pproj._11, pproj._12, pproj._13, pproj._14);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pproj._21, pproj._22, pproj._23, pproj._24);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pproj._31, pproj._32, pproj._33, pproj._34);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pproj._41, pproj._42, pproj._43, pproj._44);
-
-	//D3DXMATRIX ret;
-	//ZeroMemory(&ret, sizeof(ret));
-	//ret._11 = pMatrix->_11;
-	//ret._12 = pMatrix->_12;
-	//ret._13 = pMatrix->_13;
-	//ret._14 = pMatrix->_14;
-	//ret._21 = pMatrix->_21;
-	//ret._22 = pMatrix->_22;
-	//ret._23 = pMatrix->_23;
-	//ret._24 = pMatrix->_24;
-	//ret._31 = pMatrix->_31;
-	//ret._32 = pMatrix->_32;
-	//ret._33 = pMatrix->_33;
-	//ret._34 = pMatrix->_34;
-	//ret._41 = pMatrix->_41;//-1.5; //X (positive right, negative left)
-	//ret._42 = pMatrix->_42;//1.6; //Y (positive up, negative down)
-	//ret._43 = pMatrix->_43;
-	//ret._44 = pMatrix->_44;
-
-	////D3DXMatrixPerspectiveFovLH(&ret, D3DX_PI / 4, 1.0f, 1.0f, 100.0f);
-	////D3DXMatrixScaling(&ret, 1, 1, 0.0f);
-	//HRESULT retu = m_Direct3DDevice9Ex->SetTransform(State, &ret);
-
-	//GetTransform(D3DTS_PROJECTION, &pproj);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pproj._11, pproj._12, pproj._13, pproj._14);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pproj._21, pproj._22, pproj._23, pproj._24);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pproj._31, pproj._32, pproj._33, pproj._34);
-	//LOG(7, "%.2f %.2f %,2 %,2\n", pproj._41, pproj._42, pproj._43, pproj._44);
-
-	//return retu;
 	return m_Direct3DDevice9Ex->SetTransform(State, pMatrix);
 }
 
@@ -488,9 +377,7 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::SetViewport(CONST D3DVIEWPORT9* pView
 
 HRESULT APIENTRY Direct3DDevice9ExWrapper::GetViewport(D3DVIEWPORT9* pViewport)
 {
-	//static D3DVIEWPORT9 APVIEWPORT = {0, 0, 1024, 768, 0.0, 1.0};
 	HRESULT ret = m_Direct3DDevice9Ex->GetViewport(pViewport);
-	//pViewport = &APVIEWPORT;
 	LOG(7, "GetViewport %ld %ld %ld %ld 0x%p\n", pViewport->X, pViewport->Y, pViewport->Width, pViewport->Height, pViewport);
 
 	return ret;
