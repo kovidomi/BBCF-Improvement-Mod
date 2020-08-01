@@ -2,8 +2,8 @@
 
 #include "HookManager.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
-#include "Game/containers.h"
 #include "Game/custom_gameModes.h"
 #include "PaletteManager/custom_palette.h"
 
@@ -89,10 +89,10 @@ void __declspec(naked)GetCharObjPointers()
 		cmp edi, 1
 		je PLAYER2
 		PLAYER1 :
-		mov Containers::gameVals.P1CharObjPointer, eax
+		mov g_gameVals.P1CharObjPointer, eax
 			jmp EXIT
 			PLAYER2 :
-		mov Containers::gameVals.P2CharObjPointer, eax
+		mov g_gameVals.P2CharObjPointer, eax
 			EXIT :
 		popad
 			mov[eax + edi * 4 + 25E8h], esi
@@ -108,33 +108,33 @@ void __declspec(naked)ForceBloomOn()
 	__asm pushad
 	LOG(7, "ForceBloomOn\n");
 
-	if (Containers::gameVals.P1_selectedCharID != -1)
+	if (g_gameVals.P1_selectedCharID != -1)
 	{
-		if (Containers::gameVals.origP1PaletteIndex == 21)
-			Containers::gameVals.isP1BloomOn = 1;
-		else if (Containers::gameVals.P1_selected_custom_pal > 0)
-			Containers::gameVals.isP1BloomOn = Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][Containers::gameVals.P1_selected_custom_pal][9][0];
+		if (g_gameVals.origP1PaletteIndex == 21)
+			g_gameVals.isP1BloomOn = 1;
+		else if (g_gameVals.P1_selected_custom_pal > 0)
+			g_gameVals.isP1BloomOn = g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][g_gameVals.P1_selected_custom_pal][9][0];
 	}
-	if (Containers::gameVals.P2_selectedCharID != -1)
+	if (g_gameVals.P2_selectedCharID != -1)
 	{
-		if (Containers::gameVals.origP2PaletteIndex == 21)
-			Containers::gameVals.isP2BloomOn = 1;
-		else if (Containers::gameVals.P2_selected_custom_pal > 0)
-			Containers::gameVals.isP2BloomOn = Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][Containers::gameVals.P2_selected_custom_pal][9][0];
+		if (g_gameVals.origP2PaletteIndex == 21)
+			g_gameVals.isP2BloomOn = 1;
+		else if (g_gameVals.P2_selected_custom_pal > 0)
+			g_gameVals.isP2BloomOn = g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][g_gameVals.P2_selected_custom_pal][9][0];
 	}
 	__asm popad
 
 	__asm
 	{
-		mov eax, [Containers::gameVals.P1CharObjPointer]
+		mov eax, [g_gameVals.P1CharObjPointer]
 		cmp edi, eax
 		jne PLAYER2
 		PLAYER1 :
-		cmp Containers::gameVals.isP1BloomOn, 1
+		cmp g_gameVals.isP1BloomOn, 1
 			je TURN_BLOOM_ON
 			jmp[restoredForceBloomOffAddr]
 			PLAYER2 :
-			cmp Containers::gameVals.isP2BloomOn, 1
+			cmp g_gameVals.isP2BloomOn, 1
 			je TURN_BLOOM_ON
 			jmp[restoredForceBloomOffAddr]
 			TURN_BLOOM_ON :
@@ -147,24 +147,24 @@ void __declspec(naked)CPUsPaletteIndexAndCharIDArcadeFix()
 {
 	__asm pushad
 	LOG(2, "CPUsPaletteIndexAndCharIDArcadeFix\n");
-	if (Containers::gameVals.isP1CPU)
-		Containers::gameVals.P1DefaultPalBackup[0] = "";
+	if (g_gameVals.isP1CPU)
+		g_gameVals.P1DefaultPalBackup[0] = "";
 	else
-		Containers::gameVals.P2DefaultPalBackup[0] = "";
+		g_gameVals.P2DefaultPalBackup[0] = "";
 	__asm popad
 
 	__asm
 	{
 		mov ebx, edi
 		add ebx, 1650h
-		cmp Containers::gameVals.isP1CPU, 1
+		cmp g_gameVals.isP1CPU, 1
 		je SET_TO_PLAYER1
-		mov Containers::gameVals.P2PaletteIndex, ebx
-		mov Containers::gameVals.P2_selectedCharID, eax
+		mov g_gameVals.P2PaletteIndex, ebx
+		mov g_gameVals.P2_selectedCharID, eax
 		jmp EXIT
 		SET_TO_PLAYER1 :
-		mov Containers::gameVals.P1PaletteIndex, ebx
-			mov Containers::gameVals.P1_selectedCharID, eax
+		mov g_gameVals.P1PaletteIndex, ebx
+			mov g_gameVals.P1_selectedCharID, eax
 			EXIT :
 		mov[edi + 1648h], eax
 			jmp[CPUsPaletteIndexAndCharIDArcadeFixJmpBackAddr]
@@ -179,7 +179,7 @@ void __declspec(naked)GetIsP1CPU()
 	__asm
 	{
 		mov[eax + 1688h], edi
-		mov Containers::gameVals.isP1CPU, edi;
+		mov g_gameVals.isP1CPU, edi;
 		jmp[GetIsP1CPUJmpBackAddr]
 	}
 }
@@ -188,49 +188,49 @@ void __declspec(naked)GetP1CharIDTrainingModeCharIDChange()
 {
 	__asm pushad
 	LOG(2, "GetP1CharIDTrainingModeCharIDChange\n");
-	Containers::gameVals.P1DefaultPalBackup[0] = "";
-	Containers::tempVals.paledit_show_sel_by_highlight = false;
-	Containers::tempVals.paledit_show_placeholder = false;
+	g_gameVals.P1DefaultPalBackup[0] = "";
+	g_tempVals.paledit_show_sel_by_highlight = false;
+	g_tempVals.paledit_show_placeholder = false;
 	__asm popad
 
 	__asm
 	{
 		mov ecx, [ebp - 1Ch]
-		cmp[Containers::gameVals.isP1CPU], 1
+		cmp[g_gameVals.isP1CPU], 1
 		je PLAYER2
 		PLAYER1 :
-		cmp Containers::gameVals.P1_selectedCharID, ecx
+		cmp g_gameVals.P1_selectedCharID, ecx
 			JNE CHANGE1
 			KEEP1 :
 		push ecx
 			push eax
-			mov ecx, Containers::gameVals.origP1PaletteIndex //*Containers::gameVals.P1PaletteIndex = Containers::gameVals.origP1PaletteIndex;
-			mov eax, Containers::gameVals.P1PaletteIndex
+			mov ecx, g_gameVals.origP1PaletteIndex //*g_gameVals.P1PaletteIndex = g_gameVals.origP1PaletteIndex;
+			mov eax, g_gameVals.P1PaletteIndex
 			mov[eax], ecx
 			pop eax
 			pop ecx
 			jmp[EXIT]
 			CHANGE1:
-		mov Containers::gameVals.P1_selectedCharID, ecx
-			mov Containers::gameVals.P1_selected_custom_pal, 0
-			mov Containers::gameVals.origP1PaletteIndex, 0
+		mov g_gameVals.P1_selectedCharID, ecx
+			mov g_gameVals.P1_selected_custom_pal, 0
+			mov g_gameVals.origP1PaletteIndex, 0
 			jmp[EXIT]
 			PLAYER2 :
-			cmp Containers::gameVals.P2_selectedCharID, ecx
+			cmp g_gameVals.P2_selectedCharID, ecx
 			JNE CHANGE2
 			KEEP2 :
 		push ecx
 			push eax
-			mov ecx, Containers::gameVals.origP2PaletteIndex //*Containers::gameVals.P2PaletteIndex = Containers::gameVals.origP2PaletteIndex;
-			mov eax, Containers::gameVals.P2PaletteIndex
+			mov ecx, g_gameVals.origP2PaletteIndex //*g_gameVals.P2PaletteIndex = g_gameVals.origP2PaletteIndex;
+			mov eax, g_gameVals.P2PaletteIndex
 			mov[eax], ecx
 			pop eax
 			pop ecx
 			jmp[EXIT]
 			CHANGE2:
-		mov Containers::gameVals.P2_selectedCharID, ecx
-			mov Containers::gameVals.P2_selected_custom_pal, 0
-			mov Containers::gameVals.origP2PaletteIndex, 0
+		mov g_gameVals.P2_selectedCharID, ecx
+			mov g_gameVals.P2_selected_custom_pal, 0
+			mov g_gameVals.origP2PaletteIndex, 0
 			EXIT :
 			mov[eax], ecx
 			jmp[GetP1CharIDTrainingModeCharIDChangeJmpBackAddr]
@@ -241,49 +241,49 @@ void __declspec(naked)GetP2CharIDTrainingModeCharIDChange()
 {
 	__asm pushad
 	LOG(2, "GetP2CharIDTrainingModeCharIDChange\n");
-	Containers::gameVals.P2DefaultPalBackup[0] = "";
-	Containers::tempVals.paledit_show_sel_by_highlight = false;
-	Containers::tempVals.paledit_show_placeholder = false;
+	g_gameVals.P2DefaultPalBackup[0] = "";
+	g_tempVals.paledit_show_sel_by_highlight = false;
+	g_tempVals.paledit_show_placeholder = false;
 	__asm popad
 
 	__asm
 	{
 		push edi
 		mov[eax], esi
-		cmp[Containers::gameVals.isP1CPU], 1
+		cmp[g_gameVals.isP1CPU], 1
 		je PLAYER1
-		cmp Containers::gameVals.P2_selectedCharID, esi
+		cmp g_gameVals.P2_selectedCharID, esi
 		JNE CHANGE2
 		KEEP2 :
 		push esi
 			push eax
-			mov esi, Containers::gameVals.origP2PaletteIndex //*Containers::gameVals.P2PaletteIndex = Containers::gameVals.origP2PaletteIndex;
-			mov eax, Containers::gameVals.P2PaletteIndex
+			mov esi, g_gameVals.origP2PaletteIndex //*g_gameVals.P2PaletteIndex = g_gameVals.origP2PaletteIndex;
+			mov eax, g_gameVals.P2PaletteIndex
 			mov[eax], esi
 			pop eax
 			pop esi
 			jmp[EXIT]
 			CHANGE2:
-		mov Containers::gameVals.P2_selectedCharID, esi
-			mov Containers::gameVals.P2_selected_custom_pal, 0
-			mov Containers::gameVals.origP2PaletteIndex, 0
+		mov g_gameVals.P2_selectedCharID, esi
+			mov g_gameVals.P2_selected_custom_pal, 0
+			mov g_gameVals.origP2PaletteIndex, 0
 			jmp[EXIT]
 			PLAYER1 :
-			cmp Containers::gameVals.P1_selectedCharID, esi
+			cmp g_gameVals.P1_selectedCharID, esi
 			JNE CHANGE1
 			KEEP1 :
 		push esi
 			push eax
-			mov esi, Containers::gameVals.origP1PaletteIndex //*Containers::gameVals.P1PaletteIndex = Containers::gameVals.origP1PaletteIndex;
-			mov eax, Containers::gameVals.P1PaletteIndex
+			mov esi, g_gameVals.origP1PaletteIndex //*g_gameVals.P1PaletteIndex = g_gameVals.origP1PaletteIndex;
+			mov eax, g_gameVals.P1PaletteIndex
 			mov[eax], esi
 			pop eax
 			pop esi
 			jmp[EXIT]
 			CHANGE1:
-		mov Containers::gameVals.P1_selectedCharID, esi
-			mov Containers::gameVals.P1_selected_custom_pal, 0
-			mov Containers::gameVals.origP1PaletteIndex, 0
+		mov g_gameVals.P1_selectedCharID, esi
+			mov g_gameVals.P1_selected_custom_pal, 0
+			mov g_gameVals.origP1PaletteIndex, 0
 			EXIT :
 			call restoredGetP2CharIDTrainingModeCharAddr
 			jmp[GetP2CharIDTrainingModeCharIDChangeJmpBackAddr]
@@ -296,7 +296,7 @@ void __declspec(naked)GetP2CharIDVersusScreenMP()
 
 	__asm
 	{
-		mov Containers::gameVals.P2_selectedCharID, ecx
+		mov g_gameVals.P2_selectedCharID, ecx
 		mov[eax], ecx
 		push 1
 		mov ecx, edi
@@ -310,7 +310,7 @@ void __declspec(naked)GetP1CharIDVersusScreenMP()
 
 	__asm
 	{
-		mov Containers::gameVals.P1_selectedCharID, ecx
+		mov g_gameVals.P1_selectedCharID, ecx
 		mov[eax], ecx
 		push 0
 		mov ecx, edi
@@ -329,12 +329,12 @@ void __declspec(naked)GetCPUsCharIDVersusScreenSP()
 
 	__asm
 	{
-		cmp Containers::gameVals.isP1CPU, 1
+		cmp g_gameVals.isP1CPU, 1
 		jne SET_TO_PLAYER2
-		mov Containers::gameVals.P1_selectedCharID, eax
+		mov g_gameVals.P1_selectedCharID, eax
 		jmp EXIT
 		SET_TO_PLAYER2 :
-		mov Containers::gameVals.P2_selectedCharID, eax
+		mov g_gameVals.P2_selectedCharID, eax
 			EXIT :
 		mov[esi + 1648h], eax
 			jmp[GetCPUsCharIDVersusScreenSPJmpBackAddr]
@@ -352,14 +352,14 @@ void __declspec(naked)GetPlayersCharIDVersusScreenSP()
 
 	__asm
 	{
-		cmp Containers::gameVals.isP1CPU, 1
+		cmp g_gameVals.isP1CPU, 1
 		je SET_TO_PLAYER2
-		cmp Containers::tempVals.PlayersCharIDVersusScreenCounter, 1
+		cmp g_tempVals.PlayersCharIDVersusScreenCounter, 1
 		je SET_TO_PLAYER2
-		mov Containers::gameVals.P1_selectedCharID, eax
+		mov g_gameVals.P1_selectedCharID, eax
 		jmp EXIT
 		SET_TO_PLAYER2 :
-		mov Containers::gameVals.P2_selectedCharID, eax
+		mov g_gameVals.P2_selectedCharID, eax
 			EXIT :
 		mov[edi + 1648h], eax
 			jmp[GetPlayersCharIDVersusScreenSPJmpBackAddr]
@@ -402,22 +402,22 @@ void __declspec(naked)GetP1P2CharIDCharSelectSP()
 		PLAYER1 :
 	}
 	//reset custom palette selection if player hovers over an another character, so we avoid array out of bounds
-	Containers::gameVals.thisPlayerNum = 1;
-	if (curSelection != Containers::gameVals.P1_selectedCharID)
-		Containers::gameVals.P1_selected_custom_pal = 0;
+	g_gameVals.thisPlayerNum = 1;
+	if (curSelection != g_gameVals.P1_selectedCharID)
+		g_gameVals.P1_selected_custom_pal = 0;
 	__asm
 	{
-		mov Containers::gameVals.P1_selectedCharID, eax
+		mov g_gameVals.P1_selectedCharID, eax
 		jmp EXIT
 		PLAYER2 :
 	}
 	//reset custom palette selection if player hovers over an another character, so we avoid array out of bounds
-	Containers::gameVals.thisPlayerNum = 2;
-	if (curSelection != Containers::gameVals.P2_selectedCharID)
-		Containers::gameVals.P2_selected_custom_pal = 0;
+	g_gameVals.thisPlayerNum = 2;
+	if (curSelection != g_gameVals.P2_selectedCharID)
+		g_gameVals.P2_selected_custom_pal = 0;
 	__asm
 	{
-		mov Containers::gameVals.P2_selectedCharID, eax
+		mov g_gameVals.P2_selectedCharID, eax
 		EXIT :
 		popad
 			mov[esi + edi * 4 + 0A0Ch], eax
@@ -431,17 +431,17 @@ void __declspec(naked)GetGameStateCharacterSelect()
 
 	__asm pushad
 
-	Containers::gameVals.startMatchPalettesInit = false;
+	g_gameVals.startMatchPalettesInit = false;
 	ResettingDefaultPalettes();
 
 	//as of right now, the opponent's steamid is not known until the match starts
-	//if (Containers::gameVals.opponentSteamID)
+	//if (g_gameVals.opponentSteamID)
 	//	ImGuiSystem::AddLog("[system] Online match has started.\n");
-	if (Containers::tempVals.opponentIDToBeDeleted)
+	if (g_tempVals.opponentIDToBeDeleted)
 	{
 		LOG(2, "Deleting previous opponentSteamID, resetting...\n");
-		delete Containers::tempVals.opponentIDToBeDeleted;
-		Containers::tempVals.opponentIDToBeDeleted = 0;
+		delete g_tempVals.opponentIDToBeDeleted;
+		g_tempVals.opponentIDToBeDeleted = 0;
 	}
 	__asm popad
 
@@ -461,9 +461,9 @@ void __declspec(naked)MatchIntroStartsPlayingFunc()
 
 	InitCustomGameMode();
 
-	if (!Containers::gameVals.startMatchPalettesInit &&
-		Containers::gameVals.P1_selectedCharID != -1 &&
-		Containers::gameVals.P2_selectedCharID != -1)
+	if (!g_gameVals.startMatchPalettesInit &&
+		g_gameVals.P1_selectedCharID != -1 &&
+		g_gameVals.P2_selectedCharID != -1)
 	{
 		LOG(2, "Applying custom palettes, sending to opponent...\n");
 
@@ -474,7 +474,7 @@ void __declspec(naked)MatchIntroStartsPlayingFunc()
 		ReplaceP2Palette(false);
 		////send now once
 		SendCustomDatas();
-		Containers::gameVals.startMatchPalettesInit = true;
+		g_gameVals.startMatchPalettesInit = true;
 		HandleSavedPackets();
 	}
 	__asm
@@ -492,12 +492,12 @@ void __declspec(naked)GetOwnSteamID()
 	__asm
 	{
 		mov[edi], eax
-		cmp Containers::gameVals.ownSteamID, 0
+		cmp g_gameVals.ownSteamID, 0
 		jne EXIT
-		mov Containers::gameVals.ownSteamID, edi
+		mov g_gameVals.ownSteamID, edi
 	}
 
-	LOG_ASM(2, "OwnSteamID: 0x%x\n", *Containers::gameVals.ownSteamID);
+	LOG_ASM(2, "OwnSteamID: 0x%x\n", *g_gameVals.ownSteamID);
 
 	__asm
 	{
@@ -541,20 +541,20 @@ void __declspec(naked) GetPlayersPaletteIndexSPPointer()
 		push eax
 		mov eax, edi // <---- esi to edi fixed here!!!!!!!!!!!!!!!!!!!!!!!
 		add eax, 1650h
-		cmp Containers::gameVals.isP1CPU, 1
+		cmp g_gameVals.isP1CPU, 1
 		je SET_TO_PLAYER2
-		cmp Containers::tempVals.PlayersCharIDVersusScreenCounter, 1
+		cmp g_tempVals.PlayersCharIDVersusScreenCounter, 1
 		je SET_TO_PLAYER2
-		mov Containers::gameVals.P1PaletteIndex, eax //grab address
+		mov g_gameVals.P1PaletteIndex, eax //grab address
 		pop eax
-		mov Containers::gameVals.origP1PaletteIndex, eax //get value of paletteIndex
+		mov g_gameVals.origP1PaletteIndex, eax //get value of paletteIndex
 		jmp EXIT
 		SET_TO_PLAYER2 :
-		mov Containers::gameVals.P2PaletteIndex, eax //grab address
+		mov g_gameVals.P2PaletteIndex, eax //grab address
 			pop eax
-			mov Containers::gameVals.origP2PaletteIndex, eax //get value of paletteIndex
+			mov g_gameVals.origP2PaletteIndex, eax //get value of paletteIndex
 			EXIT :
-		add Containers::tempVals.PlayersCharIDVersusScreenCounter, 1
+		add g_tempVals.PlayersCharIDVersusScreenCounter, 1
 			mov[edi + 1650h], eax //original opcodes here
 			jmp[GetPlayersPaletteIndexSPJmpBackAddr] //jump back
 	}
@@ -580,16 +580,16 @@ void __declspec(naked) GetCPUsPaletteIndexSPPointer()
 		push eax
 		mov eax, esi
 		add eax, 1650h
-		cmp Containers::gameVals.isP1CPU, 1
+		cmp g_gameVals.isP1CPU, 1
 		jne SET_TO_PLAYER2
-		mov Containers::gameVals.P1PaletteIndex, eax
+		mov g_gameVals.P1PaletteIndex, eax
 		pop eax
-		mov Containers::gameVals.origP2PaletteIndex, eax //get value of paletteIndex
+		mov g_gameVals.origP2PaletteIndex, eax //get value of paletteIndex
 		jmp EXIT
 		SET_TO_PLAYER2 :
-		mov Containers::gameVals.P2PaletteIndex, eax //grab address
+		mov g_gameVals.P2PaletteIndex, eax //grab address
 			pop eax
-			mov Containers::gameVals.origP2PaletteIndex, eax //get value of paletteIndex
+			mov g_gameVals.origP2PaletteIndex, eax //get value of paletteIndex
 			EXIT :
 		mov[esi + 1650h], eax //original opcodes here
 			jmp[GetCPUsPaletteIndexSPJmpBackAddr] //jump back
@@ -604,7 +604,7 @@ void __declspec(naked) GetP1PaletteIndexMPPointer()
 	{
 		push eax
 		add eax, 8
-		mov[Containers::gameVals.P1PaletteIndex], eax
+		mov[g_gameVals.P1PaletteIndex], eax
 		pop eax
 		//..
 		mov[eax + 8], ecx //orig
@@ -621,7 +621,7 @@ void __declspec(naked) GetP2PaletteIndexMPPointer()
 	{
 		push eax
 		add eax, 8
-		mov[Containers::gameVals.P2PaletteIndex], eax
+		mov[g_gameVals.P2PaletteIndex], eax
 		pop eax
 		//..
 		mov[eax + 8], ecx
@@ -643,12 +643,12 @@ void __declspec(naked) GrabP1P2PalettePointers()
 
 		cmp DWORD PTR counter, 0
 		jne SHORT COUNTERCOMPARE2
-		mov DWORD PTR Containers::gameVals.P1PaletteBase, eax
+		mov DWORD PTR g_gameVals.P1PaletteBase, eax
 		jmp SHORT COUNTERCOMPARE3
 		COUNTERCOMPARE2 :
 		cmp DWORD PTR counter, 1
 			jne SHORT COUNTERCOMPARE3
-			mov DWORD PTR Containers::gameVals.P2PaletteBase, eax
+			mov DWORD PTR g_gameVals.P2PaletteBase, eax
 			COUNTERCOMPARE3 :
 		mov eax, DWORD PTR counter
 			add eax, 1
@@ -659,13 +659,13 @@ void __declspec(naked) GrabP1P2PalettePointers()
 	}
 	if (counter == 3)
 	{
-		if (Containers::gameVals.P1PaletteIndex != 0 && Containers::gameVals.P2PaletteIndex != 0)
+		if (g_gameVals.P1PaletteIndex != 0 && g_gameVals.P2PaletteIndex != 0)
 		{
 			//backup the values of palette indexes as we will switch them, so we know what they were originally
-			if (Containers::gameVals.startMatchPalettesInit == false)
+			if (g_gameVals.startMatchPalettesInit == false)
 			{
-				Containers::gameVals.origP1PaletteIndex = *Containers::gameVals.P1PaletteIndex;
-				Containers::gameVals.origP2PaletteIndex = *Containers::gameVals.P2PaletteIndex;
+				g_gameVals.origP1PaletteIndex = *g_gameVals.P1PaletteIndex;
+				g_gameVals.origP2PaletteIndex = *g_gameVals.P2PaletteIndex;
 			}
 			DereferenceP1P2PalettePointers();
 		}

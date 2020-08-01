@@ -1,8 +1,8 @@
 #include "network_manager.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/utils.h"
-#include "Game/containers.h"
 #include "ImGui/ImGuiSystem.h"
 #include "Network/bbcf_im_networking.h"
 #include "PaletteManager/custom_palette.h"
@@ -71,10 +71,10 @@ bool NetworkManager::SendPacket(CSteamID *playerID, im_packet_t *packet)
 		return ret;
 	}
 
-	for (int i = 0; i < Containers::gameVals.playersInMatch.size(); i++)
+	for (int i = 0; i < g_gameVals.playersInMatch.size(); i++)
 	{
-		LOG(2, "Sending packet to: 0x%x\n", Containers::gameVals.playersInMatch[i]);
-		ret = pSteamNetworking->SendP2PPacket(Containers::gameVals.playersInMatch[i], &internal_packet, internal_packet.length1, sendtype, 0);
+		LOG(2, "Sending packet to: 0x%x\n", g_gameVals.playersInMatch[i]);
+		ret = pSteamNetworking->SendP2PPacket(g_gameVals.playersInMatch[i], &internal_packet, internal_packet.length1, sendtype, 0);
 	}
 
 	return ret;

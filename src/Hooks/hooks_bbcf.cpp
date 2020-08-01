@@ -3,9 +3,9 @@
 #include "hooks_palette.h"
 #include "hooks_steamApiWrapper.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/utils.h"
-#include "Game/containers.h"
 #include "Game/custom_gameModes.h"
 #include "Game/gamestates.h"
 #include "Hooks/HookManager.h"
@@ -23,15 +23,15 @@ void __declspec(naked)GetGameStateTitleScreen()
 	{
 		pushad
 		add edi, 10Ch
-		lea ebx, Containers::gameVals.pGameState
+		lea ebx, g_gameVals.pGameState
 		mov[ebx], edi
 	}
 
 	placeHooks_steamApiWrapper();
 
 	ImGuiSystem::Init(
-		Containers::gameProc.hWndGameWindow,
-		Containers::g_interfaces.pD3D9ExWrapper);
+		g_gameProc.hWndGameWindow,
+		g_interfaces.pD3D9ExWrapper);
 	__asm
 	{
 		popad
@@ -43,29 +43,29 @@ void __declspec(naked)GetGameStateTitleScreen()
 void ResetBackToMenu()
 {
 	//copying the same stuffs here as in GameStateLobby
-	if (Containers::gameVals.opponentSteamID)
+	if (g_gameVals.opponentSteamID)
 	{
-		Containers::tempVals.opponentIDToBeDeleted = Containers::gameVals.opponentSteamID;
-		Containers::gameVals.opponentSteamID = 0;
+		g_tempVals.opponentIDToBeDeleted = g_gameVals.opponentSteamID;
+		g_gameVals.opponentSteamID = 0;
 	}
 
-	Containers::gameVals.thisPlayerNum = 0;
-	Containers::gameVals.bOpponentUsingBBCFIM = false;
-	Containers::gameVals.bP1UsingBBCFIM = false;
-	Containers::gameVals.bP2UsingBBCFIM = false;
+	g_gameVals.thisPlayerNum = 0;
+	g_gameVals.bOpponentUsingBBCFIM = false;
+	g_gameVals.bP1UsingBBCFIM = false;
+	g_gameVals.bP2UsingBBCFIM = false;
 	ResettingDefaultPalettes();
-	Containers::gameVals.P1_selectedCharID = -1;
-	Containers::gameVals.P2_selectedCharID = -1;
-	Containers::gameVals.P1CurPalette = 0;
-	Containers::gameVals.P2CurPalette = 0;
-	Containers::gameVals.startMatchPalettesInit = false;
-	Containers::g_interfaces.pSteamApiHelper->UpdateNumberOfCurrentPlayers();
-	Containers::tempVals.PlayersCharIDVersusScreenCounter = 0;
-	Containers::gameVals.charSelectInit = false;
-	Containers::gameVals.playersInMatch.clear();
-	Containers::gameVals.totalReadPackets = 0;
-	Containers::tempVals.paledit_show_sel_by_highlight = false;
-	Containers::tempVals.paledit_show_placeholder = false;
+	g_gameVals.P1_selectedCharID = -1;
+	g_gameVals.P2_selectedCharID = -1;
+	g_gameVals.P1CurPalette = 0;
+	g_gameVals.P2CurPalette = 0;
+	g_gameVals.startMatchPalettesInit = false;
+	g_interfaces.pSteamApiHelper->UpdateNumberOfCurrentPlayers();
+	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
+	g_gameVals.charSelectInit = false;
+	g_gameVals.playersInMatch.clear();
+	g_gameVals.totalReadPackets = 0;
+	g_tempVals.paledit_show_sel_by_highlight = false;
+	g_tempVals.paledit_show_placeholder = false;
 
 	EndCustomGameMode();
 }
@@ -81,15 +81,15 @@ void __declspec(naked)GetGameStateMenuScreen()
 	{
 		pushad
 		add eax, 10Ch
-		lea ebx, Containers::gameVals.pGameState
+		lea ebx, g_gameVals.pGameState
 		mov[ebx], eax
 	}
 
 	placeHooks_steamApiWrapper();
 	
 	ImGuiSystem::Init(
-		Containers::gameProc.hWndGameWindow,
-		Containers::g_interfaces.pD3D9ExWrapper);
+		g_gameProc.hWndGameWindow,
+		g_interfaces.pD3D9ExWrapper);
 
 	ResetBackToMenu();
 
@@ -127,20 +127,20 @@ void __declspec(naked)GetGameStateMatchStart()
 	_asm popad
 	__asm pushad
 
-	Containers::gameVals.startMatchPalettesInit = false;
-	Containers::gameVals.isP1BloomOn = 0;
-	Containers::gameVals.isP2BloomOn = 0;
-	Containers::tempVals.PlayersCharIDVersusScreenCounter = 0;
+	g_gameVals.startMatchPalettesInit = false;
+	g_gameVals.isP1BloomOn = 0;
+	g_gameVals.isP2BloomOn = 0;
+	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
 
 	ImGuiSystem::AddLogSeparator();
 
-	if (*Containers::gameVals.pGameMode == GAME_MODE_ONLINE)
+	if (*g_gameVals.pGameMode == GameMode_Online)
 	{
-		//Containers::g_interfaces.pSteamApiHelper->GetRequestUserInformation(*Containers::gameVals.opponentSteamID);
-		//ImGuiSystem::AddLog("[system] Online match against '%s' has started\n", Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
+		//g_interfaces.pSteamApiHelper->GetRequestUserInformation(*g_gameVals.opponentSteamID);
+		//ImGuiSystem::AddLog("[system] Online match against '%s' has started\n", g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
 		ImGuiSystem::AddLog("[system] Online match has started\n");
 #ifdef _DEBUG
-		ImGuiSystem::AddLog("[debug] Local player is from %s\n", Containers::g_interfaces.pSteamUtilsWrapper->GetIPCountry());
+		ImGuiSystem::AddLog("[debug] Local player is from %s\n", g_interfaces.pSteamUtilsWrapper->GetIPCountry());
 #endif
 	}
 	else
@@ -163,12 +163,12 @@ void __declspec(naked)GetGameStateVictoryScreen()
 	LOG(2, "GetGameStateVictoryScreen\n");
 
 	ResettingDefaultPalettes();
-	Containers::gameVals.startMatchPalettesInit = false;
+	g_gameVals.startMatchPalettesInit = false;
 	//restore original palette indexes so they will be correct on rematch
-	if (Containers::gameVals.P1PaletteIndex)
-		*Containers::gameVals.P1PaletteIndex = Containers::gameVals.origP1PaletteIndex;
-	if (Containers::gameVals.P2PaletteIndex)
-		*Containers::gameVals.P2PaletteIndex = Containers::gameVals.origP2PaletteIndex;
+	if (g_gameVals.P1PaletteIndex)
+		*g_gameVals.P1PaletteIndex = g_gameVals.origP1PaletteIndex;
+	if (g_gameVals.P2PaletteIndex)
+		*g_gameVals.P2PaletteIndex = g_gameVals.origP2PaletteIndex;
 
 	__asm popad
 
@@ -184,7 +184,7 @@ void __declspec(naked)GetGameStateVersusScreen()
 {
 	LOG_ASM(2, "GetGameStateVersusScreen\n");
 
-	Containers::tempVals.PlayersCharIDVersusScreenCounter = 0;
+	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
 
 	__asm
 	{
@@ -200,12 +200,12 @@ void __declspec(naked)GetGameStateReplayMenuScreen()
 	LOG(2, "GetGameStateReplayMenuScreen\n");
 
 	ResettingDefaultPalettes();
-	Containers::gameVals.P1_selectedCharID = -1;
-	Containers::gameVals.P2_selectedCharID = -1;
-	Containers::gameVals.P1CurPalette = 0;
-	Containers::gameVals.P2CurPalette = 0;
-	Containers::gameVals.startMatchPalettesInit = false;
-	Containers::tempVals.PlayersCharIDVersusScreenCounter = 0;
+	g_gameVals.P1_selectedCharID = -1;
+	g_gameVals.P2_selectedCharID = -1;
+	g_gameVals.P1CurPalette = 0;
+	g_gameVals.P2CurPalette = 0;
+	g_gameVals.startMatchPalettesInit = false;
+	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
 
 	EndCustomGameMode();
 	__asm popad
@@ -280,7 +280,7 @@ void __declspec(naked)PacketProcessingFunc()
 			sub ecx, 2 //<-- - set ecx at packet.length2
 			mov packet, ecx //<-- - align packet pointer ontop of packet.length2
 	}
-	Containers::g_interfaces.pNetworkManager->PacketProcesser(packet);
+	g_interfaces.pNetworkManager->PacketProcesser(packet);
 	_asm
 	{
 		popad
@@ -310,19 +310,19 @@ void __declspec(naked)GetPlayerAvatarBaseFunc()
 		mov eax, ebx
 		add eax, 0CAh
 		add eax, 6h
-		mov Containers::gameVals.playerAvatarBaseAddr, eax
+		mov g_gameVals.playerAvatarBaseAddr, eax
 	}
 
-	Containers::gameVals.playerAvatarAddr = reinterpret_cast<int*>(Containers::gameVals.playerAvatarBaseAddr + 0x610C);
-	Containers::gameVals.playerAvatarColAddr = reinterpret_cast<int*>(Containers::gameVals.playerAvatarBaseAddr + 0x6110);
-	Containers::gameVals.playerAvatarAcc1 = reinterpret_cast<BYTE*>(Containers::gameVals.playerAvatarBaseAddr + 0x61C4);
-	Containers::gameVals.playerAvatarAcc2 = reinterpret_cast<BYTE*>(Containers::gameVals.playerAvatarBaseAddr + 0x61C5);
+	g_gameVals.playerAvatarAddr = reinterpret_cast<int*>(g_gameVals.playerAvatarBaseAddr + 0x610C);
+	g_gameVals.playerAvatarColAddr = reinterpret_cast<int*>(g_gameVals.playerAvatarBaseAddr + 0x6110);
+	g_gameVals.playerAvatarAcc1 = reinterpret_cast<BYTE*>(g_gameVals.playerAvatarBaseAddr + 0x61C4);
+	g_gameVals.playerAvatarAcc2 = reinterpret_cast<BYTE*>(g_gameVals.playerAvatarBaseAddr + 0x61C5);
 
-	LOG(2, "Containers::gameVals.playerAvatarBaseAddr: 0x%x\n", Containers::gameVals.playerAvatarBaseAddr);
-	LOG(2, "Containers::gameVals.playerAvatarAddr: 0x%x\n", Containers::gameVals.playerAvatarAddr);
-	LOG(2, "Containers::gameVals.playerAvatarColAddr: 0x%x\n", Containers::gameVals.playerAvatarColAddr);
-	LOG(2, "Containers::gameVals.playerAvatarAcc1: 0x%x\n", Containers::gameVals.playerAvatarAcc1);
-	LOG(2, "Containers::gameVals.playerAvatarAcc2: 0x%x\n", Containers::gameVals.playerAvatarAcc2);
+	LOG(2, "g_gameVals.playerAvatarBaseAddr: 0x%x\n", g_gameVals.playerAvatarBaseAddr);
+	LOG(2, "g_gameVals.playerAvatarAddr: 0x%x\n", g_gameVals.playerAvatarAddr);
+	LOG(2, "g_gameVals.playerAvatarColAddr: 0x%x\n", g_gameVals.playerAvatarColAddr);
+	LOG(2, "g_gameVals.playerAvatarAcc1: 0x%x\n", g_gameVals.playerAvatarAcc1);
+	LOG(2, "g_gameVals.playerAvatarAcc2: 0x%x\n", g_gameVals.playerAvatarAcc2);
 	
 	//restore the original optcodes after grabbing the addresses, nothing else to do here
 	HookManager::DeactivateHook("GetPlayerAvatarBaseFunc");
@@ -358,7 +358,7 @@ void __declspec(naked)GetGameModeIndexPointer()
 	{
 		push eax
 		add eax, 108h
-		mov[Containers::gameVals.pGameMode], eax
+		mov[g_gameVals.pGameMode], eax
 		pop eax
 		mov dword ptr[eax + 108h], 0Dh
 		jmp[GetGameModeIndexPointerJmpBackAddr]
@@ -375,11 +375,11 @@ void __declspec(naked)GetSetMatchVariables()
 		//grab the pointers
 		push ecx
 		add ecx, 30h
-		mov[Containers::gameVals.pMatchState], ecx //ecx +30h
+		mov[g_gameVals.pMatchState], ecx //ecx +30h
 		sub ecx, 18h
-		mov[Containers::gameVals.pMatchTimer], ecx //ecx +18h
+		mov[g_gameVals.pMatchTimer], ecx //ecx +18h
 		sub ecx, 14h
-		mov[Containers::gameVals.pMatchRounds], ecx //ecx +4h
+		mov[g_gameVals.pMatchRounds], ecx //ecx +4h
 		pop ecx
 	}
 
@@ -398,8 +398,8 @@ void __declspec(naked)MatchStateFightStart()
 	__asm pushad
 	if (activatedGameMode == customGameMode_overdrive)
 	{
-		Containers::gameVals.P1CharObjPointer->overdrive_timeleft = 1;
-		Containers::gameVals.P2CharObjPointer->overdrive_timeleft = 1;
+		g_gameVals.P1CharObjPointer->overdriveTimeleft = 1;
+		g_gameVals.P2CharObjPointer->overdriveTimeleft = 1;
 	}
 	__asm popad
 	__asm
@@ -420,11 +420,11 @@ void __declspec(naked)GetStageSelectAddr()
 		push eax
 		mov eax, ecx
 		add eax, 0A0h
-		mov Containers::gameVals.stageListMemory, eax
+		mov g_gameVals.stageListMemory, eax
 		add eax, 0EB0h
-		mov Containers::gameVals.stageSelect_X, eax
+		mov g_gameVals.stageSelect_X, eax
 		add eax, 4h
-		mov Containers::gameVals.stageSelect_Y, eax
+		mov g_gameVals.stageSelect_Y, eax
 		pop eax
 		jmp[GetStageSelectAddrJmpBackAddr]
 	}
@@ -438,11 +438,11 @@ void __declspec(naked)GetMusicSelectAddr()
 	__asm
 	{
 		mov dword ptr[ecx + 4], 0
-		mov Containers::gameVals.musicSelect_X, ecx
+		mov g_gameVals.musicSelect_X, ecx
 		push eax
 		mov eax, ecx
 		add eax, 4h
-		mov Containers::gameVals.musicSelect_Y, eax
+		mov g_gameVals.musicSelect_Y, eax
 		pop eax
 		jmp[GetMusicSelectAddrJmpBackAddr]
 	}
@@ -459,15 +459,15 @@ void __declspec(naked)GetP1ScreenPosX()
 
 		push esi
 		add esi, 1C0h
-		mov Containers::gameVals.P1ScreenPosX, esi
+		mov g_gameVals.P1ScreenPosX, esi
 	}
 
-	//LOG_ASM(2, "Containers::gameVals.P1ScreenPosX: 0x%x\n", Containers::gameVals.P1ScreenPosX);
+	//LOG_ASM(2, "g_gameVals.P1ScreenPosX: 0x%x\n", g_gameVals.P1ScreenPosX);
 
 	__asm
 	{
 		add esi, 4
-		mov Containers::gameVals.P1ScreenPosY, esi
+		mov g_gameVals.P1ScreenPosY, esi
 		pop esi
 
 		add esi, edx
@@ -605,7 +605,7 @@ bool placeHooks_bbcf()
 		"\xff\x35\x00\x00\x00\x00\x8d\x45\xb4\x68\x00\x00\x00\x00\x50",
 		"xx????xxxx????x",
 		6);
-	Containers::gameVals.pGameMoney = (int*)HookManager::GetBytesFromAddr("GetMoneyAddr", 2, 4);
+	g_gameVals.pGameMoney = (int*)HookManager::GetBytesFromAddr("GetMoneyAddr", 2, 4);
 
 	placeHooks_palette();
 	CustomGameModeHooks();

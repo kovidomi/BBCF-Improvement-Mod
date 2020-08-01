@@ -1,9 +1,9 @@
 #include "crashdump.h"
+#include "interfaces.h"
 #include "logger.h"
 #include "Settings.h"
 
 #include "Hooks/hooks_detours.h"
-#include "Game/containers.h"
 #include "ImGui/ImGuiSystem.h"
 
 #include <Windows.h>
@@ -30,11 +30,8 @@ void CreateCustomDirectories()
 void BBCF_IM_Shutdown()
 {
 	ImGuiSystem::WriteLogToFile();
-
 	ImGuiSystem::Shutdown();
-
-	Containers::Cleanup();
-
+	CleanupInterfaces();
 	closeLogger();
 }
 
@@ -82,7 +79,6 @@ DWORD WINAPI BBCF_IM_Start(HMODULE hModule)
 	}
 	logSettingsIni();
 	Settings::initSavedSettings();
-	Containers::Init();
 
 	if (!LoadOriginalDinputDll())
 	{
@@ -95,6 +91,8 @@ DWORD WINAPI BBCF_IM_Start(HMODULE hModule)
 		MessageBoxA(nullptr, "Failed IAT hook", "BBCFIM", MB_OK);
 		ExitProcess(0);
 	}
+
+	g_interfaces.pPaletteManager = new PaletteManager();
 
 	return 0;
 }

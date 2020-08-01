@@ -1,6 +1,5 @@
 #pragma once
-
-#include <atlstr.h>
+#include <string>
 
 enum CharIndex
 {
@@ -42,4 +41,10 @@ enum CharIndex
 	CharIndex_Jubei
 };
 
-extern LPCWSTR ingame_chars[36];
+int getCharactersCount();
+
+const std::string& getCharacterNameByIndexA(int charIndex);
+
+std::wstring getCharacterNameByIndexW(int charIndex);
+
+bool isCharacterIndexOutOfBound(int charIndex);

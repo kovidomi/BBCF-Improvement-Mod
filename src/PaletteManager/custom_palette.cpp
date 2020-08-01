@@ -1,10 +1,10 @@
 #include "custom_palette.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/Settings.h"
 #include "Core/utils.h"
 #include "Game/characters.h"
-#include "Game/containers.h"
 #include "Game/custom_gameModes.h"
 #include "Game/gamestates.h"
 #include "Hooks/HookManager.h"
@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <tchar.h>
 
 char HPAL_header[HPAL_HEADER_LEN] = {
 	'\x48', '\x50', '\x41', '\x4C', '\x25', '\x01', '\x00', '\x00', '\x20', '\x04', '\x00','\x00', '\x00',
@@ -29,34 +30,34 @@ void DereferenceP1P2PalettePointers()
 	LOG(2, "DereferenceP1P2PalettePointers\n");
 
 	LOG(2, "P1PaletteBase: 0x%x, P1PaletteIndex: 0x%x, P2PaletteBase: 0x%x, P2PaletteIndex: 0x%x\n",
-		Containers::gameVals.P1PaletteBase, Containers::gameVals.P1PaletteIndex, 
-		Containers::gameVals.P2PaletteBase, Containers::gameVals.P2PaletteIndex);
+		g_gameVals.P1PaletteBase, g_gameVals.P1PaletteIndex, 
+		g_gameVals.P2PaletteBase, g_gameVals.P2PaletteIndex);
 	//DEBUGDereferencePalettePointer(P1Palette, *P1PaletteIndex);
 	//DereferencePalettePointer1(P1Palette, *P1PaletteIndex);
-	Containers::gameVals.P1CurPalette = getPaletteArray(Containers::gameVals.P1PaletteBase, *Containers::gameVals.P1PaletteIndex, 0);
-	LOG(2, "P1Palette: 0x%x\n", Containers::gameVals.P1CurPalette);
+	g_gameVals.P1CurPalette = getPaletteArray(g_gameVals.P1PaletteBase, *g_gameVals.P1PaletteIndex, 0);
+	LOG(2, "P1Palette: 0x%x\n", g_gameVals.P1CurPalette);
 
-	Containers::gameVals.P2CurPalette = getPaletteArray(Containers::gameVals.P2PaletteBase, *Containers::gameVals.P2PaletteIndex, 0);
-	LOG(2, "P2Palette: 0x%x\n", Containers::gameVals.P2CurPalette);
+	g_gameVals.P2CurPalette = getPaletteArray(g_gameVals.P2PaletteBase, *g_gameVals.P2PaletteIndex, 0);
+	LOG(2, "P2Palette: 0x%x\n", g_gameVals.P2CurPalette);
 
-	Containers::gameVals.P1Palette3 = getPaletteArray(Containers::gameVals.P1PaletteBase, 2, 0);
-	LOG(2, "P1Palette3: 0x%x\n", Containers::gameVals.P1Palette3);
+	g_gameVals.P1Palette3 = getPaletteArray(g_gameVals.P1PaletteBase, 2, 0);
+	LOG(2, "P1Palette3: 0x%x\n", g_gameVals.P1Palette3);
 
-	Containers::gameVals.P1Palette4 = getPaletteArray(Containers::gameVals.P1PaletteBase, 3, 0);
-	LOG(2, "P1Palette4: 0x%x\n", Containers::gameVals.P1Palette4);
+	g_gameVals.P1Palette4 = getPaletteArray(g_gameVals.P1PaletteBase, 3, 0);
+	LOG(2, "P1Palette4: 0x%x\n", g_gameVals.P1Palette4);
 
-	Containers::gameVals.P2Palette5 = getPaletteArray(Containers::gameVals.P2PaletteBase, 4, 0);
-	LOG(2, "P2Palette5: 0x%x\n", Containers::gameVals.P2Palette5);
+	g_gameVals.P2Palette5 = getPaletteArray(g_gameVals.P2PaletteBase, 4, 0);
+	LOG(2, "P2Palette5: 0x%x\n", g_gameVals.P2Palette5);
 
-	Containers::gameVals.P2Palette6 = getPaletteArray(Containers::gameVals.P2PaletteBase, 5, 0);
-	LOG(2, "P2Palette6: 0x%x\n", Containers::gameVals.P2Palette6);
+	g_gameVals.P2Palette6 = getPaletteArray(g_gameVals.P2PaletteBase, 5, 0);
+	LOG(2, "P2Palette6: 0x%x\n", g_gameVals.P2Palette6);
 	
 	//DereferencePalettePointer2(P2Palette, *P2PaletteIndex);
 	LOG(2, "P1PalettePointer: 0x%x , index: %d -- P2PalettePointer: 0x%x , index: %d\n",
-		Containers::gameVals.P1CurPalette, *Containers::gameVals.P1PaletteIndex, 
-		Containers::gameVals.P2CurPalette, *Containers::gameVals.P2PaletteIndex);
-	LOG(2, "P1PalettePointer contains: %s\n", RawMemoryArrayToString((unsigned char*)Containers::gameVals.P1CurPalette, 30));
-	LOG(2, "P2PalettePointer contains: %s\n", RawMemoryArrayToString((unsigned char*)Containers::gameVals.P2CurPalette, 30));
+		g_gameVals.P1CurPalette, *g_gameVals.P1PaletteIndex, 
+		g_gameVals.P2CurPalette, *g_gameVals.P2PaletteIndex);
+	LOG(2, "P1PalettePointer contains: %s\n", RawMemoryArrayToString((unsigned char*)g_gameVals.P1CurPalette, 30));
+	LOG(2, "P2PalettePointer contains: %s\n", RawMemoryArrayToString((unsigned char*)g_gameVals.P2CurPalette, 30));
 }
 
 //fileID 0 to get sprite palette, fileID 1 to get first effect file, fileID 2 to get second effect file etc...
@@ -75,12 +76,12 @@ DWORD* getCharSelPaletteArray(DWORD* base, DWORD pid, bool isP1)
 	int palIndex = 0;
 	if (isP1)
 	{
-		charIndex = Containers::gameVals.P1_selectedCharID;
+		charIndex = g_gameVals.P1_selectedCharID;
 		palIndex = *P1CharSelectPalIndex;
 	}
 	else
 	{
-		charIndex = Containers::gameVals.P2_selectedCharID;
+		charIndex = g_gameVals.P2_selectedCharID;
 		palIndex = *P2CharSelectPalIndex;
 	}
 
@@ -113,7 +114,7 @@ void DereferencePalettePointer1(DWORD* palettePointer, DWORD paletteIndex)
 		mul esi
 		mov ecx, [ebx + eax] //lvl2 pointer
 		add ecx, 20h // push it by 0x20 offset
-		mov[Containers::gameVals.P1CurPalette], ecx
+		mov[g_gameVals.P1CurPalette], ecx
 	}
 }
 
@@ -129,7 +130,7 @@ void DereferencePalettePointer2(DWORD* palettePointer, DWORD paletteIndex)
 		mul esi
 		mov ecx, [ebx + eax] //lvl2 pointer
 		add ecx, 20h // push it by 0x20 offset
-		mov[Containers::gameVals.P2CurPalette], ecx
+		mov[g_gameVals.P2CurPalette], ecx
 	}
 }
 
@@ -169,9 +170,9 @@ void DEBUGDereferencePalettePointer1(DWORD* palettePointer, DWORD paletteIndex)
 	LOG(2, "lvl2 pointer pushed by 0x20: 0x%x\n", temp); //extra
 	__asm pop ecx //extra
 
-	__asm mov[Containers::gameVals.P1CurPalette], ecx
+	__asm mov[g_gameVals.P1CurPalette], ecx
 
-	__asm mov eax, [Containers::gameVals.P1CurPalette]// extra
+	__asm mov eax, [g_gameVals.P1CurPalette]// extra
 	__asm mov[temp], eax //extra
 	LOG(2, "lvl palettePointer: 0x%x\n", temp); //extra
 }
@@ -179,14 +180,14 @@ void DEBUGDereferencePalettePointer1(DWORD* palettePointer, DWORD paletteIndex)
 void HandleSavedPackets()
 {
 	LOG(2, "HandleSavedPackets\n");
-	while (Containers::tempVals.tempPackets.size() > 0)
+	while (g_tempVals.tempPackets.size() > 0)
 	{
 #ifdef _DEBUG
 		LOG(2, "Processing previously saved tempPackets...\n");
 		ImGuiSystem::AddLog("[debug] Processing previously saved tempPacket\n");
 #endif
-		Containers::g_interfaces.pNetworkManager->PacketProcesser(&Containers::tempVals.tempPackets[Containers::tempVals.tempPackets.size() - 1]);
-		Containers::tempVals.tempPackets.pop_back();
+		g_interfaces.pNetworkManager->PacketProcesser(&g_tempVals.tempPackets[g_tempVals.tempPackets.size() - 1]);
+		g_tempVals.tempPackets.pop_back();
 	}
 }
 
@@ -194,15 +195,15 @@ void LoadPalettePacket(im_packet_internal_t *packet)
 {
 	LOG(2, "LoadPalettePacket\n");
 
-	if (!Containers::gameVals.startMatchPalettesInit)
+	if (!g_gameVals.startMatchPalettesInit)
 	{
 		LOG(2, "PalettesInit has not finished yet, saving palette...\n");
-		Containers::tempVals.tempPackets.push_back(*packet);
+		g_tempVals.tempPackets.push_back(*packet);
 		return;
 	}
 
 	//ImGuiSystem::AddLog("[system] Custom palette packet received from player%d (%s)\n",
-	//	packet->playernum, Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
+	//	packet->playernum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
 	ImGuiSystem::AddLog("[system] Custom palette packet received from player%d\n", packet->playernum);
 
 	LOG(2, "\tReceived palette packet: \n");
@@ -218,39 +219,39 @@ void LoadPalettePacket(im_packet_internal_t *packet)
 	if (packet->playernum == 1) //player1
 	{
 		LOG(2, "Received P1Palette\n");
-		LOG(2, "Copying to P1Palette3[0]: 0x%x\n", Containers::gameVals.P1Palette3);
-		ReplacePaletteInMemory(Containers::gameVals.P1Palette3, &packet->data[0]);
-		LOG(2, "Copying to P1Palette4[0]: 0x%x\n", Containers::gameVals.P1Palette4);
-		ReplacePaletteInMemory(Containers::gameVals.P1Palette4, &packet->data[0]);
+		LOG(2, "Copying to P1Palette3[0]: 0x%x\n", g_gameVals.P1Palette3);
+		ReplacePaletteInMemory(g_gameVals.P1Palette3, &packet->data[0]);
+		LOG(2, "Copying to P1Palette4[0]: 0x%x\n", g_gameVals.P1Palette4);
+		ReplacePaletteInMemory(g_gameVals.P1Palette4, &packet->data[0]);
 
-		if (*Containers::gameVals.P1PaletteIndex != 2) //need to switch paletteindex in order to reflect changes ingame
+		if (*g_gameVals.P1PaletteIndex != 2) //need to switch paletteindex in order to reflect changes ingame
 		{
 			LOG(2, "Setting P1PaletteIndex to 2 (3rd palette)\n");
-			*Containers::gameVals.P1PaletteIndex = 2;
+			*g_gameVals.P1PaletteIndex = 2;
 		}
 		else
 		{
 			LOG(2, "Setting P1PaletteIndex to 3 (4th palette)\n");
-			*Containers::gameVals.P1PaletteIndex = 3;
+			*g_gameVals.P1PaletteIndex = 3;
 		}
 	}
 	else //player2
 	{
 		LOG(2, "Received P2Palette\n");
-		LOG(2, "Copying to P2Palette5[0]: 0x%x\n", Containers::gameVals.P2Palette5);
-		ReplacePaletteInMemory(Containers::gameVals.P2Palette5, &packet->data[0]);
-		LOG(2, "Copying to P2Palette6[0]: 0x%x\n", Containers::gameVals.P2Palette6);
-		ReplacePaletteInMemory(Containers::gameVals.P2Palette6, &packet->data[0]);
+		LOG(2, "Copying to P2Palette5[0]: 0x%x\n", g_gameVals.P2Palette5);
+		ReplacePaletteInMemory(g_gameVals.P2Palette5, &packet->data[0]);
+		LOG(2, "Copying to P2Palette6[0]: 0x%x\n", g_gameVals.P2Palette6);
+		ReplacePaletteInMemory(g_gameVals.P2Palette6, &packet->data[0]);
 
-		if (*Containers::gameVals.P2PaletteIndex != 4) //need to switch paletteindex in order to reflect changes ingame
+		if (*g_gameVals.P2PaletteIndex != 4) //need to switch paletteindex in order to reflect changes ingame
 		{
 			LOG(2, "Setting P2PaletteIndex to 4 (5th palette)\n");
-			*Containers::gameVals.P2PaletteIndex = 4;
+			*g_gameVals.P2PaletteIndex = 4;
 		}
 		else
 		{
 			LOG(2, "Setting P2PaletteIndex to 5 (6th palette)\n");
-			*Containers::gameVals.P2PaletteIndex = 5;
+			*g_gameVals.P2PaletteIndex = 5;
 		}
 	}
 }
@@ -259,23 +260,23 @@ void LoadEffectPacket(im_packet_internal_t *packet)
 {
 	LOG(2, "LoadEffectPacket\n");
 
-	if (!Containers::gameVals.startMatchPalettesInit)
+	if (!g_gameVals.startMatchPalettesInit)
 	{
 		LOG(2, "PalettesInit has not finished yet, saving effect...\n");
-		Containers::tempVals.tempPackets.push_back(*packet);
+		g_tempVals.tempPackets.push_back(*packet);
 		return;
 	}
 
-	DWORD* P1Pal3EffectPart = getPaletteArray(Containers::gameVals.P1PaletteBase, 2, packet->part);
-	DWORD* P1Pal4EffectPart = getPaletteArray(Containers::gameVals.P1PaletteBase, 3, packet->part);
-	DWORD* P2Pal5EffectPart = getPaletteArray(Containers::gameVals.P2PaletteBase, 4, packet->part);
-	DWORD* P2Pal6EffectPart = getPaletteArray(Containers::gameVals.P2PaletteBase, 5, packet->part);
+	DWORD* P1Pal3EffectPart = getPaletteArray(g_gameVals.P1PaletteBase, 2, packet->part);
+	DWORD* P1Pal4EffectPart = getPaletteArray(g_gameVals.P1PaletteBase, 3, packet->part);
+	DWORD* P2Pal5EffectPart = getPaletteArray(g_gameVals.P2PaletteBase, 4, packet->part);
+	DWORD* P2Pal6EffectPart = getPaletteArray(g_gameVals.P2PaletteBase, 5, packet->part);
 
 	//if(strcmp((char*)packet->data, CURPALETTE) == 0)
 
 #ifdef _DEBUG
 	//ImGuiSystem::AddLog("[debug] Custom effect packet part%d received from player%d (%s)\n",
-	//	packet->part, packet->playernum, Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
+	//	packet->part, packet->playernum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
 	ImGuiSystem::AddLog("[debug] Custom effect packet part%d received from player%d \n", packet->part, packet->playernum);
 #endif
 
@@ -311,16 +312,16 @@ void LoadBloomPacket(im_packet_internal_t *packet)
 {
 	LOG(2, "LoadBloomPacket\n");
 
-	if (!Containers::gameVals.startMatchPalettesInit)
+	if (!g_gameVals.startMatchPalettesInit)
 	{
 		LOG(2, "PalettesInit has not finished yet, saving bloom flag...\n");
-		Containers::tempVals.tempPackets.push_back(*packet);
+		g_tempVals.tempPackets.push_back(*packet);
 		return;
 	}
 
 //#ifdef _DEBUG
 //	ImGuiSystem::AddLog("[debug] Custom bloom packet part%d received from player%d (%s)\n",
-//		packet->part, packet->playernum, Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
+//		packet->part, packet->playernum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
 //#endif
 //
 //	LOG(2, "\tReceived effect packet: \n");
@@ -336,12 +337,12 @@ void LoadBloomPacket(im_packet_internal_t *packet)
 	if (packet->playernum == 1) //player1
 	{
 		LOG(2, "Received P1 bloom effect\n");
-		Containers::gameVals.isP1BloomOn = packet->data[0];
+		g_gameVals.isP1BloomOn = packet->data[0];
 	}
 	else //player2
 	{
 		LOG(2, "Received P2 bloom effect\n");
-		Containers::gameVals.isP2BloomOn = packet->data[0];
+		g_gameVals.isP2BloomOn = packet->data[0];
 	}
 }
 
@@ -354,31 +355,31 @@ void SendCustomEffectBloom()
 	EP2PSend sendtype = k_EP2PSendUnreliable;
 	im_packet_t packet;
 
-	if (Containers::gameVals.thisPlayerNum == 1)
+	if (g_gameVals.thisPlayerNum == 1)
 	{
-		if (Containers::gameVals.P1_selectedCharID != -1)
-			isBloomOn = Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][Containers::gameVals.P1_selected_custom_pal][9][0];
+		if (g_gameVals.P1_selectedCharID != -1)
+			isBloomOn = g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][g_gameVals.P1_selected_custom_pal][9][0];
 		otherPlayerNum = 2;
 	}
 	else
 	{
-		if (Containers::gameVals.P2_selectedCharID != -1)
-			isBloomOn = Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][Containers::gameVals.P2_selected_custom_pal][9][0];
+		if (g_gameVals.P2_selectedCharID != -1)
+			isBloomOn = g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][g_gameVals.P2_selected_custom_pal][9][0];
 		otherPlayerNum = 1;
 	}
 
-	packet.playernum = Containers::gameVals.thisPlayerNum;
+	packet.playernum = g_gameVals.thisPlayerNum;
 	packet.type = packetType_bloom;
 	packet.datalen = 1;
 	packet.part = 1;
 	packet.data[0] = isBloomOn;
 
-	bool ret = Containers::g_interfaces.pNetworkManager->SendPacket(Containers::gameVals.opponentSteamID, &packet);
+	bool ret = g_interfaces.pNetworkManager->SendPacket(g_gameVals.opponentSteamID, &packet);
 #ifdef _DEBUG
 	if (ret)
 	{
 		//ImGuiSystem::AddLog("[system] Custom bloom packet sent to player%d (%s)\n",
-		//	otherPlayerNum, Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
+		//	otherPlayerNum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
 		ImGuiSystem::AddLog("[system] Custom bloom packet sent to player%d\n", otherPlayerNum);
 	}
 #endif
@@ -387,14 +388,14 @@ void SendCustomEffectBloom()
 
 void OverwriteStagesList()
 {
-	if (!Containers::gameVals.charSelectInit && 
-		(*Containers::gameVals.pGameMode == GAME_MODE_ONLINE || 
-		*Containers::gameVals.pGameMode == GAME_MODE_TRAINING ||
-		*Containers::gameVals.pGameMode == GAME_MODE_VERSUS))
+	if (!g_gameVals.charSelectInit && 
+		(*g_gameVals.pGameMode == GameMode_Online || 
+		*g_gameVals.pGameMode == GameMode_Training ||
+		*g_gameVals.pGameMode == GameMode_Versus))
 	{
 		LOG(2, "OverwriteStagesList\n");
-		memcpy(Containers::gameVals.stageListMemory, allstagesunlockedmemory, ALL_STAGES_UNLOCKED_MEMORY_SIZE * sizeof(char));
-		Containers::gameVals.charSelectInit = true;
+		memcpy(g_gameVals.stageListMemory, allstagesunlockedmemory, ALL_STAGES_UNLOCKED_MEMORY_SIZE * sizeof(char));
+		g_gameVals.charSelectInit = true;
 	}
 }
 
@@ -407,28 +408,28 @@ void SendCustomPalette()
 	EP2PSend sendtype = k_EP2PSendUnreliable;
 	im_packet_t packet;
 
-	if (Containers::gameVals.thisPlayerNum == 1)
+	if (g_gameVals.thisPlayerNum == 1)
 	{
-		PalettePointer = Containers::gameVals.P1CurPalette;
+		PalettePointer = g_gameVals.P1CurPalette;
 		otherPlayerNum = 2;
 	}
 	else
 	{
-		PalettePointer = Containers::gameVals.P2CurPalette;
+		PalettePointer = g_gameVals.P2CurPalette;
 		otherPlayerNum = 1;
 	}
 
-	packet.playernum = Containers::gameVals.thisPlayerNum;
+	packet.playernum = g_gameVals.thisPlayerNum;
 	packet.type = packetType_palette;
 	packet.datalen = PALETTE_DATALEN;
 	packet.part = 1;
 	memcpy(&packet.data[0], PalettePointer, PALETTE_DATALEN);
 
-	bool ret = Containers::g_interfaces.pNetworkManager->SendPacket(Containers::gameVals.opponentSteamID, &packet);
+	bool ret = g_interfaces.pNetworkManager->SendPacket(g_gameVals.opponentSteamID, &packet);
 	if (ret)
 	{
 		//ImGuiSystem::AddLog("[system] Custom palette packet sent to player%d (%s)\n",
-		//	otherPlayerNum, Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
+		//	otherPlayerNum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
 		ImGuiSystem::AddLog("[system] Custom palette packet sent to player%d\n", otherPlayerNum);
 	}
 }
@@ -444,29 +445,29 @@ void SendCustomEffects()
 
 	for (int i = 1; i < 8; i++)
 	{
-		if (Containers::gameVals.thisPlayerNum == 1)
+		if (g_gameVals.thisPlayerNum == 1)
 		{
-			CurPalEffectPart = getPaletteArray(Containers::gameVals.P1PaletteBase, *Containers::gameVals.P1PaletteIndex, i);
+			CurPalEffectPart = getPaletteArray(g_gameVals.P1PaletteBase, *g_gameVals.P1PaletteIndex, i);
 			otherPlayerNum = 2;
 		}
 		else
 		{
-			CurPalEffectPart = getPaletteArray(Containers::gameVals.P2PaletteBase, *Containers::gameVals.P2PaletteIndex, i);
+			CurPalEffectPart = getPaletteArray(g_gameVals.P2PaletteBase, *g_gameVals.P2PaletteIndex, i);
 			otherPlayerNum = 1;
 		}
 
-		packet.playernum = Containers::gameVals.thisPlayerNum;
+		packet.playernum = g_gameVals.thisPlayerNum;
 		packet.type = packetType_effect;
 		packet.datalen = PALETTE_DATALEN;
 		packet.part = i;
 		memcpy(&packet.data[0], CurPalEffectPart, PALETTE_DATALEN);
 
-		bool ret = Containers::g_interfaces.pNetworkManager->SendPacket(Containers::gameVals.opponentSteamID, &packet);
+		bool ret = g_interfaces.pNetworkManager->SendPacket(g_gameVals.opponentSteamID, &packet);
 #ifdef _DEBUG
 		if (ret)
 		{
 			//ImGuiSystem::AddLog("[debug] Custom effect packets sent to player%d (%s)\n",
-			//	otherPlayerNum, Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*Containers::gameVals.opponentSteamID));
+			//	otherPlayerNum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
 			ImGuiSystem::AddLog("[debug] Custom effect packets sent to player%d\n", otherPlayerNum);
 		}
 #endif
@@ -476,14 +477,14 @@ void SendCustomEffects()
 void SendCustomDatas()
 {
 	LOG(2, "SendCustomDatas\n");
-	if (Containers::gameVals.opponentSteamID == 0 || Containers::gameVals.thisPlayerNum == 0)
+	if (g_gameVals.opponentSteamID == 0 || g_gameVals.thisPlayerNum == 0)
 	{
 		LOG(2, "opponentSteamID or thisPlayerNum is 0\n");
 		return;
 	}
 
-	LOG(2, "SendPalettes to 0x%x\n", *Containers::gameVals.opponentSteamID);
-	LOG(2, "ThisPlayer = %d\n", Containers::gameVals.thisPlayerNum);
+	LOG(2, "SendPalettes to 0x%x\n", *g_gameVals.opponentSteamID);
+	LOG(2, "ThisPlayer = %d\n", g_gameVals.thisPlayerNum);
 
 	SendCustomPalette();
 	SendCustomEffects();
@@ -507,7 +508,7 @@ void CreatePaletteDirectories()
 	std::wstring path;
 	for (int i = 0; i < 36; i++)
 	{
-		path = std::wstring(L"BBCF_IM\\Palettes\\") + ingame_chars[i];
+		path = std::wstring(L"BBCF_IM\\Palettes\\") + getCharacterNameByIndexW(i);
 		CreateDirectory(path.c_str(), NULL);
 	}
 }
@@ -533,7 +534,7 @@ void InitCustomPaletteVector()
 		default_item.push_back("");			// 10	creator
 		default_item.push_back("");			// 11	description
 
-		Containers::gameVals.customPalettes[i].push_back(default_item);
+		g_gameVals.customPalettes[i].push_back(default_item);
 	}
 }
 
@@ -549,7 +550,7 @@ void LoadPaletteFiles()
 	std::wstring path;
 	for (int i = 0; i < 36; i++)
 	{
-		path = std::wstring(L"BBCF_IM\\Palettes\\") + ingame_chars[i] + L"\\*";
+		path = std::wstring(L"BBCF_IM\\Palettes\\") + getCharacterNameByIndexW(i) + L"\\*";
 		LoadCustomPalettesIntoContainer(i, path.c_str());
 	}
 	ImGuiSystem::AddLog("[system] Finished loading custom palettes\n");
@@ -558,7 +559,7 @@ void LoadPaletteFiles()
 
 void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 {
-	//Containers::gameVals.customPalettes[charIndex][palnum][0/1]
+	//g_gameVals.customPalettes[charIndex][palnum][0/1]
 	std::wstring wws(path);
 	std::string ppath(wws.begin(), wws.end());
 	LOG(2, "LoadPalettesIntoContainer %s\n", ppath);
@@ -610,9 +611,9 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 			std::stringstream buffer;
 			buffer << file.rdbuf();
 
-			if (fileName.find("_effectbloom") != std::string::npos && Containers::gameVals.customPalettes[charIndex].size() > 1)
+			if (fileName.find("_effectbloom") != std::string::npos && g_gameVals.customPalettes[charIndex].size() > 1)
 			{
-				Containers::gameVals.customPalettes[charIndex][Containers::gameVals.customPalettes[charIndex].size() - 1][9].assign("\x01");
+				g_gameVals.customPalettes[charIndex][g_gameVals.customPalettes[charIndex].size() - 1][9].assign("\x01");
 				ImGuiSystem::AddLog("[system] Loaded '%s'\n", fileName.c_str());
 				continue;
 			}
@@ -630,7 +631,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 			//effect file:
 			if (fileName.find("_effect0") != std::string::npos)
 			{
-				if (Containers::gameVals.customPalettes[charIndex].size() < 2)
+				if (g_gameVals.customPalettes[charIndex].size() < 2)
 				{
 					ImGuiSystem::AddLog("[error] '%s' has no custom character palette found to match with! Create a character palette named '%s' to load this effect file on!\n", 
 						fileName.c_str(), (fileName.substr(0, fileName.rfind("_effect0")) + ".hpl").c_str());
@@ -639,7 +640,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 				}
 
 				//if previously pushed character palette's name wasnt the effect file's name
-				if (Containers::gameVals.customPalettes[charIndex][Containers::gameVals.customPalettes[charIndex].size()-1][0] != fileName.substr(0, fileName.rfind("_effect0")))
+				if (g_gameVals.customPalettes[charIndex][g_gameVals.customPalettes[charIndex].size()-1][0] != fileName.substr(0, fileName.rfind("_effect0")))
 				{
 					ImGuiSystem::AddLog("[error] '%s' has no custom character palette found to match with! Create a character palette named '%s' to load this effect file on!\n",
 						fileName.c_str(), (fileName.substr(0, fileName.rfind("_effect0")) + ".hpl").c_str());
@@ -647,7 +648,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 					continue;
 				}
 
-				LOG(2, "\t\tEffect file! size(): %d ", Containers::gameVals.customPalettes[charIndex].size());
+				LOG(2, "\t\tEffect file! size(): %d ", g_gameVals.customPalettes[charIndex].size());
 				int pos = fileName.find("_effect0");
 				std::string index = fileName.substr(pos + 7, 2);
 				LOG(2, "index: %s ", index.c_str());
@@ -659,7 +660,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 					ImGuiSystem::AddLog("[error] '%s' has wrong index!\n", fileName.c_str());
 					continue;
 				}
-				Containers::gameVals.customPalettes[charIndex][Containers::gameVals.customPalettes[charIndex].size() - 1][pos + 1] = fileData;
+				g_gameVals.customPalettes[charIndex][g_gameVals.customPalettes[charIndex].size() - 1][pos + 1] = fileData;
 			}
 			else //palette file:
 			{
@@ -676,7 +677,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 				item.push_back("\x00");		// 9	bloom
 				item.push_back("");			// 10	creator
 				item.push_back("");			// 11	description
-				Containers::gameVals.customPalettes[charIndex].push_back(item);
+				g_gameVals.customPalettes[charIndex].push_back(item);
 			}
 			ImGuiSystem::AddLog("[system] Loaded '%s'\n", fileName.c_str());
 		} while (FindNextFile(hFind, &data));
@@ -687,9 +688,9 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 int FindCustomPaletteIndex(std::string paletteName, int charID)
 {
 	int foundPaletteIndex = 0;
-	for (int i = 0; i < Containers::gameVals.customPalettes[charID].size(); i++)
+	for (int i = 0; i < g_gameVals.customPalettes[charID].size(); i++)
 	{
-		if (Containers::gameVals.customPalettes[charID][i][0] == paletteName)
+		if (g_gameVals.customPalettes[charID][i][0] == paletteName)
 		{
 			foundPaletteIndex = i;
 			break;
@@ -704,15 +705,15 @@ void ReloadCustomPalettes()
 	//clearing arrays
 	for (int i = 0; i < 36; i++)
 	{
-		Containers::gameVals.customPalettes[i].clear();
+		g_gameVals.customPalettes[i].clear();
 	}
-	Containers::gameVals.customPalettes.clear();
-	Containers::gameVals.P1_selected_custom_pal = 0;
-	Containers::gameVals.P2_selected_custom_pal = 0;
+	g_gameVals.customPalettes.clear();
+	g_gameVals.P1_selected_custom_pal = 0;
+	g_gameVals.P2_selected_custom_pal = 0;
 
 	LoadPaletteFiles();
 
-	if (Containers::gameVals.P1_selectedCharID != -1 && Containers::gameVals.P2_selectedCharID != -1)
+	if (g_gameVals.P1_selectedCharID != -1 && g_gameVals.P2_selectedCharID != -1)
 	{
 		ReplaceP1Palette();
 		ReplaceP2Palette();
@@ -723,9 +724,9 @@ void ReplaceP1Palette(bool sendToOpponent)
 {
 	LOG(2, "ReplaceP1Palette\n");
 
-	if (*Containers::gameVals.pGameState != GAME_STATE_IN_MATCH || Containers::gameVals.P1CurPalette == 0)
+	if (*g_gameVals.pGameState != GameState_InMatch || g_gameVals.P1CurPalette == 0)
 	{
-		if (*Containers::gameVals.pGameState == GAME_STATE_IN_MATCH && Containers::gameVals.P1CurPalette == 0)
+		if (*g_gameVals.pGameState == GameState_InMatch && g_gameVals.P1CurPalette == 0)
 		{
 			LOG(2, "P1CurPalette is 0 !\n");
 			ImGuiSystem::AddLog("[error] P1CurPalette is 0! Please report this bug.\n");
@@ -733,7 +734,7 @@ void ReplaceP1Palette(bool sendToOpponent)
 		return;
 	}
 
-	if (Containers::gameVals.P1_selectedCharID == -1)
+	if (g_gameVals.P1_selectedCharID == -1)
 	{
 		LOG(2, "P1_selectedCharID is -1 !\n");
 		ImGuiSystem::AddLog("[error] P1_selectedCharID is -1 ! Please report this bug.\n");
@@ -742,36 +743,35 @@ void ReplaceP1Palette(bool sendToOpponent)
 
 	ReplaceP1PaletteEffects();
 
-	if (Containers::gameVals.P1_selected_custom_pal == 0)
+	if (g_gameVals.P1_selected_custom_pal == 0)
 	{
 		//load default palette from backup buf instead of palette array
-		ReplacePaletteInMemory(Containers::gameVals.P1Palette3, Containers::gameVals.P1DefaultPalBackup[0].c_str());
-		ReplacePaletteInMemory(Containers::gameVals.P1Palette4, Containers::gameVals.P1DefaultPalBackup[0].c_str());
+		ReplacePaletteInMemory(g_gameVals.P1Palette3, g_gameVals.P1DefaultPalBackup[0].c_str());
+		ReplacePaletteInMemory(g_gameVals.P1Palette4, g_gameVals.P1DefaultPalBackup[0].c_str());
 	}
 	else
 	{
 		//load palette from the palette array
-		ReplacePaletteInMemory(Containers::gameVals.P1Palette3, Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][Containers::gameVals.P1_selected_custom_pal][1].c_str());
-		ReplacePaletteInMemory(Containers::gameVals.P1Palette4, Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][Containers::gameVals.P1_selected_custom_pal][1].c_str());
+		ReplacePaletteInMemory(g_gameVals.P1Palette3, g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][g_gameVals.P1_selected_custom_pal][1].c_str());
+		ReplacePaletteInMemory(g_gameVals.P1Palette4, g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][g_gameVals.P1_selected_custom_pal][1].c_str());
 	}
 
-	if (*Containers::gameVals.P1PaletteIndex != 2) //need to switch paletteindex in order to reflect changes ingame
-		*Containers::gameVals.P1PaletteIndex = 2;
+	if (*g_gameVals.P1PaletteIndex != 2) //need to switch paletteindex in order to reflect changes ingame
+		*g_gameVals.P1PaletteIndex = 2;
 	else
-		*Containers::gameVals.P1PaletteIndex = 3;
+		*g_gameVals.P1PaletteIndex = 3;
 
 	//point current palette to the new one
-	Containers::gameVals.P1CurPalette = getPaletteArray(Containers::gameVals.P1PaletteBase, *Containers::gameVals.P1PaletteIndex, 0);
+	g_gameVals.P1CurPalette = getPaletteArray(g_gameVals.P1PaletteBase, *g_gameVals.P1PaletteIndex, 0);
 
-	if (*Containers::gameVals.pGameMode == GAME_MODE_TRAINING && Containers::gameVals.paletteEditor_selectedPlayer == 0)
-		memcpy(Containers::tempVals.PaletteEditorP1PalBackup,
-			getPaletteArray(Containers::gameVals.P1PaletteBase, *Containers::gameVals.P1PaletteIndex, Containers::gameVals.paletteEditor_selectedFile),
+	if (*g_gameVals.pGameMode == GameMode_Training && g_gameVals.paletteEditor_selectedPlayer == 0)
+		memcpy(g_tempVals.PaletteEditorP1PalBackup,
+			getPaletteArray(g_gameVals.P1PaletteBase, *g_gameVals.P1PaletteIndex, g_gameVals.paletteEditor_selectedFile),
 			PALETTE_DATALEN);
 
-	std::wstring ws(ingame_chars[Containers::gameVals.P1_selectedCharID]);
-	std::string charName(ws.begin(), ws.end());
+	std::string charName(getCharacterNameByIndexA(g_gameVals.P1_selectedCharID));
 	ImGuiSystem::AddLog("[system] P1 (%s) palette set to '%s'\n",
-		charName.c_str(), Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][Containers::gameVals.P1_selected_custom_pal][0].c_str());
+		charName.c_str(), g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][g_gameVals.P1_selected_custom_pal][0].c_str());
 
 	if(sendToOpponent)
 		SendCustomDatas();
@@ -781,9 +781,9 @@ void ReplaceP2Palette(bool sendToOpponent)
 {
 	LOG(2, "ReplaceP2Palette\n");
 
-	if (*Containers::gameVals.pGameState != GAME_STATE_IN_MATCH || Containers::gameVals.P2CurPalette == 0)
+	if (*g_gameVals.pGameState != GameState_InMatch || g_gameVals.P2CurPalette == 0)
 	{
-		if (*Containers::gameVals.pGameState == GAME_STATE_IN_MATCH && Containers::gameVals.P2CurPalette == 0)
+		if (*g_gameVals.pGameState == GameState_InMatch && g_gameVals.P2CurPalette == 0)
 		{
 			LOG(2, "P2CurPalette is 0 !\n");
 			ImGuiSystem::AddLog("[error] P2CurPalette is 0! Please report this bug.\n");
@@ -791,7 +791,7 @@ void ReplaceP2Palette(bool sendToOpponent)
 		return;
 	}
 
-	if (Containers::gameVals.P2_selectedCharID == -1)
+	if (g_gameVals.P2_selectedCharID == -1)
 	{
 		LOG(2, "P2_selectedCharID is -1 !\n");
 		ImGuiSystem::AddLog("[error] P2_selectedCharID is -1 ! Please report this bug.\n");
@@ -800,36 +800,35 @@ void ReplaceP2Palette(bool sendToOpponent)
 
 	ReplaceP2PaletteEffects();
 
-	if (Containers::gameVals.P2_selected_custom_pal == 0)
+	if (g_gameVals.P2_selected_custom_pal == 0)
 	{
 		//load default palette from backup buf instead of palette array
-		ReplacePaletteInMemory(Containers::gameVals.P2Palette5, Containers::gameVals.P2DefaultPalBackup[0].c_str());
-		ReplacePaletteInMemory(Containers::gameVals.P2Palette6, Containers::gameVals.P2DefaultPalBackup[0].c_str());
+		ReplacePaletteInMemory(g_gameVals.P2Palette5, g_gameVals.P2DefaultPalBackup[0].c_str());
+		ReplacePaletteInMemory(g_gameVals.P2Palette6, g_gameVals.P2DefaultPalBackup[0].c_str());
 	}
 	else
 	{
 		//load palette from the palette array
-		ReplacePaletteInMemory(Containers::gameVals.P2Palette5, Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][Containers::gameVals.P2_selected_custom_pal][1].c_str());
-		ReplacePaletteInMemory(Containers::gameVals.P2Palette6, Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][Containers::gameVals.P2_selected_custom_pal][1].c_str());
+		ReplacePaletteInMemory(g_gameVals.P2Palette5, g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][g_gameVals.P2_selected_custom_pal][1].c_str());
+		ReplacePaletteInMemory(g_gameVals.P2Palette6, g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][g_gameVals.P2_selected_custom_pal][1].c_str());
 	}
 
-	if (*Containers::gameVals.P2PaletteIndex != 4) //need to switch paletteindex in order to reflect changes ingame
-		*Containers::gameVals.P2PaletteIndex = 4;
+	if (*g_gameVals.P2PaletteIndex != 4) //need to switch paletteindex in order to reflect changes ingame
+		*g_gameVals.P2PaletteIndex = 4;
 	else
-		*Containers::gameVals.P2PaletteIndex = 5;
+		*g_gameVals.P2PaletteIndex = 5;
 
 	//point current palette to the new one
-	Containers::gameVals.P2CurPalette = getPaletteArray(Containers::gameVals.P2PaletteBase, *Containers::gameVals.P2PaletteIndex, 0);
+	g_gameVals.P2CurPalette = getPaletteArray(g_gameVals.P2PaletteBase, *g_gameVals.P2PaletteIndex, 0);
 
-	if (*Containers::gameVals.pGameMode == GAME_MODE_TRAINING && Containers::gameVals.paletteEditor_selectedPlayer == 1)
-		memcpy(Containers::tempVals.PaletteEditorP2PalBackup,
-			getPaletteArray(Containers::gameVals.P2PaletteBase, *Containers::gameVals.P2PaletteIndex, Containers::gameVals.paletteEditor_selectedFile),
+	if (*g_gameVals.pGameMode == GameMode_Training && g_gameVals.paletteEditor_selectedPlayer == 1)
+		memcpy(g_tempVals.PaletteEditorP2PalBackup,
+			getPaletteArray(g_gameVals.P2PaletteBase, *g_gameVals.P2PaletteIndex, g_gameVals.paletteEditor_selectedFile),
 			PALETTE_DATALEN);
 
-	std::wstring ws(ingame_chars[Containers::gameVals.P2_selectedCharID]);
-	std::string charName(ws.begin(), ws.end());
+	std::string charName = getCharacterNameByIndexA(g_gameVals.P2_selectedCharID);
 	ImGuiSystem::AddLog("[system] P2 (%s) palette set to '%s'\n",
-		charName.c_str(), Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][Containers::gameVals.P2_selected_custom_pal][0].c_str());
+		charName.c_str(), g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][g_gameVals.P2_selected_custom_pal][0].c_str());
 
 	if (sendToOpponent)
 		SendCustomDatas();
@@ -847,19 +846,19 @@ void SaveDefaultP1P2Pals()
 	LOG(2, "SaveDefaultP1P2Pals\n");
 
 	//if backup palettes are already set then return and dont do anything
-	if (Containers::gameVals.P1DefaultPalBackup[0] == "")
+	if (g_gameVals.P1DefaultPalBackup[0] == "")
 	{
 		LOG(2, "Backing up P1 palette\n");
-		Containers::gameVals.P1DefaultPalBackup[0].assign((char*)Containers::gameVals.P1CurPalette, PALETTE_DATALEN);
-		Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][0][1].assign(Containers::gameVals.P1DefaultPalBackup[0], 0, PALETTE_DATALEN);
+		g_gameVals.P1DefaultPalBackup[0].assign((char*)g_gameVals.P1CurPalette, PALETTE_DATALEN);
+		g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][0][1].assign(g_gameVals.P1DefaultPalBackup[0], 0, PALETTE_DATALEN);
 		BackupP1PaletteEffects();
 	}
 
-	if (Containers::gameVals.P2DefaultPalBackup[0] == "")
+	if (g_gameVals.P2DefaultPalBackup[0] == "")
 	{
 		LOG(2, "Backing up P2 palette\n");
-		Containers::gameVals.P2DefaultPalBackup[0].assign((char*)Containers::gameVals.P2CurPalette, PALETTE_DATALEN);
-		Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][0][1].assign(Containers::gameVals.P2DefaultPalBackup[0], 0, PALETTE_DATALEN);
+		g_gameVals.P2DefaultPalBackup[0].assign((char*)g_gameVals.P2CurPalette, PALETTE_DATALEN);
+		g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][0][1].assign(g_gameVals.P2DefaultPalBackup[0], 0, PALETTE_DATALEN);
 		BackupP2PaletteEffects();
 	}
 }
@@ -869,12 +868,12 @@ void ResettingDefaultPalettes()
 	LOG(2, "ResettingDefaultPalettes\n");
 	for (int i = 0; i < 36; i++)
 	{
-		Containers::gameVals.customPalettes[i][0][1] = "";
+		g_gameVals.customPalettes[i][0][1] = "";
 	}
-	Containers::gameVals.P1DefaultPalBackup[0] = "";
-	Containers::gameVals.P2DefaultPalBackup[0] = "";
-	//Containers::gameVals.P2_selected_cus = 0;
-	//Containers::gameVals.P2_selected_cus = 0;
+	g_gameVals.P1DefaultPalBackup[0] = "";
+	g_gameVals.P2DefaultPalBackup[0] = "";
+	//g_gameVals.P2_selected_cus = 0;
+	//g_gameVals.P2_selected_cus = 0;
 }
 
 void BackupP1PaletteEffects()
@@ -884,15 +883,15 @@ void BackupP1PaletteEffects()
 	//player1
 	for(int i = 1; i < 8; i++)
 	{
-		DWORD* P1CurPalEffectPart = getPaletteArray(Containers::gameVals.P1PaletteBase, *Containers::gameVals.P1PaletteIndex, i);
+		DWORD* P1CurPalEffectPart = getPaletteArray(g_gameVals.P1PaletteBase, *g_gameVals.P1PaletteIndex, i);
 
-		DWORD* P1Pal3EffectPart = getPaletteArray(Containers::gameVals.P1PaletteBase, 2, i);
-		DWORD* P1Pal4EffectPart = getPaletteArray(Containers::gameVals.P1PaletteBase, 3, i);
+		DWORD* P1Pal3EffectPart = getPaletteArray(g_gameVals.P1PaletteBase, 2, i);
+		DWORD* P1Pal4EffectPart = getPaletteArray(g_gameVals.P1PaletteBase, 3, i);
 
 		ReplacePaletteInMemory(P1Pal3EffectPart, P1CurPalEffectPart);
 		ReplacePaletteInMemory(P1Pal4EffectPart, P1CurPalEffectPart);
 
-		Containers::gameVals.P1DefaultPalBackup[i].assign((char*)P1CurPalEffectPart, PALETTE_DATALEN);
+		g_gameVals.P1DefaultPalBackup[i].assign((char*)P1CurPalEffectPart, PALETTE_DATALEN);
 	}
 }
 
@@ -902,15 +901,15 @@ void BackupP2PaletteEffects()
 	//player2
 	for (int i = 1; i < 8; i++)
 	{
-		DWORD* P2CurPalEffectPart = getPaletteArray(Containers::gameVals.P2PaletteBase, *Containers::gameVals.P2PaletteIndex, i);
+		DWORD* P2CurPalEffectPart = getPaletteArray(g_gameVals.P2PaletteBase, *g_gameVals.P2PaletteIndex, i);
 
-		DWORD* P2Pal5EffectPart = getPaletteArray(Containers::gameVals.P2PaletteBase, 4, i);
-		DWORD* P2Pal6EffectPart = getPaletteArray(Containers::gameVals.P2PaletteBase, 5, i);
+		DWORD* P2Pal5EffectPart = getPaletteArray(g_gameVals.P2PaletteBase, 4, i);
+		DWORD* P2Pal6EffectPart = getPaletteArray(g_gameVals.P2PaletteBase, 5, i);
 
 		ReplacePaletteInMemory(P2Pal5EffectPart, P2CurPalEffectPart);
 		ReplacePaletteInMemory(P2Pal6EffectPart, P2CurPalEffectPart);
 
-		Containers::gameVals.P2DefaultPalBackup[i].assign((char*)P2CurPalEffectPart, PALETTE_DATALEN);
+		g_gameVals.P2DefaultPalBackup[i].assign((char*)P2CurPalEffectPart, PALETTE_DATALEN);
 	}
 }
 
@@ -921,17 +920,17 @@ void ReplaceP1PaletteEffects()
 	for (int i = 1; i < 8; i++)
 	{
 		std::string PalettePartString;
-		DWORD* P1Pal3EffectPart = getPaletteArray(Containers::gameVals.P1PaletteBase, 2, i);
-		DWORD* P1Pal4EffectPart = getPaletteArray(Containers::gameVals.P1PaletteBase, 3, i);
+		DWORD* P1Pal3EffectPart = getPaletteArray(g_gameVals.P1PaletteBase, 2, i);
+		DWORD* P1Pal4EffectPart = getPaletteArray(g_gameVals.P1PaletteBase, 3, i);
 
-		if (Containers::gameVals.P1_selected_custom_pal == 0)
-			PalettePartString = Containers::gameVals.P1DefaultPalBackup[i];
+		if (g_gameVals.P1_selected_custom_pal == 0)
+			PalettePartString = g_gameVals.P1DefaultPalBackup[i];
 		else
-			PalettePartString = Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][Containers::gameVals.P1_selected_custom_pal][i + 1];
+			PalettePartString = g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][g_gameVals.P1_selected_custom_pal][i + 1];
 
 		//if palette string was empty, then use the default palette's effects
 		if (PalettePartString == "")
-			PalettePartString = Containers::gameVals.P1DefaultPalBackup[i];
+			PalettePartString = g_gameVals.P1DefaultPalBackup[i];
 
 		ReplacePaletteInMemory(P1Pal3EffectPart, PalettePartString.c_str());
 		ReplacePaletteInMemory(P1Pal4EffectPart, PalettePartString.c_str());
@@ -945,17 +944,17 @@ void ReplaceP2PaletteEffects()
 	for (int i = 1; i < 8; i++)
 	{
 		std::string PalettePartString;
-		DWORD* P2Pal5EffectPart = getPaletteArray(Containers::gameVals.P2PaletteBase, 4, i);
-		DWORD* P2Pal6EffectPart = getPaletteArray(Containers::gameVals.P2PaletteBase, 5, i);
+		DWORD* P2Pal5EffectPart = getPaletteArray(g_gameVals.P2PaletteBase, 4, i);
+		DWORD* P2Pal6EffectPart = getPaletteArray(g_gameVals.P2PaletteBase, 5, i);
 
-		if (Containers::gameVals.P2_selected_custom_pal == 0)
-			PalettePartString = Containers::gameVals.P2DefaultPalBackup[i];
+		if (g_gameVals.P2_selected_custom_pal == 0)
+			PalettePartString = g_gameVals.P2DefaultPalBackup[i];
 		else
-			PalettePartString = Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][Containers::gameVals.P2_selected_custom_pal][i + 1];
+			PalettePartString = g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][g_gameVals.P2_selected_custom_pal][i + 1];
 
 		//if palette string was empty, then use the default palette's effects
 		if (PalettePartString == "")
-			PalettePartString = Containers::gameVals.P2DefaultPalBackup[i];
+			PalettePartString = g_gameVals.P2DefaultPalBackup[i];
 
 			ReplacePaletteInMemory(P2Pal5EffectPart, PalettePartString.c_str());
 			ReplacePaletteInMemory(P2Pal6EffectPart, PalettePartString.c_str());
@@ -964,48 +963,48 @@ void ReplaceP2PaletteEffects()
 
 void ReplaceP1Palette_PaletteEditor(char* pPaletteData, int file)
 {
-	if (*Containers::gameVals.pGameMode != GAME_MODE_TRAINING && *Containers::gameVals.pGameState != GAME_STATE_IN_MATCH && !Containers::gameVals.P1CurPalette)
+	if (*g_gameVals.pGameMode != GameMode_Training && *g_gameVals.pGameState != GameState_InMatch && !g_gameVals.P1CurPalette)
 		return;
 
 	LOG(7, "ReplaceP1Palette_PaletteEditor\n");
 
 	//Get pointers to the palettes in memory
-	DWORD* P1Pal3FilePart = getPaletteArray(Containers::gameVals.P1PaletteBase, 2, file);
-	DWORD* P1Pal4FilePart = getPaletteArray(Containers::gameVals.P1PaletteBase, 3, file);
+	DWORD* P1Pal3FilePart = getPaletteArray(g_gameVals.P1PaletteBase, 2, file);
+	DWORD* P1Pal4FilePart = getPaletteArray(g_gameVals.P1PaletteBase, 3, file);
 
 	//Replace with our own
 	ReplacePaletteInMemory(P1Pal3FilePart, pPaletteData);
 	ReplacePaletteInMemory(P1Pal4FilePart, pPaletteData);
 
-	if (*Containers::gameVals.P1PaletteIndex != 2) //need to switch paletteindex in order to reflect changes ingame
-		*Containers::gameVals.P1PaletteIndex = 2;
+	if (*g_gameVals.P1PaletteIndex != 2) //need to switch paletteindex in order to reflect changes ingame
+		*g_gameVals.P1PaletteIndex = 2;
 	else
-		*Containers::gameVals.P1PaletteIndex = 3;
+		*g_gameVals.P1PaletteIndex = 3;
 
 	//point current palette to the new one
-	Containers::gameVals.P1CurPalette = getPaletteArray(Containers::gameVals.P1PaletteBase, *Containers::gameVals.P1PaletteIndex, 0);
+	g_gameVals.P1CurPalette = getPaletteArray(g_gameVals.P1PaletteBase, *g_gameVals.P1PaletteIndex, 0);
 }
 
 void ReplaceP2Palette_PaletteEditor(char* pPaletteData, int file)
 {
-	if (*Containers::gameVals.pGameMode != GAME_MODE_TRAINING && *Containers::gameVals.pGameState != GAME_STATE_IN_MATCH && !Containers::gameVals.P2CurPalette)
+	if (*g_gameVals.pGameMode != GameMode_Training && *g_gameVals.pGameState != GameState_InMatch && !g_gameVals.P2CurPalette)
 		return;
 
 	LOG(7, "ReplaceP2Palette_PaletteEditor\n");
 
 	//Get pointers to the palettes in memory
-	DWORD* P2Pal5FilePart = getPaletteArray(Containers::gameVals.P2PaletteBase, 4, file);
-	DWORD* P2Pal6FilePart = getPaletteArray(Containers::gameVals.P2PaletteBase, 5, file);
+	DWORD* P2Pal5FilePart = getPaletteArray(g_gameVals.P2PaletteBase, 4, file);
+	DWORD* P2Pal6FilePart = getPaletteArray(g_gameVals.P2PaletteBase, 5, file);
 
 	//Replace with our own
 	ReplacePaletteInMemory(P2Pal5FilePart, pPaletteData);
 	ReplacePaletteInMemory(P2Pal6FilePart, pPaletteData);
 
-	if (*Containers::gameVals.P2PaletteIndex != 4) //need to switch paletteindex in order to reflect changes ingame
-		*Containers::gameVals.P2PaletteIndex = 4;
+	if (*g_gameVals.P2PaletteIndex != 4) //need to switch paletteindex in order to reflect changes ingame
+		*g_gameVals.P2PaletteIndex = 4;
 	else
-		*Containers::gameVals.P2PaletteIndex = 5;
+		*g_gameVals.P2PaletteIndex = 5;
 
 	//point current palette to the new one
-	Containers::gameVals.P2CurPalette = getPaletteArray(Containers::gameVals.P2PaletteBase, *Containers::gameVals.P2PaletteIndex, 0);
+	g_gameVals.P2CurPalette = getPaletteArray(g_gameVals.P2PaletteBase, *g_gameVals.P2PaletteIndex, 0);
 }

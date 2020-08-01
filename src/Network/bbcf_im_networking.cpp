@@ -1,9 +1,9 @@
 #include "bbcf_im_networking.h"
 
 #include "Core/info.h"
+#include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/Settings.h"
-#include "Game/containers.h"
 #include "Game/custom_gameModes.h"
 #include "Game/gamestates.h"
 #include "ImGui/ImGuiSystem.h"
@@ -18,17 +18,17 @@ void Send_BBCFIM_ID(CSteamID opponentSteamID)
 	im_packet_t packet;
 
 	packet.type = packetType_IMID;
-	packet.playernum = Containers::gameVals.thisPlayerNum;
+	packet.playernum = g_gameVals.thisPlayerNum;
 	packet.datalen = sizeof(int) + (strlen(MOD_VERSION_NUM) + 1);
 
 	packet.part = 1;
 	memcpy(&packet.data[0], &internal_version_num, sizeof(int));
 	memcpy(&packet.data[4], MOD_VERSION_NUM, strlen(MOD_VERSION_NUM) + 1);
 
-	Containers::g_interfaces.pNetworkManager->SendPacket(&opponentSteamID, &packet);
+	g_interfaces.pNetworkManager->SendPacket(&opponentSteamID, &packet);
 
 #ifdef _DEBUG
-	ImGuiSystem::AddLog("[debug] BBCFIM_ID packet sent to: '%s'\n", Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(opponentSteamID));
+	ImGuiSystem::AddLog("[debug] BBCFIM_ID packet sent to: '%s'\n", g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(opponentSteamID));
 #endif
 }
 
@@ -36,7 +36,7 @@ void Receive_BBCFIM_ID(im_packet_internal_t *packet)
 {
 	LOG(2, "Receive_BBCFIM_ID\n");
 
-	if (*Containers::gameVals.pGameState != GAME_STATE_CHARACTER_SELECTION_SCREEN)
+	if (*g_gameVals.pGameState != GameState_ChracterSelectionScreen)
 	{
 		LOG(2, "ERROR, RECEIVED BBCFIM ID PACKET WHILE NOT BEING ON THE CHARSELECT SCREEN\n");
 		ImGuiSystem::AddLog("[error] BBCFIM ID packet received outside of character selection screen\n");
@@ -48,30 +48,30 @@ void Receive_BBCFIM_ID(im_packet_internal_t *packet)
 	memcpy(opponentVersionNum, &packet->data[4], strlen(MOD_VERSION_NUM) + 1);
 
 	//we are spectators
-	if (Containers::gameVals.thisPlayerNum == 0)
+	if (g_gameVals.thisPlayerNum == 0)
 	{
 		if (packet->playernum == 1)
 		{
 			text = "Player1 ";
-			memcpy(&Containers::gameVals.iP1BBCFIMvernum, &packet->data[0], sizeof(int));
-			Containers::gameVals.sP1BBCFIMvernum = opponentVersionNum;
-			Containers::gameVals.bP1UsingBBCFIM = true;
+			memcpy(&g_gameVals.iP1BBCFIMvernum, &packet->data[0], sizeof(int));
+			g_gameVals.sP1BBCFIMvernum = opponentVersionNum;
+			g_gameVals.bP1UsingBBCFIM = true;
 		}
 		else
 		{
 			text = "Player2 ";
-			memcpy(&Containers::gameVals.iP2BBCFIMvernum, &packet->data[0], sizeof(int));
-			Containers::gameVals.sP2BBCFIMvernum = opponentVersionNum;
-			Containers::gameVals.bP2UsingBBCFIM = true;
+			memcpy(&g_gameVals.iP2BBCFIMvernum, &packet->data[0], sizeof(int));
+			g_gameVals.sP2BBCFIMvernum = opponentVersionNum;
+			g_gameVals.bP2UsingBBCFIM = true;
 		}
 
 	}
 	else //As P1 / P2
 	{
 		text = "Opponent ";
-		memcpy(&Containers::gameVals.iOpponentBBCFIMvernum, &packet->data[0], sizeof(int));
-		Containers::gameVals.sOpponentBBCFIMvernum = opponentVersionNum;
-		Containers::gameVals.bOpponentUsingBBCFIM = true;
+		memcpy(&g_gameVals.iOpponentBBCFIMvernum, &packet->data[0], sizeof(int));
+		g_gameVals.sOpponentBBCFIMvernum = opponentVersionNum;
+		g_gameVals.bOpponentUsingBBCFIM = true;
 	}
 
 	text += "BBCFIM ";
@@ -90,16 +90,16 @@ void Send_customGameMode_request(CSteamID opponentSteamID)
 	im_packet_t packet;
 
 	packet.type = packetType_gamemode;
-	packet.playernum = Containers::gameVals.thisPlayerNum;
+	packet.playernum = g_gameVals.thisPlayerNum;
 	packet.datalen = sizeof(int);
 
 	packet.part = 1;
 	memcpy(&packet.data[0], &activatedGameMode, sizeof(int));
 
-	Containers::g_interfaces.pNetworkManager->SendPacket(&opponentSteamID, &packet);
+	g_interfaces.pNetworkManager->SendPacket(&opponentSteamID, &packet);
 
 #ifdef _DEBUG
-	ImGuiSystem::AddLog("[debug] customGameMode packet sent to: '%s'\n", Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(opponentSteamID));
+	ImGuiSystem::AddLog("[debug] customGameMode packet sent to: '%s'\n", g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(opponentSteamID));
 #endif
 }
 
@@ -110,7 +110,7 @@ void Receive_customGameMode_request(im_packet_internal_t *packet)
 	std::string text;
 
 	//if spectators
-	if (Containers::gameVals.thisPlayerNum == 0)
+	if (g_gameVals.thisPlayerNum == 0)
 	{
 		if (packet->playernum == 1)
 		{

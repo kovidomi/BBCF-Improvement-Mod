@@ -20,7 +20,13 @@ HRESULT APIENTRY Direct3D9ExWrapper::RegisterSoftwareDevice(void* pInitializeFun
 
 HRESULT APIENTRY Direct3D9ExWrapper::QueryInterface(const IID &riid, void **ppvObj)
 {
-	return Direct3D9Ex->QueryInterface(riid, ppvObj);
+	HRESULT hRes = Direct3D9Ex->QueryInterface(riid, ppvObj);
+	if (hRes == S_OK)
+		*ppvObj = this;
+	else
+		*ppvObj = NULL;
+
+	return hRes;
 }
 
 ULONG APIENTRY Direct3D9ExWrapper::AddRef()

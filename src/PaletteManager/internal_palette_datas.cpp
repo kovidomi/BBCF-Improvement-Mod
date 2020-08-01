@@ -2,8 +2,8 @@
 
 #include "custom_palette.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
-#include "Game/containers.h"
 
 #include <vector>
 
@@ -65,7 +65,7 @@ void LoadSingleInternalPalette(int charIndex, char* palName, char* palData, char
 	item.push_back("\x00");		// 9	bloom
 	item.push_back(creatorName);			// 10	creator
 	item.push_back(description);			// 11	description
-	Containers::gameVals.customPalettes[charIndex].push_back(item);
+	g_gameVals.customPalettes[charIndex].push_back(item);
 }
 
 void LoadInternalPalettes()

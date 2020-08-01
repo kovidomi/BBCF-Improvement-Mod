@@ -1,10 +1,11 @@
 #pragma once
 
-#include "cchar.h"
-
 #include "D3D9EXWrapper/d3d9.h"
 #include "D3D9EXWrapper/ID3D9EXWrapper_Device.h"
+#include "Game/CharData.h"
+#include "Game/Player.h"
 #include "Network/network_manager.h"
+#include "PaletteManager/PaletteManager.h"
 #include "SteamApiWrapper/SteamApiHelper.h"
 #include "SteamApiWrapper/SteamFriendsWrapper.h"
 #include "SteamApiWrapper/SteamMatchmakingWrapper.h"
@@ -17,8 +18,6 @@
 #include <string>
 #include <vector>
 
-
-
 //forward declaration
 class NetworkManager;
 struct im_packet_internal_t;
@@ -29,7 +28,14 @@ extern char* allstagesunlockedmemory;
 #define ALL_STAGES_UNLOCKED_MEMORY_SIZE 3536//3456
 #endif
 
-struct g_interfaces_t
+struct lookat_t
+{
+	D3DXVECTOR3* pEye;
+	D3DXVECTOR3* pAt;
+	D3DXVECTOR3* pUp;
+};
+
+struct interfaces_t
 {
 	SteamFriendsWrapper* pSteamFriendsWrapper;
 	SteamMatchmakingWrapper* pSteamMatchmakingWrapper;
@@ -40,6 +46,10 @@ struct g_interfaces_t
 	IDirect3DDevice9Ex* pD3D9ExWrapper;
 	NetworkManager* pNetworkManager;
 	SteamApiHelper* pSteamApiHelper;
+	PaletteManager* pPaletteManager;
+
+	Player player1;
+	Player player2;
 };
 
 struct gameVals_t
@@ -100,8 +110,8 @@ struct gameVals_t
 	byte* playerAvatarAcc1;
 	byte* playerAvatarAcc2;
 
-	CChar* P1CharObjPointer;
-	CChar* P2CharObjPointer;
+	CharData* P1CharObjPointer;
+	CharData* P2CharObjPointer;
 	
 	int P1_selectedCharID;
 	int P2_selectedCharID;
@@ -154,6 +164,28 @@ struct gameVals_t
 
 	float *P1ScreenPosX;
 	float *P1ScreenPosY;
+
+	/////////////////
+	// New fields below
+	/////////////////
+
+	// *pIsHUDHidden is a bitfield:
+	// 0x00 - hud is visible
+	// 0x01 - hud is hidden (intro)
+	// 0x02 - hud is hidden (astral)
+	// 0x04 - loading icon is shown
+	int* pIsHUDHidden;
+
+	bool isFrameFrozen;
+	unsigned framesToReach;
+	unsigned* pFrameCount;
+
+	lookat_t lookAtVector;
+	D3DXMATRIX* viewMatrix;
+	D3DXMATRIX* projMatrix;
+
+	int* pEntityList;
+	int entityCount;
 };
 
 struct gameProc_t
@@ -186,13 +218,9 @@ struct temps_t
 	CSteamID* opponentIDToBeDeleted;
 };
 
-class Containers
-{
-public:
-	static g_interfaces_t g_interfaces;
-	static gameProc_t gameProc;
-	static gameVals_t gameVals;
-	static temps_t tempVals;
-	static void Init();
-	static void Cleanup();
-};
+extern interfaces_t g_interfaces;
+extern gameProc_t g_gameProc;
+extern gameVals_t g_gameVals;
+extern temps_t g_tempVals;
+
+void CleanupInterfaces();

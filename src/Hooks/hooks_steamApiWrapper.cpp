@@ -1,41 +1,47 @@
 #include "hooks_steamApiWrapper.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
-#include "Game/containers.h"
 
 bool placeHooks_steamApiWrapper()
 {
 	LOG(1, "placeHooks_steamApiWrapper\n");
-	
-	if (Containers::tempVals.ppSteamMatchmaking)
+
+	if (g_tempVals.ppSteamMatchmaking && !g_interfaces.pSteamMatchmakingWrapper)
 	{
-		Containers::g_interfaces.pSteamMatchmakingWrapper = new SteamMatchmakingWrapper(Containers::tempVals.ppSteamMatchmaking);
+		g_interfaces.pSteamMatchmakingWrapper = new SteamMatchmakingWrapper(g_tempVals.ppSteamMatchmaking);
+		g_interfaces.pSteamMatchmakingWrapper = new SteamMatchmakingWrapper(g_tempVals.ppSteamMatchmaking);
 	}
 
-	if (Containers::tempVals.ppSteamNetworking)
+	if (g_tempVals.ppSteamNetworking && !g_interfaces.pSteamNetworkingWrapper)
 	{
-		Containers::g_interfaces.pSteamNetworkingWrapper = new SteamNetworkingWrapper(Containers::tempVals.ppSteamNetworking);
-		Containers::g_interfaces.pNetworkManager = new NetworkManager(Containers::g_interfaces.pSteamNetworkingWrapper);
+		g_interfaces.pSteamNetworkingWrapper = new SteamNetworkingWrapper(g_tempVals.ppSteamNetworking);
+		g_interfaces.pNetworkManager = new NetworkManager(g_interfaces.pSteamNetworkingWrapper);
 	}
 
-	if (Containers::tempVals.ppSteamFriends)
+	if (g_tempVals.ppSteamFriends && !g_interfaces.pSteamFriendsWrapper)
 	{
-		Containers::g_interfaces.pSteamFriendsWrapper = new SteamFriendsWrapper(Containers::tempVals.ppSteamFriends);
+		g_interfaces.pSteamFriendsWrapper = new SteamFriendsWrapper(g_tempVals.ppSteamFriends);
 	}
 
-	if (Containers::tempVals.ppSteamUser)
+	if (g_tempVals.ppSteamUser && !g_interfaces.pSteamUserWrapper)
 	{
-		Containers::g_interfaces.pSteamUserWrapper = new SteamUserWrapper(Containers::tempVals.ppSteamUser);
+		g_interfaces.pSteamUserWrapper = new SteamUserWrapper(g_tempVals.ppSteamUser);
 	}
 
-	if (Containers::tempVals.ppSteamUserStats)
+	if (g_tempVals.ppSteamUserStats && !g_interfaces.pSteamUserStatsWrapper)
 	{
-		Containers::g_interfaces.pSteamUserStatsWrapper = new SteamUserStatsWrapper(Containers::tempVals.ppSteamUserStats);
+		g_interfaces.pSteamUserStatsWrapper = new SteamUserStatsWrapper(g_tempVals.ppSteamUserStats);
 	}
 
-	if (Containers::tempVals.ppSteamUtils)
+	if (g_tempVals.ppSteamUtils && !g_interfaces.pSteamUtilsWrapper)
 	{
-		Containers::g_interfaces.pSteamUtilsWrapper = new SteamUtilsWrapper(Containers::tempVals.ppSteamUtils);
+		g_interfaces.pSteamUtilsWrapper = new SteamUtilsWrapper(g_tempVals.ppSteamUtils);
+	}
+
+	if (g_interfaces.pSteamUserStatsWrapper && g_interfaces.pSteamFriendsWrapper)
+	{
+		g_interfaces.pSteamApiHelper = new SteamApiHelper(g_interfaces.pSteamUserStatsWrapper, g_interfaces.pSteamFriendsWrapper);
 	}
 
 	return true;

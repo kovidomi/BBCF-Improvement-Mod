@@ -1,10 +1,10 @@
 #include "ImGuiSystem.h"
 
 #include "Core/info.h"
+#include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/utils.h"
 #include "Game/characters.h"
-#include "Game/containers.h"
 #include "Game/custom_gameModes.h"
 #include "Game/gamestates.h"
 #include "ImGui/fonts.h"
@@ -208,7 +208,6 @@ bool ImGuiSystem::Init(void *hwnd, IDirect3DDevice9 *device)
 		CloseHandle(thread);
 	}
 
-	Containers::g_interfaces.pSteamApiHelper = new SteamApiHelper(Containers::g_interfaces.pSteamUserStatsWrapper, Containers::g_interfaces.pSteamFriendsWrapper);
 	//HANDLE thread2 = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)FetchTotalIngamePlayers, NULL, NULL, NULL);
 	//CloseHandle(thread2);
 
@@ -306,28 +305,28 @@ void ImGuiSystem::HandleImGuiWindows()
 		ImGui::Text("");
 
 		{
-			if (Containers::gameVals.pGameMode != 0 && *Containers::gameVals.pGameMode == GAME_MODE_ONLINE)
+			if (g_gameVals.pGameMode != 0 && *g_gameVals.pGameMode == GameMode_Online)
 			{
 				//we are spectators
-				if (Containers::gameVals.thisPlayerNum == 0)
+				if (g_gameVals.thisPlayerNum == 0)
 				{
 					ImGui::Text("Player1 using BBCFIM: "); ImGui::SameLine();
-					if (Containers::gameVals.bP1UsingBBCFIM)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "YES (%s)", Containers::gameVals.sP1BBCFIMvernum.c_str());
+					if (g_gameVals.bP1UsingBBCFIM)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "YES (%s)", g_gameVals.sP1BBCFIMvernum.c_str());
 					else
 						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "NO");
 
 					ImGui::Text("Player2 using BBCFIM: "); ImGui::SameLine();
-					if (Containers::gameVals.bP2UsingBBCFIM)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "YES (%s)", Containers::gameVals.sP2BBCFIMvernum.c_str());
+					if (g_gameVals.bP2UsingBBCFIM)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "YES (%s)", g_gameVals.sP2BBCFIMvernum.c_str());
 					else
 						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "NO");
 				}
 				else
 				{
 					ImGui::Text("Opponent using BBCFIM: "); ImGui::SameLine();
-					if (Containers::gameVals.bOpponentUsingBBCFIM)
-						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "YES (%s)", Containers::gameVals.sOpponentBBCFIMvernum.c_str());
+					if (g_gameVals.bOpponentUsingBBCFIM)
+						ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "YES (%s)", g_gameVals.sOpponentBBCFIMvernum.c_str());
 					else
 						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "NO");
 				}
@@ -340,8 +339,8 @@ void ImGuiSystem::HandleImGuiWindows()
 		}
 
 		ImGui::Text("P$"); ImGui::SameLine();
-		if (Containers::gameVals.pGameMoney)
-			ImGui::InputInt("##P$", *&Containers::gameVals.pGameMoney);
+		if (g_gameVals.pGameMoney)
+			ImGui::InputInt("##P$", *&g_gameVals.pGameMoney);
 
 		if (ImGui::CollapsingHeader("Gameplay settings"))
 		{
@@ -355,10 +354,10 @@ void ImGuiSystem::HandleImGuiWindows()
 
 		if (ImGui::CollapsingHeader("Avatar settings"))
 		{
-			ImGui::Text("\t"); ImGui::SameLine(); ImGui::SliderInt("Avatar", Containers::gameVals.playerAvatarAddr, 0, 0x2F);
-			ImGui::Text("\t"); ImGui::SameLine(); ImGui::SliderInt("Color", Containers::gameVals.playerAvatarColAddr, 0, 0x3);
-			ImGui::Text("\t"); ImGui::SameLine(); ImGui::SliderByte("Accessory 1", Containers::gameVals.playerAvatarAcc1, 0, 0xCF);
-			ImGui::Text("\t"); ImGui::SameLine(); ImGui::SliderByte("Accessory 2", Containers::gameVals.playerAvatarAcc2, 0, 0xCF);
+			ImGui::Text("\t"); ImGui::SameLine(); ImGui::SliderInt("Avatar", g_gameVals.playerAvatarAddr, 0, 0x2F);
+			ImGui::Text("\t"); ImGui::SameLine(); ImGui::SliderInt("Color", g_gameVals.playerAvatarColAddr, 0, 0x3);
+			ImGui::Text("\t"); ImGui::SameLine(); ImGui::SliderByte("Accessory 1", g_gameVals.playerAvatarAcc1, 0, 0xCF);
+			ImGui::Text("\t"); ImGui::SameLine(); ImGui::SliderByte("Accessory 2", g_gameVals.playerAvatarAcc2, 0, 0xCF);
 			ImGui::Separator();
 		}
 
@@ -427,7 +426,7 @@ void ImGuiSystem::HandleImGuiWindows()
 
 		ImGui::Text("Current online players:"); ImGui::SameLine();
 		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "%s", 
-			Containers::g_interfaces.pSteamApiHelper->current_players <= 0 ? "<No data>" : std::to_string(Containers::g_interfaces.pSteamApiHelper->current_players).c_str()); //GetIngamePlayersNum().c_str());
+			g_interfaces.pSteamApiHelper->current_players <= 0 ? "<No data>" : std::to_string(g_interfaces.pSteamApiHelper->current_players).c_str()); //GetIngamePlayersNum().c_str());
 
 		if(ImGui::Button("Discord"))
 			ShellExecute(NULL, L"open", L"https://discord.gg/j2mCX9s", NULL, NULL, SW_SHOWNORMAL);
@@ -484,68 +483,68 @@ void ImGuiSystem::ShowDebugWindow(bool* p_open)
 	}
 	if (ImGui::CollapsingHeader("Game Values"))
 	{
-		ImGui::Text("\tGameState: %d", *Containers::gameVals.pGameState);
-		ImGui::Text("\tGameMode: %d", Containers::gameVals.pGameMode == 0 ? -1 : *Containers::gameVals.pGameMode);
+		ImGui::Text("\tGameState: %d", *g_gameVals.pGameState);
+		ImGui::Text("\tGameMode: %d", g_gameVals.pGameMode == 0 ? -1 : *g_gameVals.pGameMode);
 
-		if (Containers::gameVals.ownSteamID != 0)
-			ImGui::Text("\townSteamID: 0x%x", *Containers::gameVals.ownSteamID);
+		if (g_gameVals.ownSteamID != 0)
+			ImGui::Text("\townSteamID: 0x%x", *g_gameVals.ownSteamID);
 		else
 			ImGui::Text("\townSteamID: 0x%x", 0);
 
-		if (Containers::gameVals.playersInMatch.size() > 0)
+		if (g_gameVals.playersInMatch.size() > 0)
 		{
-			for (int i = 0; i < Containers::gameVals.playersInMatch.size(); i++)
+			for (int i = 0; i < g_gameVals.playersInMatch.size(); i++)
 			{
-				ImGui::Text("\tOpponent SteamID: 0x%x", Containers::gameVals.playersInMatch[i]);
+				ImGui::Text("\tOpponent SteamID: 0x%x", g_gameVals.playersInMatch[i]);
 			}
 		}
 		else
 			ImGui::Text("\tOpponent SteamID: 0");
 
-		//if (Containers::gameVals.opponentSteamID != 0)
-		//	ImGui::Text("\tOpponent SteamID: 0x%x", *Containers::gameVals.opponentSteamID);
+		//if (g_gameVals.opponentSteamID != 0)
+		//	ImGui::Text("\tOpponent SteamID: 0x%x", *g_gameVals.opponentSteamID);
 		//else
 		//	ImGui::Text("\tOpponent SteamID: 0x%x", 0);
 
-		ImGui::Text("\tthisPlayerNum: %d", Containers::gameVals.thisPlayerNum);
+		ImGui::Text("\tthisPlayerNum: %d", g_gameVals.thisPlayerNum);
 
-		ImGui::Text("\ttotalReadPackets: %d", Containers::gameVals.totalReadPackets);
+		ImGui::Text("\ttotalReadPackets: %d", g_gameVals.totalReadPackets);
 
-		ImGui::Text("\tpMatchState: 0x%x : %d", Containers::gameVals.pMatchState, *Containers::gameVals.pMatchState);
-		ImGui::Text("\tpMatchTimer: 0x%x : %d", Containers::gameVals.pMatchTimer, *Containers::gameVals.pMatchTimer);
-		ImGui::Text("\tpMatchRounds: 0x%x : %d", Containers::gameVals.pMatchRounds, Containers::gameVals.pMatchRounds == 0 ? -1 : *Containers::gameVals.pMatchRounds);
-		ImGui::Text("\tisP1CPU: %d", Containers::gameVals.isP1CPU);
-		ImGui::Text("\tstageListMemory: 0x%x", Containers::gameVals.stageListMemory);
+		ImGui::Text("\tpMatchState: 0x%x : %d", g_gameVals.pMatchState, *g_gameVals.pMatchState);
+		ImGui::Text("\tpMatchTimer: 0x%x : %d", g_gameVals.pMatchTimer, *g_gameVals.pMatchTimer);
+		ImGui::Text("\tpMatchRounds: 0x%x : %d", g_gameVals.pMatchRounds, g_gameVals.pMatchRounds == 0 ? -1 : *g_gameVals.pMatchRounds);
+		ImGui::Text("\tisP1CPU: %d", g_gameVals.isP1CPU);
+		ImGui::Text("\tstageListMemory: 0x%x", g_gameVals.stageListMemory);
 	}
 	if (ImGui::CollapsingHeader("Player Objects"))
 	{
-		ImGui::Text("\tP1CharObjAddr: 0x%x", Containers::gameVals.P1CharObjPointer);
-		ImGui::Text("\tP2CharObjAddr: 0x%x", Containers::gameVals.P2CharObjPointer);
-		ImGui::Text("\tP1SelectedCharID: %d", Containers::gameVals.P1_selectedCharID);
-		ImGui::Text("\tP2SelectedCharID: %d", Containers::gameVals.P2_selectedCharID);
-		ImGui::Text("\tP1_is_doing_distortion: %d", Containers::gameVals.P1CharObjPointer == 0 ? -1 : Containers::gameVals.P1CharObjPointer->is_doing_distortion);
-		ImGui::Text("\tP2_is_doing_distortion: %d", Containers::gameVals.P2CharObjPointer == 0 ? -1 : Containers::gameVals.P2CharObjPointer->is_doing_distortion);
-		ImGui::Text("\tP1_curHP: %d", Containers::gameVals.P1CharObjPointer == 0 ? -1 : Containers::gameVals.P1CharObjPointer->currentHP);
-		ImGui::Text("\tP1_maxHP: %d", Containers::gameVals.P1CharObjPointer == 0 ? -1 : Containers::gameVals.P1CharObjPointer->maxHP);
-		ImGui::Text("\tP2_curHP: %d", Containers::gameVals.P2CharObjPointer == 0 ? -1 : Containers::gameVals.P2CharObjPointer->currentHP);
-		ImGui::Text("\tP2_maxHP: %d", Containers::gameVals.P2CharObjPointer == 0 ? -1 : Containers::gameVals.P2CharObjPointer->maxHP);
-		ImGui::Text("\tP1_selected_custom_pal: %d", Containers::gameVals.P1_selected_custom_pal);
-		ImGui::Text("\tP2_selected_custom_pal: %d", Containers::gameVals.P2_selected_custom_pal);
+		ImGui::Text("\tP1CharObjAddr: 0x%x", g_gameVals.P1CharObjPointer);
+		ImGui::Text("\tP2CharObjAddr: 0x%x", g_gameVals.P2CharObjPointer);
+		ImGui::Text("\tP1SelectedCharID: %d", g_gameVals.P1_selectedCharID);
+		ImGui::Text("\tP2SelectedCharID: %d", g_gameVals.P2_selectedCharID);
+		ImGui::Text("\tP1_is_doing_distortion: %d", g_gameVals.P1CharObjPointer == 0 ? -1 : g_gameVals.P1CharObjPointer->isDoingDistortion);
+		ImGui::Text("\tP2_is_doing_distortion: %d", g_gameVals.P2CharObjPointer == 0 ? -1 : g_gameVals.P2CharObjPointer->isDoingDistortion);
+		ImGui::Text("\tP1_curHP: %d", g_gameVals.P1CharObjPointer == 0 ? -1 : g_gameVals.P1CharObjPointer->currentHP);
+		ImGui::Text("\tP1_maxHP: %d", g_gameVals.P1CharObjPointer == 0 ? -1 : g_gameVals.P1CharObjPointer->maxHP);
+		ImGui::Text("\tP2_curHP: %d", g_gameVals.P2CharObjPointer == 0 ? -1 : g_gameVals.P2CharObjPointer->currentHP);
+		ImGui::Text("\tP2_maxHP: %d", g_gameVals.P2CharObjPointer == 0 ? -1 : g_gameVals.P2CharObjPointer->maxHP);
+		ImGui::Text("\tP1_selected_custom_pal: %d", g_gameVals.P1_selected_custom_pal);
+		ImGui::Text("\tP2_selected_custom_pal: %d", g_gameVals.P2_selected_custom_pal);
 		ImGui::Text("\tP1PaletteIndex:");
-		if (Containers::gameVals.P1PaletteIndex)
+		if (g_gameVals.P1PaletteIndex)
 		{
 			ImGui::SameLine();
-			ImGui::InputInt("##P1PaletteIndex", *&Containers::gameVals.P1PaletteIndex);
+			ImGui::InputInt("##P1PaletteIndex", *&g_gameVals.P1PaletteIndex);
 		}
 		ImGui::Text("\tP2PaletteIndex:");
-		if (Containers::gameVals.P2PaletteIndex)
+		if (g_gameVals.P2PaletteIndex)
 		{
 			ImGui::SameLine();
-			ImGui::InputInt("##P2PaletteIndex", *&Containers::gameVals.P2PaletteIndex);
+			ImGui::InputInt("##P2PaletteIndex", *&g_gameVals.P2PaletteIndex);
 		}
-		ImGui::Text("\torigP1PaletteIndex:%d", Containers::gameVals.origP1PaletteIndex);
-		ImGui::Text("\torigP2PaletteIndex:%d", Containers::gameVals.origP2PaletteIndex);
-		ImGui::Text("\tP1ScreenPosX: 0x%x : %.2f", Containers::gameVals.P1ScreenPosX, *Containers::gameVals.P1ScreenPosX);
+		ImGui::Text("\torigP1PaletteIndex:%d", g_gameVals.origP1PaletteIndex);
+		ImGui::Text("\torigP2PaletteIndex:%d", g_gameVals.origP2PaletteIndex);
+		ImGui::Text("\tP1ScreenPosX: 0x%x : %.2f", g_gameVals.P1ScreenPosX, *g_gameVals.P1ScreenPosX);
 	}
 
 	if (ImGui::CollapsingHeader("Notifications"))
@@ -579,9 +578,9 @@ void ImGuiSystem::ShowDebugWindow(bool* p_open)
 void ImGuiSystem::ShowCustomPalettesMenu()
 {
 	// 6 = character selection screen, 14 = versus screen, 15 = in match
-	if (*Containers::gameVals.pGameState != GAME_STATE_CHARACTER_SELECTION_SCREEN && 
-		*Containers::gameVals.pGameState != GAME_STATE_VERSUS_SCREEN &&
-		*Containers::gameVals.pGameState != GAME_STATE_IN_MATCH)
+	if (*g_gameVals.pGameState != GameState_ChracterSelectionScreen && 
+		*g_gameVals.pGameState != GameState_VersusScreen &&
+		*g_gameVals.pGameState != GameState_InMatch)
 	{
 		ImGui::Text("\t"); ImGui::SameLine();
 		ImGui::Button("P1 palette"); ImGui::SameLine(); ImGui::TextDisabled("NOT IN MATCH");
@@ -592,21 +591,21 @@ void ImGuiSystem::ShowCustomPalettesMenu()
 	else
 	{
 		//prevent array out of bounds
-		if (Containers::gameVals.P1_selectedCharID != -1)
+		if (g_gameVals.P1_selectedCharID != -1)
 		{
-			if (Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID].size() <= Containers::gameVals.P1_selected_custom_pal)
-				Containers::gameVals.P1_selected_custom_pal = 0;
+			if (g_gameVals.customPalettes[g_gameVals.P1_selectedCharID].size() <= g_gameVals.P1_selected_custom_pal)
+				g_gameVals.P1_selected_custom_pal = 0;
 		}
-		if (Containers::gameVals.P2_selectedCharID != -1)
+		if (g_gameVals.P2_selectedCharID != -1)
 		{
-			if (Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID].size() <= Containers::gameVals.P2_selected_custom_pal)
-				Containers::gameVals.P2_selected_custom_pal = 0;
+			if (g_gameVals.customPalettes[g_gameVals.P2_selectedCharID].size() <= g_gameVals.P2_selected_custom_pal)
+				g_gameVals.P2_selected_custom_pal = 0;
 		}
 
 
-		if (Containers::gameVals.opponentSteamID == 0 || Containers::gameVals.thisPlayerNum == 1 || *Containers::gameVals.pGameState == GAME_STATE_CHARACTER_SELECTION_SCREEN)
+		if (g_gameVals.opponentSteamID == 0 || g_gameVals.thisPlayerNum == 1 || *g_gameVals.pGameState == GameState_ChracterSelectionScreen)
 		{
-			if (Containers::gameVals.P1_selectedCharID == -1)
+			if (g_gameVals.P1_selectedCharID == -1)
 			{
 				ImGui::Text("\t"); ImGui::SameLine();
 				ImGui::Button("P1 palette"); ImGui::SameLine(); ImGui::TextDisabled("NO CHARACTER SELECTED");
@@ -616,15 +615,15 @@ void ImGuiSystem::ShowCustomPalettesMenu()
 				ImGui::Text("\t"); ImGui::SameLine();
 				if (ImGui::Button("?##P1"))
 				{
-					if (Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID].size() > 2)
+					if (g_gameVals.customPalettes[g_gameVals.P1_selectedCharID].size() > 2)
 					{
-						int orig_pal = Containers::gameVals.P1_selected_custom_pal;
-						while (orig_pal == Containers::gameVals.P1_selected_custom_pal)
+						int orig_pal = g_gameVals.P1_selected_custom_pal;
+						while (orig_pal == g_gameVals.P1_selected_custom_pal)
 						{
-							Containers::gameVals.P1_selected_custom_pal = rand() % Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID].size();
-							if (Containers::gameVals.P1_selected_custom_pal == 0)
-								Containers::gameVals.P1_selected_custom_pal = 1;
-							LOG(2, "%d - %d\n", orig_pal, Containers::gameVals.P1_selected_custom_pal);
+							g_gameVals.P1_selected_custom_pal = rand() % g_gameVals.customPalettes[g_gameVals.P1_selectedCharID].size();
+							if (g_gameVals.P1_selected_custom_pal == 0)
+								g_gameVals.P1_selected_custom_pal = 1;
+							LOG(2, "%d - %d\n", orig_pal, g_gameVals.P1_selected_custom_pal);
 						}
 						ReplaceP1Palette();
 					}
@@ -639,39 +638,37 @@ void ImGuiSystem::ShowCustomPalettesMenu()
 				if (ImGui::Button("P1 palette"))
 					ImGui::OpenPopup("select1");
 				ImGui::SameLine();
-				ImGui::TextUnformatted(Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][Containers::gameVals.P1_selected_custom_pal][0].c_str());
+				ImGui::TextUnformatted(g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][g_gameVals.P1_selected_custom_pal][0].c_str());
 				if (ImGui::BeginPopup("select1"))
 				{
-					std::wstring ws(ingame_chars[Containers::gameVals.P1_selectedCharID]);
-					std::string charName(ws.begin(), ws.end());
-					ImGui::Text(charName.c_str());
+					ImGui::Text(getCharacterNameByIndexA(g_gameVals.P1_selectedCharID).c_str());
 					ImGui::Separator();
-					for (int i = 0; i < Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID].size(); i++)
+					for (int i = 0; i < g_gameVals.customPalettes[g_gameVals.P1_selectedCharID].size(); i++)
 					{
-						bool clicked = ImGui::Selectable(Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][0].c_str());
+						bool clicked = ImGui::Selectable(g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][0].c_str());
 						if (ImGui::IsItemHovered() && i != 0)
 						{
 							//preventing null exceptions
-							if (Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][9][0] == 1 ||
-								Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][10] != "" ||
-								Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][11] != "")
+							if (g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][9][0] == 1 ||
+								g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][10] != "" ||
+								g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][11] != "")
 							{
 								//control size of tooltip:
 								//ImGui::PushItemWidth();
 								//ImGui::PopItemWidth();
 								ImGui::BeginTooltip();
-								if (Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][10] != "")
-									ImGui::Text("Creator: %s", Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][10].c_str());
-								if (Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][11] != "")
-									ImGui::Text("Description: %s", Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][11].c_str());
-								if (Containers::gameVals.customPalettes[Containers::gameVals.P1_selectedCharID][i][9][0] == 1)
+								if (g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][10] != "")
+									ImGui::Text("Creator: %s", g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][10].c_str());
+								if (g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][11] != "")
+									ImGui::Text("Description: %s", g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][11].c_str());
+								if (g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][i][9][0] == 1)
 									ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Has bloom effect");
 								ImGui::EndTooltip();
 							}
 						}
 						if (clicked)
 						{
-							Containers::gameVals.P1_selected_custom_pal = i;
+							g_gameVals.P1_selected_custom_pal = i;
 							ReplaceP1Palette();
 						}
 					}
@@ -680,9 +677,9 @@ void ImGuiSystem::ShowCustomPalettesMenu()
 			}
 		}
 
-		if (Containers::gameVals.opponentSteamID == 0 || Containers::gameVals.thisPlayerNum == 2 || *Containers::gameVals.pGameState == GAME_STATE_CHARACTER_SELECTION_SCREEN)
+		if (g_gameVals.opponentSteamID == 0 || g_gameVals.thisPlayerNum == 2 || *g_gameVals.pGameState == GameState_ChracterSelectionScreen)
 		{
-			if (Containers::gameVals.P2_selectedCharID == -1)
+			if (g_gameVals.P2_selectedCharID == -1)
 			{
 				ImGui::Text("\t"); ImGui::SameLine();
 				ImGui::Button("P2 palette"); ImGui::SameLine(); ImGui::TextDisabled("NO CHARACTER SELECTED");
@@ -692,15 +689,15 @@ void ImGuiSystem::ShowCustomPalettesMenu()
 				ImGui::Text("\t"); ImGui::SameLine();
 				if (ImGui::Button("?##P2"))
 				{
-					if (Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID].size() > 2)
+					if (g_gameVals.customPalettes[g_gameVals.P2_selectedCharID].size() > 2)
 					{
-						int orig_pal = Containers::gameVals.P2_selected_custom_pal;
-						while (orig_pal == Containers::gameVals.P2_selected_custom_pal)
+						int orig_pal = g_gameVals.P2_selected_custom_pal;
+						while (orig_pal == g_gameVals.P2_selected_custom_pal)
 						{
-							Containers::gameVals.P2_selected_custom_pal = rand() % Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID].size();
-							if (Containers::gameVals.P2_selected_custom_pal == 0)
-								Containers::gameVals.P2_selected_custom_pal = 1;
-							LOG(2, "%d - %d\n", orig_pal, Containers::gameVals.P2_selected_custom_pal);
+							g_gameVals.P2_selected_custom_pal = rand() % g_gameVals.customPalettes[g_gameVals.P2_selectedCharID].size();
+							if (g_gameVals.P2_selected_custom_pal == 0)
+								g_gameVals.P2_selected_custom_pal = 1;
+							LOG(2, "%d - %d\n", orig_pal, g_gameVals.P2_selected_custom_pal);
 						}
 						ReplaceP2Palette();
 					}
@@ -715,39 +712,37 @@ void ImGuiSystem::ShowCustomPalettesMenu()
 				if (ImGui::Button("P2 palette"))
 					ImGui::OpenPopup("select2");
 				ImGui::SameLine();
-				ImGui::TextUnformatted(Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][Containers::gameVals.P2_selected_custom_pal][0].c_str());
+				ImGui::TextUnformatted(g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][g_gameVals.P2_selected_custom_pal][0].c_str());
 				if (ImGui::BeginPopup("select2"))
 				{
-					std::wstring ws(ingame_chars[Containers::gameVals.P2_selectedCharID]);
-					std::string charName(ws.begin(), ws.end());
-					ImGui::Text(charName.c_str());
+					ImGui::Text(getCharacterNameByIndexA(g_gameVals.P2_selectedCharID).c_str());
 					ImGui::Separator();
-					for (int i = 0; i < Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID].size(); i++)
+					for (int i = 0; i < g_gameVals.customPalettes[g_gameVals.P2_selectedCharID].size(); i++)
 					{
-						bool clicked = ImGui::Selectable(Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][0].c_str());
+						bool clicked = ImGui::Selectable(g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][0].c_str());
 						if (ImGui::IsItemHovered() && i != 0)
 						{
 							//preventing null exceptions
-							if (Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][9][0] == 1 ||
-								Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][10] != "" ||
-								Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][11] != "")
+							if (g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][9][0] == 1 ||
+								g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][10] != "" ||
+								g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][11] != "")
 							{
 								//control size of tooltip:
 								//ImGui::PushItemWidth();
 								//ImGui::PopItemWidth();
 								ImGui::BeginTooltip();
-								if (Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][10] != "")
-									ImGui::Text("Creator: %s", Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][10].c_str());
-								if (Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][11] != "")
-									ImGui::Text("Description: %s", Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][11].c_str());
-								if (Containers::gameVals.customPalettes[Containers::gameVals.P2_selectedCharID][i][9][0] == 1)
+								if (g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][10] != "")
+									ImGui::Text("Creator: %s", g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][10].c_str());
+								if (g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][11] != "")
+									ImGui::Text("Description: %s", g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][11].c_str());
+								if (g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][i][9][0] == 1)
 									ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Has bloom effect");
 								ImGui::EndTooltip();
 							}
 						}
 						if (clicked)
 						{
-							Containers::gameVals.P2_selected_custom_pal = i;
+							g_gameVals.P2_selected_custom_pal = i;
 							ReplaceP2Palette();
 						}
 					}
@@ -760,7 +755,7 @@ void ImGuiSystem::ShowCustomPalettesMenu()
 	ImGui::Text("");
 	ImGui::Text("\t"); ImGui::SameLine();
 	bool pressed = ImGui::Button("Palette editor");
-	if (*Containers::gameVals.pGameState != GAME_STATE_IN_MATCH || *Containers::gameVals.pGameMode != GAME_MODE_TRAINING)
+	if (*g_gameVals.pGameState != GameState_InMatch || *g_gameVals.pGameMode != GameMode_Training)
 	{
 		ImGui::SameLine();
 		ImGui::TextDisabled("NOT IN TRAINING MODE");
@@ -957,16 +952,16 @@ void ImGuiSystem::ShowUpdateWindow()
 
 void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 {
-	if (*Containers::gameVals.pGameState != GAME_STATE_IN_MATCH || *Containers::gameVals.pGameMode != GAME_MODE_TRAINING)
+	if (*g_gameVals.pGameState != GameState_InMatch || *g_gameVals.pGameMode != GameMode_Training)
 		return;
 
 	ImGui::Begin("Palette editor", p_open);
 
-	static int selected_character = Containers::gameVals.P1_selectedCharID;
-	static int prev_selectedP1Char = Containers::gameVals.P1_selectedCharID;
-	static int prev_selectedP2Char = Containers::gameVals.P2_selectedCharID;
+	static int selected_character = g_gameVals.P1_selectedCharID;
+	static int prev_selectedP1Char = g_gameVals.P1_selectedCharID;
+	static int prev_selectedP2Char = g_gameVals.P2_selectedCharID;
 	static std::string files[] = { "Character", "Effect01", "Effect02", "Effect03", "Effect04", "Effect05", "Effect06", "Effect07" };
-	static char* pBackupPal = Containers::tempVals.PaletteEditorP1PalBackup;
+	static char* pBackupPal = g_tempVals.PaletteEditorP1PalBackup;
 	static bool show_alpha = false;
 	static int selected_box = 0;
 	static int prev_selected_box = 0;
@@ -975,14 +970,14 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 	static int color_edit_flags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha;
 
 	//reset variables upon switching characters via training's quick char selection
-	if (prev_selectedP1Char != Containers::gameVals.P1_selectedCharID || prev_selectedP2Char != Containers::gameVals.P2_selectedCharID)
+	if (prev_selectedP1Char != g_gameVals.P1_selectedCharID || prev_selectedP2Char != g_gameVals.P2_selectedCharID)
 	{
-		selected_character = Containers::gameVals.P1_selectedCharID;
-		Containers::gameVals.paletteEditor_selectedFile = 0;
-		Containers::gameVals.paletteEditor_selectedPlayer = 0;
-		pBackupPal = Containers::tempVals.PaletteEditorP1PalBackup;
-		prev_selectedP1Char = Containers::gameVals.P1_selectedCharID;
-		prev_selectedP2Char = Containers::gameVals.P2_selectedCharID;
+		selected_character = g_gameVals.P1_selectedCharID;
+		g_gameVals.paletteEditor_selectedFile = 0;
+		g_gameVals.paletteEditor_selectedPlayer = 0;
+		pBackupPal = g_tempVals.PaletteEditorP1PalBackup;
+		prev_selectedP1Char = g_gameVals.P1_selectedCharID;
+		prev_selectedP2Char = g_gameVals.P2_selectedCharID;
 	}
 
 	//////////////////////////////// SELECT CHARACTER
@@ -991,51 +986,47 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 		ImGui::OpenPopup("select_char_pal");
 	ImGui::SameLine();
 
-	std::wstring ws(ingame_chars[selected_character]);
-	std::string charName(ws.begin(), ws.end());
-	ImGui::Text(charName.c_str());
+	ImGui::Text(getCharacterNameByIndexA(selected_character).c_str());
 
 	if (ImGui::BeginPopup("select_char_pal"))
 	{
 		static std::vector<std::string> chars(2);
-		std::wstring wsChar1(ingame_chars[Containers::gameVals.P1_selectedCharID]);
-		std::wstring wsChar2(ingame_chars[Containers::gameVals.P2_selectedCharID]);
-		chars[0] = std::string(wsChar1.begin(), wsChar1.end());
-		chars[1] = std::string(wsChar2.begin(), wsChar2.end());
+		chars[0] = getCharacterNameByIndexA(g_gameVals.P1_selectedCharID);
+		chars[1] = getCharacterNameByIndexA(g_gameVals.P2_selectedCharID);
 		for (int i = 0; i < 2; i++)
 		{
 			ImGui::PushID(i);
 			if(ImGui::Selectable(chars[i].c_str()))
 			{
 				//restore original palette
-				if (Containers::tempVals.paledit_show_sel_by_highlight || Containers::tempVals.paledit_show_placeholder)
+				if (g_tempVals.paledit_show_sel_by_highlight || g_tempVals.paledit_show_placeholder)
 				{
-					Containers::tempVals.paledit_show_sel_by_highlight = false;
-					Containers::tempVals.paledit_show_placeholder = false;
+					g_tempVals.paledit_show_sel_by_highlight = false;
+					g_tempVals.paledit_show_placeholder = false;
 					memcpy(pBackupPal, highlight_orig_backup, PALETTE_DATALEN);
-					if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-						ReplaceP1Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+					if (g_gameVals.paletteEditor_selectedPlayer == 0)
+						ReplaceP1Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 					else
-						ReplaceP2Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+						ReplaceP2Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 				}
 
 				if (i == 0)
 				{
-					selected_character = Containers::gameVals.P1_selectedCharID;
-					memcpy(Containers::tempVals.PaletteEditorP1PalBackup, getPaletteArray(Containers::gameVals.P1PaletteBase, 
-						*Containers::gameVals.P1PaletteIndex, Containers::gameVals.paletteEditor_selectedFile), PALETTE_DATALEN);
-					pBackupPal = Containers::tempVals.PaletteEditorP1PalBackup;
+					selected_character = g_gameVals.P1_selectedCharID;
+					memcpy(g_tempVals.PaletteEditorP1PalBackup, getPaletteArray(g_gameVals.P1PaletteBase, 
+						*g_gameVals.P1PaletteIndex, g_gameVals.paletteEditor_selectedFile), PALETTE_DATALEN);
+					pBackupPal = g_tempVals.PaletteEditorP1PalBackup;
 				}
 				else
 				{
-					selected_character = Containers::gameVals.P2_selectedCharID;
-					memcpy(Containers::tempVals.PaletteEditorP2PalBackup, getPaletteArray(Containers::gameVals.P2PaletteBase,
-						*Containers::gameVals.P2PaletteIndex, Containers::gameVals.paletteEditor_selectedFile), PALETTE_DATALEN);
-					pBackupPal = Containers::tempVals.PaletteEditorP2PalBackup;
+					selected_character = g_gameVals.P2_selectedCharID;
+					memcpy(g_tempVals.PaletteEditorP2PalBackup, getPaletteArray(g_gameVals.P2PaletteBase,
+						*g_gameVals.P2PaletteIndex, g_gameVals.paletteEditor_selectedFile), PALETTE_DATALEN);
+					pBackupPal = g_tempVals.PaletteEditorP2PalBackup;
 				}
-				Containers::gameVals.paletteEditor_selectedPlayer = i;
-				ImGui::PopID();
+				g_gameVals.paletteEditor_selectedPlayer = i;
 			}
+			ImGui::PopID();
 		}
 		ImGui::EndPopup();
 	}
@@ -1045,52 +1036,52 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 	if (ImGui::Button("Select palette  "))
 		ImGui::OpenPopup("select_custom_pal");
 	ImGui::SameLine();
-	if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-		ImGui::Text(Containers::gameVals.customPalettes[selected_character][Containers::gameVals.P1_selected_custom_pal][0].c_str());
+	if (g_gameVals.paletteEditor_selectedPlayer == 0)
+		ImGui::Text(g_gameVals.customPalettes[selected_character][g_gameVals.P1_selected_custom_pal][0].c_str());
 	else
-		ImGui::Text(Containers::gameVals.customPalettes[selected_character][Containers::gameVals.P2_selected_custom_pal][0].c_str());
+		ImGui::Text(g_gameVals.customPalettes[selected_character][g_gameVals.P2_selected_custom_pal][0].c_str());
 
 	if (ImGui::BeginPopup("select_custom_pal"))
 	{
-		for (int i = 0; i < Containers::gameVals.customPalettes[selected_character].size(); i++)
+		for (int i = 0; i < g_gameVals.customPalettes[selected_character].size(); i++)
 		{
-			bool clicked = ImGui::Selectable(Containers::gameVals.customPalettes[selected_character][i][0].c_str());
+			bool clicked = ImGui::Selectable(g_gameVals.customPalettes[selected_character][i][0].c_str());
 			if (ImGui::IsItemHovered() && i != 0)
 			{
 				//preventing null exceptions
-				if (Containers::gameVals.customPalettes[selected_character][i][9][0] == 1 ||
-					Containers::gameVals.customPalettes[selected_character][i][10] != "" ||
-					Containers::gameVals.customPalettes[selected_character][i][11] != "")
+				if (g_gameVals.customPalettes[selected_character][i][9][0] == 1 ||
+					g_gameVals.customPalettes[selected_character][i][10] != "" ||
+					g_gameVals.customPalettes[selected_character][i][11] != "")
 				{
 					//control size of tooltip:
 					//ImGui::PushItemWidth();
 					//ImGui::PopItemWidth();
 					ImGui::BeginTooltip();
-					if (Containers::gameVals.customPalettes[selected_character][i][10] != "")
-						ImGui::Text("Creator: %s", Containers::gameVals.customPalettes[selected_character][i][10].c_str());
-					if (Containers::gameVals.customPalettes[selected_character][i][11] != "")
-						ImGui::Text("Description: %s", Containers::gameVals.customPalettes[selected_character][i][11].c_str());
-					if (Containers::gameVals.customPalettes[selected_character][i][9][0] == 1)
+					if (g_gameVals.customPalettes[selected_character][i][10] != "")
+						ImGui::Text("Creator: %s", g_gameVals.customPalettes[selected_character][i][10].c_str());
+					if (g_gameVals.customPalettes[selected_character][i][11] != "")
+						ImGui::Text("Description: %s", g_gameVals.customPalettes[selected_character][i][11].c_str());
+					if (g_gameVals.customPalettes[selected_character][i][9][0] == 1)
 						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Has bloom effect");
 					ImGui::EndTooltip();
 				}
 			}
 			if (clicked)
 			{
-				if (Containers::tempVals.paledit_show_sel_by_highlight || Containers::tempVals.paledit_show_placeholder)
+				if (g_tempVals.paledit_show_sel_by_highlight || g_tempVals.paledit_show_placeholder)
 				{
-					Containers::tempVals.paledit_show_sel_by_highlight = false;
-					Containers::tempVals.paledit_show_placeholder = false;
+					g_tempVals.paledit_show_sel_by_highlight = false;
+					g_tempVals.paledit_show_placeholder = false;
 				}
 
-				if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
+				if (g_gameVals.paletteEditor_selectedPlayer == 0)
 				{
-					Containers::gameVals.P1_selected_custom_pal = i;
+					g_gameVals.P1_selected_custom_pal = i;
 					ReplaceP1Palette();
 				}
 				else
 				{
-					Containers::gameVals.P2_selected_custom_pal = i;
+					g_gameVals.P2_selected_custom_pal = i;
 					ReplaceP2Palette();
 				}
 			}
@@ -1104,7 +1095,7 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 		ImGui::OpenPopup("select_file_pal");
 	ImGui::SameLine();
 
-	ImGui::Text(files[Containers::gameVals.paletteEditor_selectedFile].c_str());
+	ImGui::Text(files[g_gameVals.paletteEditor_selectedFile].c_str());
 
 	if (ImGui::BeginPopup("select_file_pal"))
 	{
@@ -1113,29 +1104,29 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 			if (ImGui::Selectable(files[i].c_str()))
 			{
 				//restore original palette
-				if (Containers::tempVals.paledit_show_sel_by_highlight || Containers::tempVals.paledit_show_placeholder)
+				if (g_tempVals.paledit_show_sel_by_highlight || g_tempVals.paledit_show_placeholder)
 				{
-					Containers::tempVals.paledit_show_sel_by_highlight = false;
-					Containers::tempVals.paledit_show_placeholder = false;
+					g_tempVals.paledit_show_sel_by_highlight = false;
+					g_tempVals.paledit_show_placeholder = false;
 					memcpy(pBackupPal, highlight_orig_backup, PALETTE_DATALEN);
-					if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-						ReplaceP1Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+					if (g_gameVals.paletteEditor_selectedPlayer == 0)
+						ReplaceP1Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 					else
-						ReplaceP2Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+						ReplaceP2Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 				}
 
-				Containers::gameVals.paletteEditor_selectedFile = i;
-				if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
+				g_gameVals.paletteEditor_selectedFile = i;
+				if (g_gameVals.paletteEditor_selectedPlayer == 0)
 				{
-					memcpy(Containers::tempVals.PaletteEditorP1PalBackup, getPaletteArray(Containers::gameVals.P1PaletteBase,
-						*Containers::gameVals.P1PaletteIndex, Containers::gameVals.paletteEditor_selectedFile), PALETTE_DATALEN);
-					pBackupPal = Containers::tempVals.PaletteEditorP1PalBackup;
+					memcpy(g_tempVals.PaletteEditorP1PalBackup, getPaletteArray(g_gameVals.P1PaletteBase,
+						*g_gameVals.P1PaletteIndex, g_gameVals.paletteEditor_selectedFile), PALETTE_DATALEN);
+					pBackupPal = g_tempVals.PaletteEditorP1PalBackup;
 				}
 				else
 				{
-					memcpy(Containers::tempVals.PaletteEditorP2PalBackup, getPaletteArray(Containers::gameVals.P2PaletteBase,
-						*Containers::gameVals.P2PaletteIndex, Containers::gameVals.paletteEditor_selectedFile), PALETTE_DATALEN);
-					pBackupPal = Containers::tempVals.PaletteEditorP2PalBackup;
+					memcpy(g_tempVals.PaletteEditorP2PalBackup, getPaletteArray(g_gameVals.P2PaletteBase,
+						*g_gameVals.P2PaletteIndex, g_gameVals.paletteEditor_selectedFile), PALETTE_DATALEN);
+					pBackupPal = g_tempVals.PaletteEditorP2PalBackup;
 				}
 			}
 		}
@@ -1158,12 +1149,12 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 	//	ImGui::TextDisabled("Highlight mode");
 	//}
 	//else 
-	if (ImGui::Checkbox("Highlight mode", &Containers::tempVals.paledit_show_sel_by_highlight))
+	if (ImGui::Checkbox("Highlight mode", &g_tempVals.paledit_show_sel_by_highlight))
 	{
-		if (Containers::tempVals.paledit_show_sel_by_highlight)
+		if (g_tempVals.paledit_show_sel_by_highlight)
 		{
-			if (Containers::tempVals.paledit_show_placeholder)
-				Containers::tempVals.paledit_show_placeholder = false;
+			if (g_tempVals.paledit_show_placeholder)
+				g_tempVals.paledit_show_placeholder = false;
 			else
 				memcpy(highlight_orig_backup, pBackupPal, PALETTE_DATALEN); //save original into backup
 			//fill the array with black
@@ -1178,22 +1169,22 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 				else
 					pBackupPal[i] = 0;
 			}
-			if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-				ReplaceP1Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+			if (g_gameVals.paletteEditor_selectedPlayer == 0)
+				ReplaceP1Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 			else
-				ReplaceP2Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+				ReplaceP2Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 		}
 		else
 		{
 			memcpy(pBackupPal, highlight_orig_backup, PALETTE_DATALEN);
-			if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-				ReplaceP1Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+			if (g_gameVals.paletteEditor_selectedPlayer == 0)
+				ReplaceP1Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 			else
-				ReplaceP2Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+				ReplaceP2Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 		}
 	}
 
-	if (Containers::gameVals.paletteEditor_selectedFile == 0)
+	if (g_gameVals.paletteEditor_selectedFile == 0)
 	{
 		//if (show_sel_by_highlight)
 		//{
@@ -1204,33 +1195,33 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 		//	//ImGui::ColorButtonOn32Bit("##PalColorButton", (unsigned char*)pBackupPal + (i * 4), color_edit_flags); 
 		//}
 		//else 
-		if (ImGui::Checkbox("Placeholder mode", &Containers::tempVals.paledit_show_placeholder))
+		if (ImGui::Checkbox("Placeholder mode", &g_tempVals.paledit_show_placeholder))
 		{
-			if (Containers::tempVals.paledit_show_placeholder)
+			if (g_tempVals.paledit_show_placeholder)
 			{
-				if (Containers::tempVals.paledit_show_sel_by_highlight)
-					Containers::tempVals.paledit_show_sel_by_highlight = false;
+				if (g_tempVals.paledit_show_sel_by_highlight)
+					g_tempVals.paledit_show_sel_by_highlight = false;
 				else
 					memcpy(highlight_orig_backup, pBackupPal, PALETTE_DATALEN); //save original into backup
 																			//fill the array with black
-				if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
+				if (g_gameVals.paletteEditor_selectedPlayer == 0)
 				{
-					memcpy(pBackupPal, placeholder_palettes[Containers::gameVals.P1_selectedCharID], PALETTE_DATALEN);
-					ReplaceP1Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+					memcpy(pBackupPal, placeholder_palettes[g_gameVals.P1_selectedCharID], PALETTE_DATALEN);
+					ReplaceP1Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 				}
 				else
 				{
-					memcpy(pBackupPal, placeholder_palettes[Containers::gameVals.P2_selectedCharID], PALETTE_DATALEN);
-					ReplaceP2Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+					memcpy(pBackupPal, placeholder_palettes[g_gameVals.P2_selectedCharID], PALETTE_DATALEN);
+					ReplaceP2Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 				}
 			}
 			else
 			{
 				memcpy(pBackupPal, highlight_orig_backup, PALETTE_DATALEN);
-				if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-					ReplaceP1Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+				if (g_gameVals.paletteEditor_selectedPlayer == 0)
+					ReplaceP1Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 				else
-					ReplaceP2Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+					ReplaceP2Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 			}
 		}
 	}
@@ -1254,13 +1245,13 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 		bool changed = false;
 		bool pressed = false;
 
-		if (Containers::tempVals.paledit_show_sel_by_highlight)
+		if (g_tempVals.paledit_show_sel_by_highlight)
 			pressed = ImGui::ColorButtonOn32Bit("##PalColorButton", (unsigned char*)pBackupPal + (i * 4), color_edit_flags);
 		else
 			changed = ImGui::ColorEdit4On32Bit("##PalColorEdit", (unsigned char*)pBackupPal + (i * 4), color_edit_flags);
 		if (changed || pressed)
 		{
-			if (Containers::tempVals.paledit_show_sel_by_highlight)
+			if (g_tempVals.paledit_show_sel_by_highlight)
 			{
 				prev_selected_box = selected_box;
 				selected_box = i * 4;
@@ -1277,10 +1268,10 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 				//((int*)pBackupPal)[selected_box] = 0xFFFFFFFF;
 			}
 			
-			if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-				ReplaceP1Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+			if (g_gameVals.paletteEditor_selectedPlayer == 0)
+				ReplaceP1Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 			else
-				ReplaceP2Palette_PaletteEditor(pBackupPal, Containers::gameVals.paletteEditor_selectedFile);
+				ReplaceP2Palette_PaletteEditor(pBackupPal, g_gameVals.paletteEditor_selectedFile);
 		}
 		if (col < 15)
 		{
@@ -1302,14 +1293,14 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 	ImGui::Text("");
 	ImGui::Separator();
 
-	if (Containers::tempVals.paledit_show_sel_by_highlight)
+	if (g_tempVals.paledit_show_sel_by_highlight)
 	{
 		ImGui::TextDisabled("Cannot save with Highlight mode on!");
 		ImGui::End();
 		return;
 	}
 
-	if (Containers::gameVals.paletteEditor_selectedFile == 0)
+	if (g_gameVals.paletteEditor_selectedFile == 0)
 	{
 		ImGui::Checkbox("Save with bloom effect", &save_bloom);
 		if (ImGui::IsItemHovered())
@@ -1345,7 +1336,7 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 		std::wstring fullPath = std::wstring(pathBuf).substr(0, pos);
 
 		fullPath += L"\\BBCF_IM\\Palettes\\";
-		fullPath += ingame_chars[selected_character];
+		fullPath += getCharacterNameByIndexW(selected_character);
 		fullPath += L"\\";
 
 		std::string filenameTemp(buf1);
@@ -1355,12 +1346,12 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 		std::wstring bloomfilefullpath = fullPath;
 		bloomfilefullpath += L"_effectbloom.hpl";
 
-		if (Containers::gameVals.paletteEditor_selectedFile > 0 && filename.find(L"_effect0") == std::wstring::npos)
+		if (g_gameVals.paletteEditor_selectedFile > 0 && filename.find(L"_effect0") == std::wstring::npos)
 		{
 			fullPath += L"_effect0";
-			fullPath += std::to_wstring(Containers::gameVals.paletteEditor_selectedFile);
+			fullPath += std::to_wstring(g_gameVals.paletteEditor_selectedFile);
 			filenameTemp += "_effect0";
-			filenameTemp += std::to_string(Containers::gameVals.paletteEditor_selectedFile);
+			filenameTemp += std::to_string(g_gameVals.paletteEditor_selectedFile);
 		}
 
 		if (filename.find(L".hpl") == std::wstring::npos)
@@ -1445,10 +1436,10 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 				isFileClosed = CloseHandle(file);
 
 			int prevSelectedPal = 0;
-			if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-				prevSelectedPal = Containers::gameVals.P1_selected_custom_pal;
+			if (g_gameVals.paletteEditor_selectedPlayer == 0)
+				prevSelectedPal = g_gameVals.P1_selected_custom_pal;
 			else
-				prevSelectedPal = Containers::gameVals.P2_selected_custom_pal;
+				prevSelectedPal = g_gameVals.P2_selected_custom_pal;
 
 			DoLogging = false; //dont log
 			ReloadCustomPalettes();
@@ -1459,10 +1450,10 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 			int foundPaletteIndex = 0;
 			bool isEffectFile = false;
 
-			if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
-				selectedCharID = Containers::gameVals.P1_selectedCharID;
+			if (g_gameVals.paletteEditor_selectedPlayer == 0)
+				selectedCharID = g_gameVals.P1_selectedCharID;
 			else
-				selectedCharID = Containers::gameVals.P2_selectedCharID;
+				selectedCharID = g_gameVals.P2_selectedCharID;
 
 			if (filenameTemp.find("_effect0") != std::string::npos)
 				isEffectFile = true;
@@ -1481,18 +1472,18 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 					ImGuiSystem::AddLog("[error] '%s' wasn't loaded properly, try pressing the 'Reload custom palettes' button!\n", filenameTemp.c_str());
 
 				DoLogging = false;
-				if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
+				if (g_gameVals.paletteEditor_selectedPlayer == 0)
 				{
-					if(foundPaletteIndex < Containers::gameVals.customPalettes[selectedCharID].size())
-						Containers::gameVals.P1_selected_custom_pal = prevSelectedPal;
+					if(foundPaletteIndex < g_gameVals.customPalettes[selectedCharID].size())
+						g_gameVals.P1_selected_custom_pal = prevSelectedPal;
 
 					ReplaceP1Palette();
 					ReplaceP1Palette();//doing it twice to not set it back to the original index
 				}
 				else
 				{
-					if (foundPaletteIndex < Containers::gameVals.customPalettes[selectedCharID].size())
-						Containers::gameVals.P2_selected_custom_pal = prevSelectedPal;
+					if (foundPaletteIndex < g_gameVals.customPalettes[selectedCharID].size())
+						g_gameVals.P2_selected_custom_pal = prevSelectedPal;
 
 					ReplaceP2Palette();
 					ReplaceP2Palette();//doing it twice to not set it back to the original index
@@ -1503,15 +1494,15 @@ void ImGuiSystem::ShowPaletteEditorWindow(bool* p_open)
 			}
 
 			DoLogging = false; //dont log
-			if (Containers::gameVals.paletteEditor_selectedPlayer == 0)
+			if (g_gameVals.paletteEditor_selectedPlayer == 0)
 			{
-				Containers::gameVals.P1_selected_custom_pal = foundPaletteIndex;
+				g_gameVals.P1_selected_custom_pal = foundPaletteIndex;
 				ReplaceP1Palette();
 				ReplaceP1Palette(); //doing it twice to not set it back to the original index
 			}
 			else
 			{
-				Containers::gameVals.P2_selected_custom_pal = foundPaletteIndex;
+				g_gameVals.P2_selected_custom_pal = foundPaletteIndex;
 				ReplaceP2Palette();
 				ReplaceP2Palette(); //doing it twice to not set it back to the original index
 			}
@@ -1532,20 +1523,20 @@ void ImGuiSystem::ShowGameplaySettingsMenu()
 	static unsigned char selectedStage = 0;
 	ImGui::Text("\t"); ImGui::SameLine();
 
-	if (Containers::gameVals.pGameMode == 0 || Containers::gameVals.pGameState == 0)
+	if (g_gameVals.pGameMode == 0 || g_gameVals.pGameState == 0)
 	{
 		ImGui::TextDisabled("Not available");
 		return;
 	}
 
-	if (*Containers::gameVals.pGameMode == GAME_MODE_ONLINE ||
-		*Containers::gameVals.pGameMode == GAME_MODE_TRAINING ||
-		*Containers::gameVals.pGameMode == GAME_MODE_VERSUS)
+	if (*g_gameVals.pGameMode == GameMode_Online ||
+		*g_gameVals.pGameMode == GameMode_Training ||
+		*g_gameVals.pGameMode == GameMode_Versus)
 	{
 		if (ImGui::SliderByte("Stage", &selectedStage, 0, 78))
 		{
-			*Containers::gameVals.stageSelect_X = stages[selectedStage][0];
-			*Containers::gameVals.stageSelect_Y = stages[selectedStage][1];
+			*g_gameVals.stageSelect_X = stages[selectedStage][0];
+			*g_gameVals.stageSelect_Y = stages[selectedStage][1];
 		}
 	}
 	else
@@ -1554,10 +1545,10 @@ void ImGuiSystem::ShowGameplaySettingsMenu()
 	std::string selectedGameMode = GameModes[activatedGameMode].name;
 	selectedGameMode += " Mode";
 
-	if (*Containers::gameVals.pGameMode == GAME_MODE_ONLINE)
+	if (*g_gameVals.pGameMode == GameMode_Online)
 	{
 		//we are spectators
-		if (Containers::gameVals.thisPlayerNum == 0)
+		if (g_gameVals.thisPlayerNum == 0)
 		{
 			std::string P1SelectedGameMode = "";
 			if (P1_activatedGameMode < GameModes.size())
@@ -1602,14 +1593,14 @@ void ImGuiSystem::ShowGameplaySettingsMenu()
 		ImGui::Text("");
 	}
 
-	if (*Containers::gameVals.pGameState != GAME_STATE_CHARACTER_SELECTION_SCREEN && *Containers::gameVals.pGameState != GAME_STATE_REPLAY_MENU)
+	if (*g_gameVals.pGameState != GameState_ChracterSelectionScreen && *g_gameVals.pGameState != GameState_ReplayMenu)
 	{
 		ImGui::Text("\t"); ImGui::SameLine(); ImGui::RadioButton(selectedGameMode.c_str(), true);
 		ImGui::Text("\t"); ImGui::SameLine(); ImGui::TextDisabled("NOT ON CHARACTER SELECTION SCREEN");
 		//ImGui::Text("\t"); ImGui::SameLine(); ImGui::TextDisabled("NOT ON REPLAY MENU SCREEN");
 	}
-	else if (*Containers::gameVals.pGameMode != GAME_MODE_VERSUS && *Containers::gameVals.pGameMode != GAME_MODE_ONLINE && 
-		*Containers::gameVals.pGameMode != GAME_MODE_TRAINING && *Containers::gameVals.pGameState != GAME_STATE_REPLAY_MENU)//we use gamestate for replay menu, since GameMode sets to 0, if we return to the replay menu via the pause menu
+	else if (*g_gameVals.pGameMode != GameMode_Versus && *g_gameVals.pGameMode != GameMode_Online && 
+		*g_gameVals.pGameMode != GameMode_Training && *g_gameVals.pGameState != GameState_ReplayMenu)//we use gamestate for replay menu, since GameMode sets to 0, if we return to the replay menu via the pause menu
 	{
 		ImGui::Text("\t"); ImGui::SameLine(); ImGui::RadioButton(selectedGameMode.c_str(), true);
 		ImGui::Text("\t"); ImGui::SameLine(); ImGui::TextDisabled("NOT IN ONLINE, TRAINING, OR VERSUS MODES");
@@ -1623,14 +1614,14 @@ void ImGuiSystem::ShowGameplaySettingsMenu()
 			selectedGameMode += " Mode";
 			//prevent some game modes being played in training, due to instadeath on match start
 			if ((i == customGameMode_onepunch || i == customGameMode_twopunch || i == customGameMode_fivepunch || i == customGameMode_tugofwar) &&
-				*Containers::gameVals.pGameMode == GAME_MODE_TRAINING)
+				*g_gameVals.pGameMode == GameMode_Training)
 			{
 				ImGui::RadioButton(selectedGameMode.c_str(), false);
 			}
 			else
 			{
-				if (ImGui::RadioButton(selectedGameMode.c_str(), &activatedGameMode, GameModes[i].id) && Containers::gameVals.opponentSteamID != 0)
-					Send_customGameMode_request(*Containers::gameVals.opponentSteamID);
+				if (ImGui::RadioButton(selectedGameMode.c_str(), &activatedGameMode, GameModes[i].id) && g_gameVals.opponentSteamID != 0)
+					Send_customGameMode_request(*g_gameVals.opponentSteamID);
 			}
 			if (ImGui::IsItemHovered() && GameModes[i].desc)
 			{

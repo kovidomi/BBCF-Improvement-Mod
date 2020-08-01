@@ -1,8 +1,8 @@
 #include "SteamNetworkingWrapper.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/utils.h"
-#include "Game/containers.h"
 #include "Game/gamestates.h"
 #include "ImGui/ImGuiSystem.h"
 #include "Network/bbcf_im_networking.h"
@@ -64,20 +64,20 @@ bool SteamNetworkingWrapper::ReadP2PPacket(void *pubDest, uint32 cubDest, uint32
 	LOG(7, "SteamNetworkingWrapper ReadP2PPacket\n");
 	bool ret = m_SteamNetworking->ReadP2PPacket(pubDest, cubDest, pcubMsgSize, psteamIDRemote, nChannel);
 
-	if (*Containers::gameVals.pGameState == GAME_STATE_CHARACTER_SELECTION_SCREEN && 
-		//Containers::gameVals.opponentSteamID == 0 &&
-		Containers::gameVals.thisPlayerNum != 0)
+	if (*g_gameVals.pGameState == GameState_ChracterSelectionScreen && 
+		//g_gameVals.opponentSteamID == 0 &&
+		g_gameVals.thisPlayerNum != 0)
 	{
-		Containers::gameVals.totalReadPackets++;
+		g_gameVals.totalReadPackets++;
 		
 		//LOG(2, "totalReadPackets: %d\n", totalReadPackets);
-		if (Containers::gameVals.totalReadPackets > 5)
+		if (g_gameVals.totalReadPackets > 5)
 		{
 			//fill the vector with the participating players
 			bool isPlayerInList = false;
-			for (int i = 0; i < Containers::gameVals.playersInMatch.size(); i++)
+			for (int i = 0; i < g_gameVals.playersInMatch.size(); i++)
 			{
-				if (Containers::gameVals.playersInMatch[i] == *psteamIDRemote)
+				if (g_gameVals.playersInMatch[i] == *psteamIDRemote)
 				{
 					isPlayerInList = true;
 					break;
@@ -89,16 +89,16 @@ bool SteamNetworkingWrapper::ReadP2PPacket(void *pubDest, uint32 cubDest, uint32
 				LOG(2, "Added 0x%x to playerList\n", *psteamIDRemote);
 #ifdef _DEBUG
 				ImGuiSystem::AddLog("[debug] 0x%x ('%s') added to the playersList\n", *psteamIDRemote, 
-					Containers::g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*psteamIDRemote));
+					g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*psteamIDRemote));
 #endif
-				Containers::gameVals.playersInMatch.push_back(*psteamIDRemote);
+				g_gameVals.playersInMatch.push_back(*psteamIDRemote);
 				Send_BBCFIM_ID(*psteamIDRemote);
 			}
 
-			if (Containers::gameVals.opponentSteamID == 0)
+			if (g_gameVals.opponentSteamID == 0)
 			{
 				LOG(2, "Setting opponent's steamID\n");
-				Containers::gameVals.opponentSteamID = new CSteamID(*psteamIDRemote);
+				g_gameVals.opponentSteamID = new CSteamID(*psteamIDRemote);
 			}
 		}
 	}

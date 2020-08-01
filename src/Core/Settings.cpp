@@ -1,7 +1,7 @@
 #include "Settings.h"
 #include "logger.h"
 
-#include "Game/containers.h"
+#include "Core/interfaces.h"
 
 #include <atlstr.h>
 #include <ctime>

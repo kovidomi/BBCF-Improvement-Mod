@@ -1,58 +1,54 @@
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 // Generated using ReClass 2015
 
-class CChar;
-class OBJ_CCharBase;
-class AA_CCollision_JON;
-
-class CChar
+class CharData
 {
 public:
-	class OBJ_CCharBase* _obj_charbase; //0x0000
+	class OBJ_CCharBase* obj_ccharbase; //0x0000
 	char pad_0004[20]; //0x0004
-	int32_t total_state_changes; //0x0018
+	int32_t stateChangedCount; //0x0018
 	char pad_001C[24]; //0x001C
-	int32_t charID; //0x0034
+	int32_t charIndex; //0x0034
 	char pad_0038[4]; //0x0038
-	class AA_CCollision_JON* aa_ccollision_jon; //0x003C
+	class AA_CCollision_JON* aa_collision_jon; //0x003C
 	char pad_0040[12]; //0x0040
-	class N0000950C* collision_data; //0x004C
+	class JonbEntry* pJonbEntryBegin; //0x004C
 	char pad_0050[68]; //0x0050
-	int32_t total_hitboxes; //0x0094
-	int32_t total_hurtboxes; //0x0098
+	int32_t hurtboxCount; //0x0094
+	int32_t hitboxCount; //0x0098
 	char pad_009C[60]; //0x009C
-	char* current_sprite_img; //0x00D8
+	char* currentSprite; //0x00D8
 	char pad_00DC[208]; //0x00DC
 	int32_t lambda_nu_drive_hitcount; //0x01AC
 	char pad_01B0[16]; //0x01B0
-	int32_t overdrive_timeleft; //0x01C0
-	int32_t overdrive_timer_started_at; //0x01C4
+	int32_t overdriveTimeleft; //0x01C0
+	int32_t overdriveTimerStartedAt; //0x01C4
 	char pad_01C8[20]; //0x01C8
 	int32_t some_distortion_timer; //0x01DC
-	int32_t is_doing_distortion; //0x01E0
+	int32_t isDoingDistortion; //0x01E0
 	char pad_01E4[676]; //0x01E4
-	int32_t heat_usage_type; //0x0488
+	int32_t heatUsageType; //0x0488
 	char pad_048C[1348]; //0x048C
 	int32_t previousHP; //0x09D0
 	int32_t currentHP; //0x09D4
 	int32_t maxHP; //0x09D8
 	char pad_09DC[5656]; //0x09DC
-	char last_action[20]; //0x1FF4
+	char lastAction[20]; //0x1FF4
 	char pad_2008[104]; //0x2008
-	char current_action[20]; //0x2070
+	char currentAction[20]; //0x2070
 	char pad_2084[452]; //0x2084
-	char char_abbr[4]; //0x2248
+	char charAbbr[4]; //0x2248
 	char pad_224C[14472]; //0x224C
-	int32_t heat; //0x5AD4
+	int32_t heatMeter; //0x5AD4
 	char pad_5AD8[4]; //0x5AD8
-	int32_t heat_gain_cooldown; //0x5ADC
+	int32_t heatGainCooldown; //0x5ADC
 	char pad_5AE0[4]; //0x5AE0
-	int32_t overdrive_meter; //0x5AE4
+	int32_t overdriveMeter; //0x5AE4
 	char pad_5AE8[16]; //0x5AE8
-	int32_t overdrive_maxtime; //0x5AF8
+	int32_t maxOverdriveTime; //0x5AF8
 	char pad_5AFC[8]; //0x5AFC
-	int32_t barrier; //0x5B04
+	int32_t barrierMeter; //0x5B04
 	char pad_5B08[108036]; //0x5B08
 	int32_t Drive1; //0x2010C
 	char pad_20110[12]; //0x20110
@@ -63,19 +59,3 @@ public:
 	int32_t Drive3; //0x20154
 	char pad_20158[4972]; //0x20158
 }; //Size: 0x214C4
-
-
-class OBJ_CCharBase
-{
-public:
-	char pad_0x0000[0x129C]; //0x0000
-
-}; //Size=0x129C
-
-class AA_CCollision_JON
-{
-public:
-	char pad_0x0000[0x60]; //0x0000
-
-}; //Size=0x0060
-

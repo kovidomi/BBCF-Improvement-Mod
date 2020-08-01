@@ -1,9 +1,9 @@
 #include "custom_gameModes.h"
 
-#include "cchar.h"
+#include "CharData.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
-#include "Game/containers.h"
 #include "Game/gamestates.h"
 #include "Hooks/HookManager.h"
 #include "Hooks/hooks_customGameModes.h"
@@ -55,7 +55,7 @@ void ActivateCustomGameMode()
 	ResetAllHooks(); //making sure we dont leave anything turned on
 
 	//if we are spectators, set up activatedGameMode
-	if (Containers::gameVals.thisPlayerNum == 0)
+	if (g_gameVals.thisPlayerNum == 0)
 		activatedGameMode = P1_activatedGameMode;
 
 	if (activatedGameMode < GameModes.size())
@@ -70,10 +70,10 @@ void InitCustomGameMode()
 	//if (activatedGameMode != customGameMode_none)
 	//	InitIngamePointers();
 
-	if (Containers::gameVals.P1CharObjPointer == 0 || Containers::gameVals.P2CharObjPointer == 0) //|| customGameModeInitialized)
+	if (g_gameVals.P1CharObjPointer == 0 || g_gameVals.P2CharObjPointer == 0) //|| customGameModeInitialized)
 		return;
 
-	if (*Containers::gameVals.pGameMode == GAME_MODE_ONLINE) //online
+	if (*g_gameVals.pGameMode == GameMode_Online)
 	{
 		if (activatedGameMode == opponent_activatedGameMode || P1_activatedGameMode == P2_activatedGameMode) // only run in online, and if opponent has selected the same mode as us
 		{
@@ -130,10 +130,10 @@ void InitSteroidMode()
 	LOG(2, "InitSteroidMode\n");
 	ImGuiSystem::AddLog("[system] Starting Steroid Mode\n");
 
-	Containers::gameVals.P1CharObjPointer->maxHP *= steroid_hp_multiplier;
-	Containers::gameVals.P2CharObjPointer->maxHP *= steroid_hp_multiplier;
-	Containers::gameVals.P1CharObjPointer->currentHP *= steroid_hp_multiplier;
-	Containers::gameVals.P2CharObjPointer->currentHP *= steroid_hp_multiplier;
+	g_gameVals.P1CharObjPointer->maxHP *= steroid_hp_multiplier;
+	g_gameVals.P2CharObjPointer->maxHP *= steroid_hp_multiplier;
+	g_gameVals.P1CharObjPointer->currentHP *= steroid_hp_multiplier;
+	g_gameVals.P2CharObjPointer->currentHP *= steroid_hp_multiplier;
 
 	HookManager::ActivateHook("steroid_OverdriveCharge");
 	HookManager::ActivateHook("steroid_HeatModify");
@@ -174,16 +174,16 @@ void InitOnePunchMode()
 	LOG(2, "InitOnePunchMode\n");
 	ImGuiSystem::AddLog("[system] Starting One Punch Mode\n");
 
-	*Containers::gameVals.pMatchRounds = 5;
-	*Containers::gameVals.pMatchTimer = 60 * 15;
+	*g_gameVals.pMatchRounds = 5;
+	*g_gameVals.pMatchTimer = 60 * 15;
 	//new round, recharge 50% of the burst
-	Containers::gameVals.P1CharObjPointer->overdrive_meter += 50000;
-	if (Containers::gameVals.P1CharObjPointer->overdrive_meter > 100000)
-		Containers::gameVals.P1CharObjPointer->overdrive_meter = 100000;
+	g_gameVals.P1CharObjPointer->overdriveMeter += 50000;
+	if (g_gameVals.P1CharObjPointer->overdriveMeter > 100000)
+		g_gameVals.P1CharObjPointer->overdriveMeter = 100000;
 
-	Containers::gameVals.P2CharObjPointer->overdrive_meter += 50000;
-	if (Containers::gameVals.P2CharObjPointer->overdrive_meter > 100000)
-		Containers::gameVals.P2CharObjPointer->overdrive_meter = 100000;
+	g_gameVals.P2CharObjPointer->overdriveMeter += 50000;
+	if (g_gameVals.P2CharObjPointer->overdriveMeter > 100000)
+		g_gameVals.P2CharObjPointer->overdriveMeter = 100000;
 	HookManager::ActivateHook("onepunch_HealthModify");
 }
 
@@ -192,16 +192,16 @@ void InitTwoPunchMode()
 	LOG(2, "InitTwoPunchMode\n");
 	ImGuiSystem::AddLog("[system] Starting Two Punch Mode\n");
 
-	*Containers::gameVals.pMatchRounds = 5;
-	*Containers::gameVals.pMatchTimer = 60 * 15;
+	*g_gameVals.pMatchRounds = 5;
+	*g_gameVals.pMatchTimer = 60 * 15;
 	//new round, recharge 50% of the burst
-	Containers::gameVals.P1CharObjPointer->overdrive_meter += 50000;
-	if (Containers::gameVals.P1CharObjPointer->overdrive_meter > 100000)
-		Containers::gameVals.P1CharObjPointer->overdrive_meter = 100000;
+	g_gameVals.P1CharObjPointer->overdriveMeter += 50000;
+	if (g_gameVals.P1CharObjPointer->overdriveMeter > 100000)
+		g_gameVals.P1CharObjPointer->overdriveMeter = 100000;
 
-	Containers::gameVals.P2CharObjPointer->overdrive_meter += 50000;
-	if (Containers::gameVals.P2CharObjPointer->overdrive_meter > 100000)
-		Containers::gameVals.P2CharObjPointer->overdrive_meter = 100000;
+	g_gameVals.P2CharObjPointer->overdriveMeter += 50000;
+	if (g_gameVals.P2CharObjPointer->overdriveMeter > 100000)
+		g_gameVals.P2CharObjPointer->overdriveMeter = 100000;
 
 	HookManager::ActivateHook("twopunch_HealthModify");
 }
@@ -211,16 +211,16 @@ void InitFivePunchMode()
 	LOG(2, "InitFivePunchMode\n");
 	ImGuiSystem::AddLog("[system] Starting Five Punch Mode\n");
 
-	*Containers::gameVals.pMatchRounds = 5;
-	*Containers::gameVals.pMatchTimer = 60 * 60;
+	*g_gameVals.pMatchRounds = 5;
+	*g_gameVals.pMatchTimer = 60 * 60;
 	//new round, recharge 50% of the burst
-	Containers::gameVals.P1CharObjPointer->overdrive_meter += 50000;
-	if (Containers::gameVals.P1CharObjPointer->overdrive_meter > 100000)
-		Containers::gameVals.P1CharObjPointer->overdrive_meter = 100000;
+	g_gameVals.P1CharObjPointer->overdriveMeter += 50000;
+	if (g_gameVals.P1CharObjPointer->overdriveMeter > 100000)
+		g_gameVals.P1CharObjPointer->overdriveMeter = 100000;
 
-	Containers::gameVals.P2CharObjPointer->overdrive_meter += 50000;
-	if (Containers::gameVals.P2CharObjPointer->overdrive_meter > 100000)
-		Containers::gameVals.P2CharObjPointer->overdrive_meter = 100000;
+	g_gameVals.P2CharObjPointer->overdriveMeter += 50000;
+	if (g_gameVals.P2CharObjPointer->overdriveMeter > 100000)
+		g_gameVals.P2CharObjPointer->overdriveMeter = 100000;
 
 	HookManager::ActivateHook("fivepunch_HealthModify");
 }
@@ -230,20 +230,20 @@ void InitTugOfWar()
 	LOG(2, "InitTugOfWarMode\n");
 	ImGuiSystem::AddLog("[system] Starting Tug of War Mode\n");
 
-	*Containers::gameVals.pMatchRounds = 5;
-	*Containers::gameVals.pMatchTimer = 60 * 60;
+	*g_gameVals.pMatchRounds = 5;
+	*g_gameVals.pMatchTimer = 60 * 60;
 
-	Containers::gameVals.P1CharObjPointer->currentHP /= 2;
-	Containers::gameVals.P2CharObjPointer->currentHP /= 2;
+	g_gameVals.P1CharObjPointer->currentHP /= 2;
+	g_gameVals.P2CharObjPointer->currentHP /= 2;
 
 	//new round, recharge 50% of the burst
-	Containers::gameVals.P1CharObjPointer->overdrive_meter += 50000;
-	if (Containers::gameVals.P1CharObjPointer->overdrive_meter > 100000)
-		Containers::gameVals.P1CharObjPointer->overdrive_meter = 100000;
+	g_gameVals.P1CharObjPointer->overdriveMeter += 50000;
+	if (g_gameVals.P1CharObjPointer->overdriveMeter > 100000)
+		g_gameVals.P1CharObjPointer->overdriveMeter = 100000;
 
-	Containers::gameVals.P2CharObjPointer->overdrive_meter += 50000;
-	if (Containers::gameVals.P2CharObjPointer->overdrive_meter > 100000)
-		Containers::gameVals.P2CharObjPointer->overdrive_meter = 100000;
+	g_gameVals.P2CharObjPointer->overdriveMeter += 50000;
+	if (g_gameVals.P2CharObjPointer->overdriveMeter > 100000)
+		g_gameVals.P2CharObjPointer->overdriveMeter = 100000;
 
 	HookManager::ActivateHook("tugofwar_HealthModify");
 }
@@ -253,10 +253,10 @@ void InitInfiniteHeatMode()
 	LOG(2, "InitInfiniteHeatMode\n");
 	ImGuiSystem::AddLog("[system] Starting Infinite Heat Mode\n");
 
-	//*Containers::gameVals.pMatchTimer = 60 * 60;
+	//*g_gameVals.pMatchTimer = 60 * 60;
 	//new round, recharge 50% of the burst
-	Containers::gameVals.P1CharObjPointer->heat = 10000;
-	Containers::gameVals.P2CharObjPointer->heat = 10000;
+	g_gameVals.P1CharObjPointer->heatMeter = 10000;
+	g_gameVals.P2CharObjPointer->heatMeter = 10000;
 
 	HookManager::ActivateHook("infiniteheat_HeatModify");
 }
@@ -266,13 +266,13 @@ void InitOverdriveMode()
 	LOG(2, "InitOverdriveMode\n");
 	ImGuiSystem::AddLog("[system] Starting Overdrive Mode\n");
 
-	//*Containers::gameVals.pMatchRounds = 5;
-	//*Containers::gameVals.pMatchTimer = 60 * 60;
+	//*g_gameVals.pMatchRounds = 5;
+	//*g_gameVals.pMatchTimer = 60 * 60;
 	//new round, recharge 100% of the burst
-	//Containers::gameVals.P1CharObjPointer->overdrive_meter = 0;
-	//Containers::gameVals.P2CharObjPointer->overdrive_meter = 0;
-	//Containers::gameVals.P1CharObjPointer->overdrive_timeleft = 500;
-	//Containers::gameVals.P2CharObjPointer->overdrive_timeleft = 500;
+	//g_gameVals.P1CharObjPointer->overdriveMeter = 0;
+	//g_gameVals.P2CharObjPointer->overdriveMeter = 0;
+	//g_gameVals.P1CharObjPointer->overdriveTimeleft = 500;
+	//g_gameVals.P2CharObjPointer->overdriveTimeleft = 500;
 
 	HookManager::ActivateHook("overdrive_FreezeOverdriveTimeleft");
 	HookManager::ActivateHook("overdrive_KeepTimerGoing");

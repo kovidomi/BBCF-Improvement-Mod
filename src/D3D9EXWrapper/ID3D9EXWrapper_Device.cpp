@@ -1,7 +1,7 @@
 #include "ID3D9EXWrapper_Device.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
-#include "Game/containers.h"
 #include "Hooks/hooks_bbcf.h"
 #include "ImGui/ImGuiSystem.h"
 
@@ -18,7 +18,7 @@ Direct3DDevice9ExWrapper::Direct3DDevice9ExWrapper(IDirect3DDevice9Ex **ppReturn
 	m_Direct3D9Ex = pIDirect3D9Ex;
 
 	//grab pointer
-	Containers::g_interfaces.pD3D9ExWrapper = *ppReturnedDeviceInterface;
+	g_interfaces.pD3D9ExWrapper = *ppReturnedDeviceInterface;
 
 	//place all other hooks that can only be placed after steamDRM unpacks the .exe in memory!!!
 	placeHooks_bbcf();

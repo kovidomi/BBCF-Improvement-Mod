@@ -2,8 +2,8 @@
 
 #include "HookManager.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
-#include "Game/containers.h"
 #include "Game/custom_gameModes.h"
 #include "Game/gamestates.h"
 
@@ -161,8 +161,8 @@ void __declspec(naked)vampire_HealthModify()
 	static int newHP = 0;
 	//static int previousHP = 0;
 	static int opponentHealing = 0;
-	static CChar* thisPlayerObj = 0;
-	static CChar* otherPlayerObj = 0;
+	static CharData* thisPlayerObj = 0;
+	static CharData* otherPlayerObj = 0;
 
 	__asm
 	{
@@ -173,10 +173,10 @@ void __declspec(naked)vampire_HealthModify()
 		mov[thisPlayerObj], ecx
 	}
 
-	if (*Containers::gameVals.pMatchState == MATCH_STATE_FIGHT && newHP < thisPlayerObj->previousHP) // only if we took damage. avoiding running on healing (like ragna for example)
+	if (*g_gameVals.pMatchState == MatchState_Fight && newHP < thisPlayerObj->previousHP) // only if we took damage. avoiding running on healing (like ragna for example)
 	{
 		//LOG(2, "Vampire: \n");
-		if (thisPlayerObj != Containers::gameVals.P1CharObjPointer && thisPlayerObj != Containers::gameVals.P2CharObjPointer)
+		if (thisPlayerObj != g_gameVals.P1CharObjPointer && thisPlayerObj != g_gameVals.P2CharObjPointer)
 		{
 			//LOG(2, "NEITHER PLAYER OBJECTS!\n");
 			__asm
@@ -187,10 +187,10 @@ void __declspec(naked)vampire_HealthModify()
 
 		opponentHealing = (thisPlayerObj->previousHP - newHP) * vampire_healing_percent;
 
-		if (thisPlayerObj == Containers::gameVals.P1CharObjPointer)
+		if (thisPlayerObj == g_gameVals.P1CharObjPointer)
 		{
 			//LOG(2, "\tP1 took %d damage\nHealing P2 with %d HP...:\n", (thisPlayerObj->previousHP - newHP), opponentHealing);
-			otherPlayerObj = Containers::gameVals.P2CharObjPointer;
+			otherPlayerObj = g_gameVals.P2CharObjPointer;
 			//LOG(2, "\tP2 currentHP: %d\n", otherPlayerObj->currentHP);
 			//LOG(2, "\tP2 maxHP: %d\n", otherPlayerObj->maxHP);
 			//LOG(2, "\tP2 ")
@@ -198,7 +198,7 @@ void __declspec(naked)vampire_HealthModify()
 		else
 		{
 			//LOG(2, "\tP2 took %d damage\nHealing P1 with %d HP...:\n", (thisPlayerObj->previousHP - newHP), opponentHealing);
-			otherPlayerObj = Containers::gameVals.P1CharObjPointer;
+			otherPlayerObj = g_gameVals.P1CharObjPointer;
 			//LOG(2, "\tP1 currentHP: %d\n", otherPlayerObj->currentHP);
 			//LOG(2, "\tP1 maxHP: %d\n", otherPlayerObj->maxHP);
 			//LOG(2, "\tP1 ");
@@ -238,39 +238,39 @@ void __declspec(naked)vampire_HealthDrain()
 
 	__asm pushad
 
-	if (*Containers::gameVals.pMatchState == MATCH_STATE_FIGHT) //on match only
+	if (*g_gameVals.pMatchState == MatchState_Fight) //on match only
 	{
-		if (*Containers::gameVals.pGameMode == GAME_MODE_TRAINING || *Containers::gameVals.pMatchTimer == 5939) //if we are in training mode, calculate it a different way, since we have no match timer
+		if (*g_gameVals.pGameMode == GameMode_Training || *g_gameVals.pMatchTimer == 5939) //if we are in training mode, calculate it a different way, since we have no match timer
 		{
 			//do not reduce hp while distortions / od finishers / astrals are happening:
-			if (!Containers::gameVals.P1CharObjPointer->is_doing_distortion &&
-				!Containers::gameVals.P2CharObjPointer->is_doing_distortion)
+			if (!g_gameVals.P1CharObjPointer->isDoingDistortion &&
+				!g_gameVals.P2CharObjPointer->isDoingDistortion)
 				vampirism_timer += ImGui::GetIO().DeltaTime;
 		}
 		else
 		{
 			//uninitialized value or new match started:
-			if (previous_real_timer == 0 || previous_real_timer < *Containers::gameVals.pMatchTimer)
-				previous_real_timer = *Containers::gameVals.pMatchTimer;
+			if (previous_real_timer == 0 || previous_real_timer < *g_gameVals.pMatchTimer)
+				previous_real_timer = *g_gameVals.pMatchTimer;
 
-			vampirism_timer += (previous_real_timer - *Containers::gameVals.pMatchTimer);
-			previous_real_timer = *Containers::gameVals.pMatchTimer;
+			vampirism_timer += (previous_real_timer - *g_gameVals.pMatchTimer);
+			previous_real_timer = *g_gameVals.pMatchTimer;
 		}
 
 		if (vampirism_timer > 60) // 1 sec
 		{
 			//LOG(2, "!Vampire taking 1sec damage\n");
-			int P1_lostHP = Containers::gameVals.P1CharObjPointer->maxHP * vampire_health_loss_percent_per_sec;
-			int P2_lostHP = Containers::gameVals.P2CharObjPointer->maxHP * vampire_health_loss_percent_per_sec;
-			Containers::gameVals.P1CharObjPointer->currentHP -= P1_lostHP;
-			Containers::gameVals.P2CharObjPointer->currentHP -= P2_lostHP;
-			if (Containers::gameVals.P1CharObjPointer->currentHP < 1) //prevent dying of this effect
-				Containers::gameVals.P1CharObjPointer->currentHP = 1;
-			if (Containers::gameVals.P2CharObjPointer->currentHP < 1) //prevent dying of this effect
-				Containers::gameVals.P2CharObjPointer->currentHP = 1;
+			int P1_lostHP = g_gameVals.P1CharObjPointer->maxHP * vampire_health_loss_percent_per_sec;
+			int P2_lostHP = g_gameVals.P2CharObjPointer->maxHP * vampire_health_loss_percent_per_sec;
+			g_gameVals.P1CharObjPointer->currentHP -= P1_lostHP;
+			g_gameVals.P2CharObjPointer->currentHP -= P2_lostHP;
+			if (g_gameVals.P1CharObjPointer->currentHP < 1) //prevent dying of this effect
+				g_gameVals.P1CharObjPointer->currentHP = 1;
+			if (g_gameVals.P2CharObjPointer->currentHP < 1) //prevent dying of this effect
+				g_gameVals.P2CharObjPointer->currentHP = 1;
 
-			Containers::gameVals.P1CharObjPointer->previousHP = Containers::gameVals.P1CharObjPointer->currentHP;
-			Containers::gameVals.P2CharObjPointer->previousHP = Containers::gameVals.P2CharObjPointer->currentHP;
+			g_gameVals.P1CharObjPointer->previousHP = g_gameVals.P1CharObjPointer->currentHP;
+			g_gameVals.P2CharObjPointer->previousHP = g_gameVals.P2CharObjPointer->currentHP;
 
 			vampirism_timer = 0.0;
 		}
@@ -292,8 +292,8 @@ void __declspec(naked)exVampire_HealthModify()
 	static int newHP = 0;
 	//static int previousHP = 0;
 	static int opponentHealing = 0;
-	static CChar* thisPlayerObj = 0;
-	static CChar* otherPlayerObj = 0;
+	static CharData* thisPlayerObj = 0;
+	static CharData* otherPlayerObj = 0;
 
 	__asm
 	{
@@ -304,10 +304,10 @@ void __declspec(naked)exVampire_HealthModify()
 		mov[thisPlayerObj], ecx
 	}
 
-	if (*Containers::gameVals.pMatchState == MATCH_STATE_FIGHT && newHP < thisPlayerObj->previousHP) // only if we took damage. avoiding running on healing (like ragna for example)
+	if (*g_gameVals.pMatchState == MatchState_Fight && newHP < thisPlayerObj->previousHP) // only if we took damage. avoiding running on healing (like ragna for example)
 	{
 		//LOG(2, "exVampire: \n");
-		if (thisPlayerObj != Containers::gameVals.P1CharObjPointer && thisPlayerObj != Containers::gameVals.P2CharObjPointer)
+		if (thisPlayerObj != g_gameVals.P1CharObjPointer && thisPlayerObj != g_gameVals.P2CharObjPointer)
 		{
 			//LOG(2, "NEITHER PLAYER OBJECTS!\n");
 			__asm
@@ -318,10 +318,10 @@ void __declspec(naked)exVampire_HealthModify()
 
 		opponentHealing = (thisPlayerObj->previousHP - newHP) * exVampire_healing_percent;
 
-		if (thisPlayerObj == Containers::gameVals.P1CharObjPointer)
+		if (thisPlayerObj == g_gameVals.P1CharObjPointer)
 		{
 			//LOG(2, "\tP1 took %d damage\nHealing P2 with %d HP...:\n", (thisPlayerObj->previousHP - newHP), opponentHealing);
-			otherPlayerObj = Containers::gameVals.P2CharObjPointer;
+			otherPlayerObj = g_gameVals.P2CharObjPointer;
 			//LOG(2, "\tP2 currentHP: %d\n", otherPlayerObj->currentHP);
 			//LOG(2, "\tP2 maxHP: %d\n", otherPlayerObj->maxHP);
 			//LOG(2, "\tP2 ")
@@ -329,7 +329,7 @@ void __declspec(naked)exVampire_HealthModify()
 		else
 		{
 			//LOG(2, "\tP2 took %d damage\nHealing P1 with %d HP...:\n", (thisPlayerObj->previousHP - newHP), opponentHealing);
-			otherPlayerObj = Containers::gameVals.P1CharObjPointer;
+			otherPlayerObj = g_gameVals.P1CharObjPointer;
 			//LOG(2, "\tP1 currentHP: %d\n", otherPlayerObj->currentHP);
 			//LOG(2, "\tP1 maxHP: %d\n", otherPlayerObj->maxHP);
 			//LOG(2, "\tP1 ");
@@ -369,39 +369,39 @@ void __declspec(naked)exVampire_HealthDrain()
 
 	__asm pushad
 
-	if (*Containers::gameVals.pMatchState == MATCH_STATE_FIGHT) //on match only
+	if (*g_gameVals.pMatchState == MatchState_Fight) //on match only
 	{
-		if (*Containers::gameVals.pGameMode == GAME_MODE_TRAINING || *Containers::gameVals.pMatchTimer == 5939) //if we are in training mode, calculate it a different way, since we have no match timer. pMatchTimer is set to 5939 when infinite timer
+		if (*g_gameVals.pGameMode == GameMode_Training || *g_gameVals.pMatchTimer == 5939) //if we are in training mode, calculate it a different way, since we have no match timer. pMatchTimer is set to 5939 when infinite timer
 		{
 			//do not reduce hp while distortions / od finishers / astrals are happening:
-			if (!Containers::gameVals.P1CharObjPointer->is_doing_distortion &&
-				!Containers::gameVals.P2CharObjPointer->is_doing_distortion)
+			if (!g_gameVals.P1CharObjPointer->isDoingDistortion &&
+				!g_gameVals.P2CharObjPointer->isDoingDistortion)
 				vampirism_timer += ImGui::GetIO().DeltaTime;
 		}
 		else
 		{
 			//uninitialized value or new match started:
-			if (previous_real_timer == 0 || previous_real_timer < *Containers::gameVals.pMatchTimer)
-				previous_real_timer = *Containers::gameVals.pMatchTimer;
+			if (previous_real_timer == 0 || previous_real_timer < *g_gameVals.pMatchTimer)
+				previous_real_timer = *g_gameVals.pMatchTimer;
 
-			vampirism_timer += (previous_real_timer - *Containers::gameVals.pMatchTimer);
-			previous_real_timer = *Containers::gameVals.pMatchTimer;
+			vampirism_timer += (previous_real_timer - *g_gameVals.pMatchTimer);
+			previous_real_timer = *g_gameVals.pMatchTimer;
 		}
 
 		if (vampirism_timer > 60) // 1 sec
 		{
 			//LOG(2, "!exVampire taking 1sec damage\n");
-			int P1_lostHP = Containers::gameVals.P1CharObjPointer->maxHP * exVampire_health_loss_percent_per_sec;
-			int P2_lostHP = Containers::gameVals.P2CharObjPointer->maxHP * exVampire_health_loss_percent_per_sec;
-			Containers::gameVals.P1CharObjPointer->currentHP -= P1_lostHP;
-			Containers::gameVals.P2CharObjPointer->currentHP -= P2_lostHP;
-			if (Containers::gameVals.P1CharObjPointer->currentHP < 1) //prevent dying of this effect
-				Containers::gameVals.P1CharObjPointer->currentHP = 1;
-			if (Containers::gameVals.P2CharObjPointer->currentHP < 1) //prevent dying of this effect
-				Containers::gameVals.P2CharObjPointer->currentHP = 1;
+			int P1_lostHP = g_gameVals.P1CharObjPointer->maxHP * exVampire_health_loss_percent_per_sec;
+			int P2_lostHP = g_gameVals.P2CharObjPointer->maxHP * exVampire_health_loss_percent_per_sec;
+			g_gameVals.P1CharObjPointer->currentHP -= P1_lostHP;
+			g_gameVals.P2CharObjPointer->currentHP -= P2_lostHP;
+			if (g_gameVals.P1CharObjPointer->currentHP < 1) //prevent dying of this effect
+				g_gameVals.P1CharObjPointer->currentHP = 1;
+			if (g_gameVals.P2CharObjPointer->currentHP < 1) //prevent dying of this effect
+				g_gameVals.P2CharObjPointer->currentHP = 1;
 
-			Containers::gameVals.P1CharObjPointer->previousHP = Containers::gameVals.P1CharObjPointer->currentHP;
-			Containers::gameVals.P2CharObjPointer->previousHP = Containers::gameVals.P2CharObjPointer->currentHP;
+			g_gameVals.P1CharObjPointer->previousHP = g_gameVals.P1CharObjPointer->currentHP;
+			g_gameVals.P2CharObjPointer->previousHP = g_gameVals.P2CharObjPointer->currentHP;
 
 			vampirism_timer = 0.0;
 		}
@@ -423,7 +423,7 @@ void __declspec(naked)onepunch_HealthModify()
 
 	__asm mov[newHP], eax
 	__asm pushad
-	if (*Containers::gameVals.pMatchState == MATCH_STATE_FIGHT) //on match only
+	if (*g_gameVals.pMatchState == MatchState_Fight) //on match only
 		newHP = 0;
 	__asm popad
 
@@ -440,7 +440,7 @@ void __declspec(naked)twopunch_HealthModify()
 	LOG_ASM(7, "twopunch_HealthModify\n");
 
 	static int newHP = 0;
-	static CChar* thisPlayerObj = 0;
+	static CharData* thisPlayerObj = 0;
 
 	__asm
 	{
@@ -449,9 +449,9 @@ void __declspec(naked)twopunch_HealthModify()
 		pushad
 	}
 
-	if (*Containers::gameVals.pMatchState == MATCH_STATE_FIGHT) //on match only
+	if (*g_gameVals.pMatchState == MatchState_Fight) //on match only
 	{
-		if (thisPlayerObj != Containers::gameVals.P1CharObjPointer && thisPlayerObj != Containers::gameVals.P2CharObjPointer)
+		if (thisPlayerObj != g_gameVals.P1CharObjPointer && thisPlayerObj != g_gameVals.P2CharObjPointer)
 		{
 			//LOG(2, "NEITHER PLAYER OBJECTS!\n");
 			__asm jmp EXIT
@@ -481,7 +481,7 @@ void __declspec(naked)fivepunch_HealthModify()
 	LOG_ASM(7, "fivepunch_HealthModify\n");
 
 	static int newHP = 0;
-	static CChar* thisPlayerObj = 0;
+	static CharData* thisPlayerObj = 0;
 
 	__asm
 	{
@@ -490,9 +490,9 @@ void __declspec(naked)fivepunch_HealthModify()
 		pushad
 	}
 
-	if (*Containers::gameVals.pMatchState == MATCH_STATE_FIGHT) //on match only
+	if (*g_gameVals.pMatchState == MatchState_Fight) //on match only
 	{
-		if (thisPlayerObj != Containers::gameVals.P1CharObjPointer && thisPlayerObj != Containers::gameVals.P2CharObjPointer)
+		if (thisPlayerObj != g_gameVals.P1CharObjPointer && thisPlayerObj != g_gameVals.P2CharObjPointer)
 		{
 			//LOG(2, "NEITHER PLAYER OBJECTS!\n");
 			__asm jmp EXIT
@@ -522,8 +522,8 @@ void __declspec(naked)tugofwar_HealthModify()
 	LOG_ASM(7, "tugofwar_HealthModify\n");
 
 	static int newHP = 0;
-	static CChar* thisPlayerObj = 0;
-	static CChar* otherPlayerObj = 0;
+	static CharData* thisPlayerObj = 0;
+	static CharData* otherPlayerObj = 0;
 
 	__asm
 	{
@@ -532,9 +532,9 @@ void __declspec(naked)tugofwar_HealthModify()
 		pushad
 	}
 
-	if (*Containers::gameVals.pMatchState == MATCH_STATE_FIGHT) //on match only
+	if (*g_gameVals.pMatchState == MatchState_Fight) //on match only
 	{
-		if (thisPlayerObj != Containers::gameVals.P1CharObjPointer && thisPlayerObj != Containers::gameVals.P2CharObjPointer)
+		if (thisPlayerObj != g_gameVals.P1CharObjPointer && thisPlayerObj != g_gameVals.P2CharObjPointer)
 		{
 			//LOG(2, "NEITHER PLAYER OBJECTS!\n");
 			__asm jmp EXIT
@@ -546,10 +546,10 @@ void __declspec(naked)tugofwar_HealthModify()
 			newHP = thisPlayerObj->previousHP; //we want to do exactly 20% max hp damage
 			newHP -= thisPlayerObj->maxHP / 10;
 
-			if (thisPlayerObj == Containers::gameVals.P1CharObjPointer)
-				otherPlayerObj = Containers::gameVals.P2CharObjPointer;
+			if (thisPlayerObj == g_gameVals.P1CharObjPointer)
+				otherPlayerObj = g_gameVals.P2CharObjPointer;
 			else
-				otherPlayerObj = Containers::gameVals.P1CharObjPointer;
+				otherPlayerObj = g_gameVals.P1CharObjPointer;
 
 			//heal the other player
 			otherPlayerObj->currentHP += otherPlayerObj->maxHP / 10;

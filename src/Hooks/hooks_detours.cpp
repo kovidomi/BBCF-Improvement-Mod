@@ -2,11 +2,11 @@
 
 #include "HookManager.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "D3D9EXWrapper/ID3D9Wrapper_Sprite.h"
 #include "D3D9EXWrapper/ID3DXWrapper_Effect.h"
 #include "D3D9EXWrapper/ID3D9EXWrapper.h"
-#include "Game/containers.h"
 
 #include <detours.h>
 
@@ -72,7 +72,7 @@ void __declspec(naked)GetSteamMatchmaking()
 		/////
 		pushad
 		add esi, 10h
-		mov Containers::tempVals.ppSteamMatchmaking, esi
+		mov g_tempVals.ppSteamMatchmaking, esi
 		popad
 		/////
 		mov[esi + 10h], eax
@@ -91,7 +91,7 @@ void __declspec(naked)GetSteamNetworking()
 		/////
 		pushad
 		add esi, 20h
-		mov Containers::tempVals.ppSteamNetworking, esi
+		mov g_tempVals.ppSteamNetworking, esi
 		popad
 		/////
 		mov[esi + 20h], eax
@@ -110,7 +110,7 @@ void __declspec(naked)GetSteamUser()
 		/////
 		pushad
 		add esi, 4h
-		mov Containers::tempVals.ppSteamUser, esi
+		mov g_tempVals.ppSteamUser, esi
 		popad
 		/////
 		mov[esi + 4h], eax
@@ -129,7 +129,7 @@ void __declspec(naked)GetSteamFriends()
 		/////
 		pushad
 		add esi, 8h
-		mov Containers::tempVals.ppSteamFriends, esi
+		mov g_tempVals.ppSteamFriends, esi
 		popad
 		/////
 		mov[esi + 8h], eax
@@ -148,7 +148,7 @@ void __declspec(naked)GetSteamUtils()
 		/////
 		pushad
 		add esi, 0Ch
-		mov Containers::tempVals.ppSteamUtils, esi
+		mov g_tempVals.ppSteamUtils, esi
 		popad
 		/////
 		mov[esi + 0Ch], eax
@@ -167,7 +167,7 @@ void __declspec(naked)GetSteamUserStats()
 		/////
 		pushad
 		add esi, 14h
-		mov Containers::tempVals.ppSteamUserStats, esi
+		mov g_tempVals.ppSteamUserStats, esi
 		popad
 		/////
 		mov[esi + 14h], eax
@@ -213,7 +213,7 @@ HWND WINAPI hook_CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR l
 		if (counter == 2) // 2nd created window should be the correct one according to process hacker
 		{
 			LOG(2, "Correct window: 0x%x\n", hWnd);
-			Containers::gameProc.hWndGameWindow = hWnd;
+			g_gameProc.hWndGameWindow = hWnd;
 		}
 	}
 	counter++;
