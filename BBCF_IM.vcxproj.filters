@@ -82,9 +82,6 @@
     <ClCompile Include="src\Core\crashdump.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\containers.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Web\update_check.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -122,6 +119,26 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Hooks\hooks_palette.cpp" />
+    <ClCompile Include="src\Overlay\fonts.cpp" />
+    <ClCompile Include="src\Overlay\imgui_utils.cpp" />
+    <ClCompile Include="src\Overlay\WindowManager.cpp" />
+    <ClCompile Include="src\Overlay\Logger\ImGuiLogger.cpp" />
+    <ClCompile Include="src\Overlay\Window\DebugWindow.cpp" />
+    <ClCompile Include="src\Overlay\Window\LogWindow.cpp" />
+    <ClCompile Include="src\Overlay\Window\MainWindow.cpp" />
+    <ClCompile Include="src\Overlay\Window\NotificationWindow.cpp" />
+    <ClCompile Include="src\Overlay\Window\PaletteEditorWindow.cpp" />
+    <ClCompile Include="src\Overlay\Window\UpdateNotifierWindow.cpp" />
+    <ClCompile Include="src\Core\interfaces.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Jonb\JonbReader.cpp" />
+    <ClCompile Include="src\Overlay\Window\IWindow.cpp" />
+    <ClCompile Include="src\Overlay\WindowContainer\WindowContainer.cpp" />
+    <ClCompile Include="src\PaletteManager\PaletteManager.cpp" />
+    <ClCompile Include="src\Game\Player.cpp" />
+    <ClCompile Include="src\Game\CharPaletteHandle.cpp" />
+    <ClCompile Include="src\Game\gamestates.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="depends\imgui\imgui.h" />
@@ -176,13 +193,7 @@
     <ClInclude Include="src\Core\crashdump.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\containers.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="src\Web\update_check.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\cchar.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="src\PaletteManager\internal_palette_datas.h">
@@ -221,6 +232,32 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="src\Hooks\hooks_palette.h" />
+    <ClInclude Include="src\Overlay\WindowManager.h" />
+    <ClInclude Include="src\Overlay\fonts.h" />
+    <ClInclude Include="src\Overlay\imgui_utils.h" />
+    <ClInclude Include="src\Overlay\Logger\Logger.h" />
+    <ClInclude Include="src\Overlay\Logger\ImGuiLogger.h" />
+    <ClInclude Include="src\Overlay\Window\DebugWindow.h" />
+    <ClInclude Include="src\Overlay\Window\LogWindow.h" />
+    <ClInclude Include="src\Overlay\Window\MainWindow.h" />
+    <ClInclude Include="src\Overlay\Window\NotificationWindow.h" />
+    <ClInclude Include="src\Overlay\Window\PaletteEditorWindow.h" />
+    <ClInclude Include="src\Overlay\Window\UpdateNotifierWindow.h" />
+    <ClInclude Include="src\Overlay\WindowContainer\WindowType.h" />
+    <ClInclude Include="src\Overlay\WindowContainer\WindowContainer.h" />
+    <ClInclude Include="src\Core\interfaces.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CharData.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Jonb\JonbEntry.h" />
+    <ClInclude Include="src\Game\Jonb\JonbReader.h" />
+    <ClInclude Include="src\Overlay\Window\IWindow.h" />
+    <ClInclude Include="src\PaletteManager\PaletteManager.h" />
+    <ClInclude Include="src\PaletteManager\impl_format.h" />
+    <ClInclude Include="src\Game\Player.h" />
+    <ClInclude Include="src\Game\CharPaletteHandle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="export\dinput8.def">
