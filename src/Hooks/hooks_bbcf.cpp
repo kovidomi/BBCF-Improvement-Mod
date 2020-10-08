@@ -9,7 +9,8 @@
 #include "Game/custom_gameModes.h"
 #include "Game/gamestates.h"
 #include "Hooks/HookManager.h"
-#include "ImGui/ImGuiSystem.h"
+#include "Overlay/Logger/ImGuiLogger.h"
+#include "Overlay/WindowManager.h"
 #include "PaletteManager/custom_palette.h"
 
 DWORD GetGameStateTitleScreenJmpBackAddr = 0;
@@ -29,9 +30,9 @@ void __declspec(naked)GetGameStateTitleScreen()
 
 	placeHooks_steamApiWrapper();
 
-	ImGuiSystem::Init(
-		g_gameProc.hWndGameWindow,
-		g_interfaces.pD3D9ExWrapper);
+	WindowManager::GetInstance()
+		.Initialize(g_gameProc.hWndGameWindow, g_interfaces.pD3D9ExWrapper);
+
 	__asm
 	{
 		popad
@@ -87,9 +88,8 @@ void __declspec(naked)GetGameStateMenuScreen()
 
 	placeHooks_steamApiWrapper();
 	
-	ImGuiSystem::Init(
-		g_gameProc.hWndGameWindow,
-		g_interfaces.pD3D9ExWrapper);
+	WindowManager::GetInstance()
+		.Initialize(g_gameProc.hWndGameWindow, g_interfaces.pD3D9ExWrapper);
 
 	ResetBackToMenu();
 
@@ -132,20 +132,20 @@ void __declspec(naked)GetGameStateMatchStart()
 	g_gameVals.isP2BloomOn = 0;
 	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
 
-	ImGuiSystem::AddLogSeparator();
+	g_imGuiLogger->LogSeparator();
 
 	if (*g_gameVals.pGameMode == GameMode_Online)
 	{
 		//g_interfaces.pSteamApiHelper->GetRequestUserInformation(*g_gameVals.opponentSteamID);
-		//ImGuiSystem::AddLog("[system] Online match against '%s' has started\n", g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
-		ImGuiSystem::AddLog("[system] Online match has started\n");
+		//g_imGuiLogger->Log("[system] Online match against '%s' has started\n", g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
+		g_imGuiLogger->Log("[system] Online match has started\n");
 #ifdef _DEBUG
-		ImGuiSystem::AddLog("[debug] Local player is from %s\n", g_interfaces.pSteamUtilsWrapper->GetIPCountry());
+		g_imGuiLogger->Log("[debug] Local player is from %s\n", g_interfaces.pSteamUtilsWrapper->GetIPCountry());
 #endif
 	}
 	else
 	{
-		ImGuiSystem::AddLog("[system] Local match has started\n");
+		g_imGuiLogger->Log("[system] Local match has started\n");
 	}
 
 	__asm
@@ -221,6 +221,8 @@ DWORD WindowMsgHandlerJmpBackAddr = 0;
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void __declspec(naked)PassMsgToImGui()
 {
+	static bool isWindowManagerInitialized = false;
+
 	__asm
 	{
 		mov edi, [ebp + 0Ch]
@@ -228,11 +230,14 @@ void __declspec(naked)PassMsgToImGui()
 	}
 
 	LOG_ASM(7, "PassMsgToImGui\n");
+	__asm pushad
+	isWindowManagerInitialized = WindowManager::GetInstance().IsInitialized();
+	__asm popad
 
 	__asm
 	{
 		pushad
-		movzx eax, ImGuiSystem::Initialized
+		movzx eax, isWindowManagerInitialized
 		cmp eax, 0
 		je SKIP
 		push[ebp + 10h] //lparam
@@ -246,9 +251,9 @@ void __declspec(naked)PassMsgToImGui()
 		pop ebx
 		cmp eax, 1
 		je EXIT
-		SKIP :
+SKIP:
 		popad
-			jmp[WindowMsgHandlerJmpBackAddr]
+		jmp[WindowMsgHandlerJmpBackAddr]
 	}
 EXIT:
 	__asm

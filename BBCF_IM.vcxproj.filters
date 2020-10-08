@@ -139,6 +139,7 @@
     <ClCompile Include="src\Game\Player.cpp" />
     <ClCompile Include="src\Game\CharPaletteHandle.cpp" />
     <ClCompile Include="src\Game\gamestates.cpp" />
+    <ClCompile Include="src\Game\MatchState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="depends\imgui\imgui.h" />
@@ -258,6 +259,7 @@
     <ClInclude Include="src\PaletteManager\impl_format.h" />
     <ClInclude Include="src\Game\Player.h" />
     <ClInclude Include="src\Game\CharPaletteHandle.h" />
+    <ClInclude Include="src\Game\MatchState.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="export\dinput8.def">

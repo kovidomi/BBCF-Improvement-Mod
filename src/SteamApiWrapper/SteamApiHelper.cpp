@@ -1,7 +1,7 @@
 #include "SteamApiHelper.h"
 
 #include "Core/logger.h"
-#include "ImGui/ImGuiSystem.h"
+#include "Overlay/Logger/ImGuiLogger.h"
 
 //note: commented out functions are not working
 
@@ -26,13 +26,13 @@ void SteamApiHelper::OnUpdateNumberOfCurrentPlayers(NumberOfCurrentPlayers_t* pC
 {
 	if (bIOFailure || !pCallback->m_bSuccess)
 	{
-		ImGuiSystem::AddLog("[error] Failed to update the current number of ingame players\n");
+		g_imGuiLogger->Log("[error] Failed to update the current number of ingame players\n");
 		current_players = -1;
 		return;
 	}
 	//printf("Number of players currently playing: %d\n", pCallback->m_cPlayers);
 #ifdef ENABLE_LOGGING
-	ImGuiSystem::AddLog("[debug] Updated the current number of ingame players: %d\n", pCallback->m_cPlayers);
+	g_imGuiLogger->Log("[debug] Updated the current number of ingame players: %d\n", pCallback->m_cPlayers);
 #endif
 	current_players = pCallback->m_cPlayers;
 }
@@ -47,9 +47,9 @@ void SteamApiHelper::OnUpdateNumberOfCurrentPlayers(NumberOfCurrentPlayers_t* pC
 //{
 //	if (bIOFailure)
 //	{
-//		ImGuiSystem::AddLog("[system] Online match against '?????' has started\n");
+//		g_imGuiLogger->Log("[system] Online match against '?????' has started\n");
 //		return;
 //	}
 //
-//	ImGuiSystem::AddLog("[system] Online match against '%s' has started\n", pSteamFriends->GetPlayerNickname(pCallback->m_ulSteamID));
+//	g_imGuiLogger->Log("[system] Online match against '%s' has started\n", pSteamFriends->GetPlayerNickname(pCallback->m_ulSteamID));
 //}

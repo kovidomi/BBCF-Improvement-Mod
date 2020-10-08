@@ -2,7 +2,8 @@
 
 #include "Core/info.h"
 #include "Core/logger.h"
-#include "ImGui/ImGuiSystem.h"
+#include "Overlay/Logger/ImGuiLogger.h"
+#include "Overlay/WindowManager.h"
 
 #include <WinHttpClient.h>
 #include <regex>
@@ -50,15 +51,15 @@ void CheckUpdate()
 	std::smatch m;
 	std::regex_search(str, m, r);
 
-	//ImGuiSystem::AddLog("on site: ");
-	//ImGuiSystem::AddLog(m[1].str().c_str());
-	//ImGuiSystem::AddLog("\n");
-	//ImGuiSystem::AddLog("installed: ");
-	//ImGuiSystem::AddLog(MOD_VERSION_NUM);
+	//g_imGuiLogger->Log("on site: ");
+	//g_imGuiLogger->Log(m[1].str().c_str());
+	//g_imGuiLogger->Log("\n");
+	//g_imGuiLogger->Log("installed: ");
+	//g_imGuiLogger->Log(MOD_VERSION_NUM);
 	
 	if (m[1].str() == "")
 	{
-		ImGuiSystem::AddLog("[error] Update check failed.\n");
+		g_imGuiLogger->Log("[error] Update check failed.\n");
 		return;
 	}
 
@@ -66,12 +67,12 @@ void CheckUpdate()
 	{
 		newVersionNum = m[1].str();
 		LOG(2, "New version found: %s\n", newVersionNum.c_str());
-		ImGuiSystem::AddLog("[system] Update available: BBCF Improvement Mod %s has been released!\n", newVersionNum.c_str());
-		ImGuiSystem::IsUpdateAvailable = true;
+		g_imGuiLogger->Log("[system] Update available: BBCF Improvement Mod %s has been released!\n", newVersionNum.c_str());
+		WindowManager::GetInstance().GetWindowContainer()->GetWindow(WindowType_UpdateNotifier)->Open();
 	}
 	else
 	{
-		ImGuiSystem::AddLog("[system] BBCF Improvement Mod is up-to-date\n");
+		g_imGuiLogger->Log("[system] BBCF Improvement Mod is up-to-date\n");
 	}
 }
 
@@ -94,7 +95,7 @@ void FetchTotalIngamePlayers()
 	ingamePlayersNum = m[1].str();
 
 	LOG(2, "%s ingame players\n", ingamePlayersNum.c_str());
-	ImGuiSystem::AddLog("[system] Total players in-game: %s\n", ingamePlayersNum.c_str());
+	g_imGuiLogger->Log("[system] Total players in-game: %s\n", ingamePlayersNum.c_str());
 }
 
 std::string GetIngamePlayersNum()

@@ -23,7 +23,7 @@ class NetworkManager;
 struct im_packet_internal_t;
 
 extern unsigned char stages[79][5];
-extern char* allstagesunlockedmemory;
+extern char* allStagesUnlockedMemoryBlock;
 #ifndef ALL_STAGES_UNLOCKED_MEMORY_SIZE
 #define ALL_STAGES_UNLOCKED_MEMORY_SIZE 3536//3456
 #endif

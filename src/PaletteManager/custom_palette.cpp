@@ -8,7 +8,7 @@
 #include "Game/custom_gameModes.h"
 #include "Game/gamestates.h"
 #include "Hooks/HookManager.h"
-#include "ImGui/ImGuiSystem.h"
+#include "Overlay/Logger/ImGuiLogger.h"
 #include "PaletteManager/internal_palette_datas.h"
 #include "SteamApiWrapper/SteamNetworkingWrapper.h"
 
@@ -184,7 +184,7 @@ void HandleSavedPackets()
 	{
 #ifdef _DEBUG
 		LOG(2, "Processing previously saved tempPackets...\n");
-		ImGuiSystem::AddLog("[debug] Processing previously saved tempPacket\n");
+		g_imGuiLogger->Log("[debug] Processing previously saved tempPacket\n");
 #endif
 		g_interfaces.pNetworkManager->PacketProcesser(&g_tempVals.tempPackets[g_tempVals.tempPackets.size() - 1]);
 		g_tempVals.tempPackets.pop_back();
@@ -202,9 +202,9 @@ void LoadPalettePacket(im_packet_internal_t *packet)
 		return;
 	}
 
-	//ImGuiSystem::AddLog("[system] Custom palette packet received from player%d (%s)\n",
+	//g_imGuiLogger->Log("[system] Custom palette packet received from player%d (%s)\n",
 	//	packet->playernum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
-	ImGuiSystem::AddLog("[system] Custom palette packet received from player%d\n", packet->playernum);
+	g_imGuiLogger->Log("[system] Custom palette packet received from player%d\n", packet->playernum);
 
 	LOG(2, "\tReceived palette packet: \n");
 	LOG(2, "\tlength1: %s\n", RawMemoryArrayToString((unsigned char*)&packet->length1, sizeof(packet->length1)));
@@ -275,9 +275,9 @@ void LoadEffectPacket(im_packet_internal_t *packet)
 	//if(strcmp((char*)packet->data, CURPALETTE) == 0)
 
 #ifdef _DEBUG
-	//ImGuiSystem::AddLog("[debug] Custom effect packet part%d received from player%d (%s)\n",
+	//g_imGuiLogger->Log("[debug] Custom effect packet part%d received from player%d (%s)\n",
 	//	packet->part, packet->playernum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
-	ImGuiSystem::AddLog("[debug] Custom effect packet part%d received from player%d \n", packet->part, packet->playernum);
+	g_imGuiLogger->Log("[debug] Custom effect packet part%d received from player%d \n", packet->part, packet->playernum);
 #endif
 
 	LOG(2, "\tReceived effect packet: \n");
@@ -320,7 +320,7 @@ void LoadBloomPacket(im_packet_internal_t *packet)
 	}
 
 //#ifdef _DEBUG
-//	ImGuiSystem::AddLog("[debug] Custom bloom packet part%d received from player%d (%s)\n",
+//	g_imGuiLogger->Log("[debug] Custom bloom packet part%d received from player%d (%s)\n",
 //		packet->part, packet->playernum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
 //#endif
 //
@@ -378,9 +378,9 @@ void SendCustomEffectBloom()
 #ifdef _DEBUG
 	if (ret)
 	{
-		//ImGuiSystem::AddLog("[system] Custom bloom packet sent to player%d (%s)\n",
+		//g_imGuiLogger->Log("[system] Custom bloom packet sent to player%d (%s)\n",
 		//	otherPlayerNum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
-		ImGuiSystem::AddLog("[system] Custom bloom packet sent to player%d\n", otherPlayerNum);
+		g_imGuiLogger->Log("[system] Custom bloom packet sent to player%d\n", otherPlayerNum);
 	}
 #endif
 
@@ -394,7 +394,7 @@ void OverwriteStagesList()
 		*g_gameVals.pGameMode == GameMode_Versus))
 	{
 		LOG(2, "OverwriteStagesList\n");
-		memcpy(g_gameVals.stageListMemory, allstagesunlockedmemory, ALL_STAGES_UNLOCKED_MEMORY_SIZE * sizeof(char));
+		memcpy(g_gameVals.stageListMemory, allStagesUnlockedMemoryBlock, ALL_STAGES_UNLOCKED_MEMORY_SIZE * sizeof(char));
 		g_gameVals.charSelectInit = true;
 	}
 }
@@ -428,9 +428,9 @@ void SendCustomPalette()
 	bool ret = g_interfaces.pNetworkManager->SendPacket(g_gameVals.opponentSteamID, &packet);
 	if (ret)
 	{
-		//ImGuiSystem::AddLog("[system] Custom palette packet sent to player%d (%s)\n",
+		//g_imGuiLogger->Log("[system] Custom palette packet sent to player%d (%s)\n",
 		//	otherPlayerNum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
-		ImGuiSystem::AddLog("[system] Custom palette packet sent to player%d\n", otherPlayerNum);
+		g_imGuiLogger->Log("[system] Custom palette packet sent to player%d\n", otherPlayerNum);
 	}
 }
 
@@ -466,9 +466,9 @@ void SendCustomEffects()
 #ifdef _DEBUG
 		if (ret)
 		{
-			//ImGuiSystem::AddLog("[debug] Custom effect packets sent to player%d (%s)\n",
+			//g_imGuiLogger->Log("[debug] Custom effect packets sent to player%d (%s)\n",
 			//	otherPlayerNum, g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
-			ImGuiSystem::AddLog("[debug] Custom effect packets sent to player%d\n", otherPlayerNum);
+			g_imGuiLogger->Log("[debug] Custom effect packets sent to player%d\n", otherPlayerNum);
 		}
 #endif
 	}
@@ -541,8 +541,8 @@ void InitCustomPaletteVector()
 void LoadPaletteFiles()
 {
 	LOG(2, "LoadPaletteFiles\n");
-	ImGuiSystem::AddLogSeparator();
-	ImGuiSystem::AddLog("[system] Loading custom palettes...\n");
+	g_imGuiLogger->LogSeparator();
+	g_imGuiLogger->Log("[system] Loading custom palettes...\n");
 
 	InitCustomPaletteVector();
 	LoadInternalPalettes();
@@ -553,8 +553,8 @@ void LoadPaletteFiles()
 		path = std::wstring(L"BBCF_IM\\Palettes\\") + getCharacterNameByIndexW(i) + L"\\*";
 		LoadCustomPalettesIntoContainer(i, path.c_str());
 	}
-	ImGuiSystem::AddLog("[system] Finished loading custom palettes\n");
-	ImGuiSystem::AddLogSeparator();
+	g_imGuiLogger->Log("[system] Finished loading custom palettes\n");
+	g_imGuiLogger->LogSeparator();
 }
 
 void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
@@ -599,12 +599,12 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 			if (!file.is_open())
 			{
 				LOG(2, "\tCouldn't open %s!\n", strerror(errno));
-				ImGuiSystem::AddLog("[error] Unable to open '%s' : %s\n", fileName.c_str(), strerror(errno));
+				g_imGuiLogger->Log("[error] Unable to open '%s' : %s\n", fileName.c_str(), strerror(errno));
 				continue;
 			}
 			if (fileName.find(".hpl") == std::string::npos)
 			{
-				ImGuiSystem::AddLog("[error] Unable to open '%s' : not a .hpl file\n", fileName.c_str());
+				g_imGuiLogger->Log("[error] Unable to open '%s' : not a .hpl file\n", fileName.c_str());
 				continue;
 			}
 
@@ -614,7 +614,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 			if (fileName.find("_effectbloom") != std::string::npos && g_gameVals.customPalettes[charIndex].size() > 1)
 			{
 				g_gameVals.customPalettes[charIndex][g_gameVals.customPalettes[charIndex].size() - 1][9].assign("\x01");
-				ImGuiSystem::AddLog("[system] Loaded '%s'\n", fileName.c_str());
+				g_imGuiLogger->Log("[system] Loaded '%s'\n", fileName.c_str());
 				continue;
 			}
 
@@ -622,7 +622,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 			if (buffer.str().length() < PALETTE_DATALEN)
 			{
 				LOG(2, "ERROR, unrecognized file contents!\n");
-				ImGuiSystem::AddLog("[error] '%s' unrecognized file contents, data length less than 3FCh!\n", fileName.c_str());
+				g_imGuiLogger->Log("[error] '%s' unrecognized file contents, data length less than 3FCh!\n", fileName.c_str());
 				continue;
 			}
 
@@ -633,7 +633,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 			{
 				if (g_gameVals.customPalettes[charIndex].size() < 2)
 				{
-					ImGuiSystem::AddLog("[error] '%s' has no custom character palette found to match with! Create a character palette named '%s' to load this effect file on!\n", 
+					g_imGuiLogger->Log("[error] '%s' has no custom character palette found to match with! Create a character palette named '%s' to load this effect file on!\n", 
 						fileName.c_str(), (fileName.substr(0, fileName.rfind("_effect0")) + ".hpl").c_str());
 					LOG(2, "\t\tEffect file has no custom character palette to match with!\n");
 					continue;
@@ -642,7 +642,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 				//if previously pushed character palette's name wasnt the effect file's name
 				if (g_gameVals.customPalettes[charIndex][g_gameVals.customPalettes[charIndex].size()-1][0] != fileName.substr(0, fileName.rfind("_effect0")))
 				{
-					ImGuiSystem::AddLog("[error] '%s' has no custom character palette found to match with! Create a character palette named '%s' to load this effect file on!\n",
+					g_imGuiLogger->Log("[error] '%s' has no custom character palette found to match with! Create a character palette named '%s' to load this effect file on!\n",
 						fileName.c_str(), (fileName.substr(0, fileName.rfind("_effect0")) + ".hpl").c_str());
 					LOG(2, "\t\tEffect file has no custom character palette to match with!\n");
 					continue;
@@ -657,7 +657,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 				if (pos > 7 || pos == -1)
 				{
 					LOG(2, "ERROR, WRONG INDEX OF EFFECT FILE!\n");
-					ImGuiSystem::AddLog("[error] '%s' has wrong index!\n", fileName.c_str());
+					g_imGuiLogger->Log("[error] '%s' has wrong index!\n", fileName.c_str());
 					continue;
 				}
 				g_gameVals.customPalettes[charIndex][g_gameVals.customPalettes[charIndex].size() - 1][pos + 1] = fileData;
@@ -679,7 +679,7 @@ void LoadCustomPalettesIntoContainer(int charIndex, LPCWSTR path)
 				item.push_back("");			// 11	description
 				g_gameVals.customPalettes[charIndex].push_back(item);
 			}
-			ImGuiSystem::AddLog("[system] Loaded '%s'\n", fileName.c_str());
+			g_imGuiLogger->Log("[system] Loaded '%s'\n", fileName.c_str());
 		} while (FindNextFile(hFind, &data));
 		FindClose(hFind);
 	}
@@ -729,7 +729,7 @@ void ReplaceP1Palette(bool sendToOpponent)
 		if (*g_gameVals.pGameState == GameState_InMatch && g_gameVals.P1CurPalette == 0)
 		{
 			LOG(2, "P1CurPalette is 0 !\n");
-			ImGuiSystem::AddLog("[error] P1CurPalette is 0! Please report this bug.\n");
+			g_imGuiLogger->Log("[error] P1CurPalette is 0! Please report this bug.\n");
 		}
 		return;
 	}
@@ -737,7 +737,7 @@ void ReplaceP1Palette(bool sendToOpponent)
 	if (g_gameVals.P1_selectedCharID == -1)
 	{
 		LOG(2, "P1_selectedCharID is -1 !\n");
-		ImGuiSystem::AddLog("[error] P1_selectedCharID is -1 ! Please report this bug.\n");
+		g_imGuiLogger->Log("[error] P1_selectedCharID is -1 ! Please report this bug.\n");
 		return;
 	}
 
@@ -770,7 +770,7 @@ void ReplaceP1Palette(bool sendToOpponent)
 			PALETTE_DATALEN);
 
 	std::string charName(getCharacterNameByIndexA(g_gameVals.P1_selectedCharID));
-	ImGuiSystem::AddLog("[system] P1 (%s) palette set to '%s'\n",
+	g_imGuiLogger->Log("[system] P1 (%s) palette set to '%s'\n",
 		charName.c_str(), g_gameVals.customPalettes[g_gameVals.P1_selectedCharID][g_gameVals.P1_selected_custom_pal][0].c_str());
 
 	if(sendToOpponent)
@@ -786,7 +786,7 @@ void ReplaceP2Palette(bool sendToOpponent)
 		if (*g_gameVals.pGameState == GameState_InMatch && g_gameVals.P2CurPalette == 0)
 		{
 			LOG(2, "P2CurPalette is 0 !\n");
-			ImGuiSystem::AddLog("[error] P2CurPalette is 0! Please report this bug.\n");
+			g_imGuiLogger->Log("[error] P2CurPalette is 0! Please report this bug.\n");
 		}
 		return;
 	}
@@ -794,7 +794,7 @@ void ReplaceP2Palette(bool sendToOpponent)
 	if (g_gameVals.P2_selectedCharID == -1)
 	{
 		LOG(2, "P2_selectedCharID is -1 !\n");
-		ImGuiSystem::AddLog("[error] P2_selectedCharID is -1 ! Please report this bug.\n");
+		g_imGuiLogger->Log("[error] P2_selectedCharID is -1 ! Please report this bug.\n");
 		return;
 	}
 
@@ -827,7 +827,7 @@ void ReplaceP2Palette(bool sendToOpponent)
 			PALETTE_DATALEN);
 
 	std::string charName = getCharacterNameByIndexA(g_gameVals.P2_selectedCharID);
-	ImGuiSystem::AddLog("[system] P2 (%s) palette set to '%s'\n",
+	g_imGuiLogger->Log("[system] P2 (%s) palette set to '%s'\n",
 		charName.c_str(), g_gameVals.customPalettes[g_gameVals.P2_selectedCharID][g_gameVals.P2_selected_custom_pal][0].c_str());
 
 	if (sendToOpponent)

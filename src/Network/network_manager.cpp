@@ -3,8 +3,8 @@
 #include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/utils.h"
-#include "ImGui/ImGuiSystem.h"
 #include "Network/bbcf_im_networking.h"
+#include "Overlay/Logger/ImGuiLogger.h"
 #include "PaletteManager/custom_palette.h"
 
 NetworkManager::NetworkManager(SteamNetworkingWrapper *SteamNetworking)
@@ -88,7 +88,7 @@ void NetworkManager::PacketProcesser(im_packet_internal_t* packet)
 	if (packet->code != 0x98)
 	{
 		LOG(2, "Opponent is using incompatible version of BBCFIM\n");
-		ImGuiSystem::AddLog("[error] Opponent is using incompatible version of BBCFIM\n");
+		g_imGuiLogger->Log("[error] Opponent is using incompatible version of BBCFIM\n");
 		return;
 	}
 
@@ -117,7 +117,7 @@ void NetworkManager::PacketProcesser(im_packet_internal_t* packet)
 		break;
 	default:
 		LOG(2, "packet type not found\n");
-		ImGuiSystem::AddLog("[error] Packet type not found\n");
+		g_imGuiLogger->Log("[error] Packet type not found\n");
 	}
 }
 

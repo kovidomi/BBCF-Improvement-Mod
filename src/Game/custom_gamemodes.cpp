@@ -7,7 +7,7 @@
 #include "Game/gamestates.h"
 #include "Hooks/HookManager.h"
 #include "Hooks/hooks_customGameModes.h"
-#include "ImGui/ImGuiSystem.h"
+#include "Overlay/Logger/ImGuiLogger.h"
 
 #include <imgui.h>
 
@@ -81,7 +81,7 @@ void InitCustomGameMode()
 		}
 		else
 		{
-			ImGuiSystem::AddLog("[system] Players couldn't agree on the same game mode. Resetting back to 'Normal'\n");
+			g_imGuiLogger->Log("[system] Players couldn't agree on the same game mode. Resetting back to 'Normal'\n");
 			EndCustomGameMode();
 		}
 	}
@@ -128,7 +128,7 @@ void EndCustomGameMode()
 void InitSteroidMode()
 {
 	LOG(2, "InitSteroidMode\n");
-	ImGuiSystem::AddLog("[system] Starting Steroid Mode\n");
+	g_imGuiLogger->Log("[system] Starting Steroid Mode\n");
 
 	g_gameVals.P1CharObjPointer->maxHP *= steroid_hp_multiplier;
 	g_gameVals.P2CharObjPointer->maxHP *= steroid_hp_multiplier;
@@ -154,7 +154,7 @@ void InitSteroidMode()
 void InitVampireMode()
 {
 	LOG(2, "InitVampireMode\n");
-	ImGuiSystem::AddLog("[system] Starting Vampire Mode\n");
+	g_imGuiLogger->Log("[system] Starting Vampire Mode\n");
 
 	HookManager::ActivateHook("vampire_HealthModify");
 	HookManager::ActivateHook("vampire_HealthDrain");
@@ -163,7 +163,7 @@ void InitVampireMode()
 void InitExVampireMode()
 {
 	LOG(2, "InitExVampireMode\n");
-	ImGuiSystem::AddLog("[system] Starting exVampire Mode\n");
+	g_imGuiLogger->Log("[system] Starting exVampire Mode\n");
 
 	HookManager::ActivateHook("exVampire_HealthModify");
 	HookManager::ActivateHook("exVampire_HealthDrain");
@@ -172,7 +172,7 @@ void InitExVampireMode()
 void InitOnePunchMode()
 {
 	LOG(2, "InitOnePunchMode\n");
-	ImGuiSystem::AddLog("[system] Starting One Punch Mode\n");
+	g_imGuiLogger->Log("[system] Starting One Punch Mode\n");
 
 	*g_gameVals.pMatchRounds = 5;
 	*g_gameVals.pMatchTimer = 60 * 15;
@@ -190,7 +190,7 @@ void InitOnePunchMode()
 void InitTwoPunchMode()
 {
 	LOG(2, "InitTwoPunchMode\n");
-	ImGuiSystem::AddLog("[system] Starting Two Punch Mode\n");
+	g_imGuiLogger->Log("[system] Starting Two Punch Mode\n");
 
 	*g_gameVals.pMatchRounds = 5;
 	*g_gameVals.pMatchTimer = 60 * 15;
@@ -209,7 +209,7 @@ void InitTwoPunchMode()
 void InitFivePunchMode()
 {
 	LOG(2, "InitFivePunchMode\n");
-	ImGuiSystem::AddLog("[system] Starting Five Punch Mode\n");
+	g_imGuiLogger->Log("[system] Starting Five Punch Mode\n");
 
 	*g_gameVals.pMatchRounds = 5;
 	*g_gameVals.pMatchTimer = 60 * 60;
@@ -228,7 +228,7 @@ void InitFivePunchMode()
 void InitTugOfWar()
 {
 	LOG(2, "InitTugOfWarMode\n");
-	ImGuiSystem::AddLog("[system] Starting Tug of War Mode\n");
+	g_imGuiLogger->Log("[system] Starting Tug of War Mode\n");
 
 	*g_gameVals.pMatchRounds = 5;
 	*g_gameVals.pMatchTimer = 60 * 60;
@@ -251,7 +251,7 @@ void InitTugOfWar()
 void InitInfiniteHeatMode()
 {
 	LOG(2, "InitInfiniteHeatMode\n");
-	ImGuiSystem::AddLog("[system] Starting Infinite Heat Mode\n");
+	g_imGuiLogger->Log("[system] Starting Infinite Heat Mode\n");
 
 	//*g_gameVals.pMatchTimer = 60 * 60;
 	//new round, recharge 50% of the burst
@@ -264,7 +264,7 @@ void InitInfiniteHeatMode()
 void InitOverdriveMode()
 {
 	LOG(2, "InitOverdriveMode\n");
-	ImGuiSystem::AddLog("[system] Starting Overdrive Mode\n");
+	g_imGuiLogger->Log("[system] Starting Overdrive Mode\n");
 
 	//*g_gameVals.pMatchRounds = 5;
 	//*g_gameVals.pMatchTimer = 60 * 60;

@@ -4,7 +4,7 @@
 #include "Settings.h"
 
 #include "Hooks/hooks_detours.h"
-#include "ImGui/ImGuiSystem.h"
+#include "Overlay/WindowManager.h"
 
 #include <Windows.h>
 
@@ -29,8 +29,7 @@ void CreateCustomDirectories()
 
 void BBCF_IM_Shutdown()
 {
-	ImGuiSystem::WriteLogToFile();
-	ImGuiSystem::Shutdown();
+	WindowManager::GetInstance().Shutdown();
 	CleanupInterfaces();
 	closeLogger();
 }

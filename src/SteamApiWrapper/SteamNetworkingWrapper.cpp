@@ -4,8 +4,8 @@
 #include "Core/logger.h"
 #include "Core/utils.h"
 #include "Game/gamestates.h"
-#include "ImGui/ImGuiSystem.h"
 #include "Network/bbcf_im_networking.h"
+#include "Overlay/Logger/ImGuiLogger.h"
 
 SteamNetworkingWrapper::SteamNetworkingWrapper(ISteamNetworking** pSteamNetworking)
 {
@@ -88,7 +88,7 @@ bool SteamNetworkingWrapper::ReadP2PPacket(void *pubDest, uint32 cubDest, uint32
 			{
 				LOG(2, "Added 0x%x to playerList\n", *psteamIDRemote);
 #ifdef _DEBUG
-				ImGuiSystem::AddLog("[debug] 0x%x ('%s') added to the playersList\n", *psteamIDRemote, 
+				g_imGuiLogger->Log("[debug] 0x%x ('%s') added to the playersList\n", *psteamIDRemote, 
 					g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*psteamIDRemote));
 #endif
 				g_gameVals.playersInMatch.push_back(*psteamIDRemote);
