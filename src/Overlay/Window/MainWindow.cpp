@@ -102,7 +102,7 @@ void MainWindow::Draw()
 void MainWindow::DrawHudSection() const
 {
 	ImGui::Text(" "); ImGui::SameLine();
-	ImGui::Checkbox("Show HUD", (bool*)g_gameVals.pIsHUDHidden);
+	// ImGui::Checkbox("Show HUD", (bool*)g_gameVals.pIsHUDHidden);
 }
 
 void MainWindow::DrawCustomPalettesSection() const

@@ -4,6 +4,7 @@
 #include "Core/utils.h"
 #include "Game/characters.h"
 #include "Overlay/Logger/ImGuiLogger.h"
+#include "custom_palette.h"
 
 #include <atlstr.h>
 
@@ -13,6 +14,7 @@ PaletteManager::PaletteManager()
 {
 	LOG(2, "PaletteManager::PaletteManager\n");
 
+	LoadPaletteFiles();
 	CreatePaletteFolders();
 	//CreatePaletteSlotsFile();
 }
