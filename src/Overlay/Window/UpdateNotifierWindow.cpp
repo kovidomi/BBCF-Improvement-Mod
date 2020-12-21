@@ -20,7 +20,7 @@ void UpdateNotifierWindow::Draw()
 
 	const ImVec2 buttonSize = ImVec2(120, 23);
 	AlignItemHorizontalCenter(buttonSize.x);
-	if (ButtonUrl("Show", MOD_LINK_FORUM, buttonSize))
+	if (ButtonUrl("Download", MOD_LINK_FORUM, buttonSize))
 	{
 		Close();
 	}
