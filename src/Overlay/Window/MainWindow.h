@@ -7,23 +7,24 @@ class MainWindow : public IWindow
 {
 public:
 	MainWindow(const std::string& windowTitle, bool windowClosable,
-		ImGuiWindowFlags windowFlags = 0)
-		: IWindow(windowTitle, windowClosable, windowFlags)
-	{
-		SetMainWindowTitle();
-	}
+		WindowContainer& windowContainer, ImGuiWindowFlags windowFlags = 0);
+
 	~MainWindow() override = default;
-	void SetMainWindowTitle(const std::string text = "");
-	void SetWindowContainer(WindowContainer& windowContainer);
+
 protected:
 	void BeforeDraw() override;
 	void Draw() override;
+
 private:
+	void DrawUtilButtons() const;
+	void DrawCurrentPlayersCount() const;
 	void DrawLinkButtons() const;
-	void DrawLoadedSettingsValues() const;
+	void DrawLoadedSettingsValuesSection() const;
 	void DrawHudSection() const;
 	void DrawCustomPalettesSection() const;
 	void DrawHitboxOverlaySection() const;
+	void DrawGameplaySettingSection() const;
+	void DrawAvatarSection() const;
 
 	const ImVec2 BTN_SIZE = ImVec2(60, 20);
 	WindowContainer* m_pWindowContainer = nullptr;
