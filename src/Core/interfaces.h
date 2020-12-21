@@ -1,11 +1,15 @@
 #pragma once
 
+#include "CustomGameMode/GameModeManager.h"
 #include "D3D9EXWrapper/d3d9.h"
 #include "D3D9EXWrapper/ID3D9EXWrapper_Device.h"
-#include "Game/CharData.h"
 #include "Game/Player.h"
-#include "Network/network_manager.h"
-#include "PaletteManager/PaletteManager.h"
+#include "Game/Room/Room.h"
+#include "Network/NetworkManager.h"
+#include "Network/OnlineGameModeManager.h"
+#include "Network/OnlinePaletteManager.h"
+#include "Network/RoomManager.h"
+#include "Palette/PaletteManager.h"
 #include "SteamApiWrapper/SteamApiHelper.h"
 #include "SteamApiWrapper/SteamFriendsWrapper.h"
 #include "SteamApiWrapper/SteamMatchmakingWrapper.h"
@@ -13,27 +17,6 @@
 #include "SteamApiWrapper/SteamUserStatsWrapper.h"
 #include "SteamApiWrapper/SteamUserWrapper.h"
 #include "SteamApiWrapper/SteamUtilsWrapper.h"
-
-#include <steam_api.h>
-#include <string>
-#include <vector>
-
-//forward declaration
-class NetworkManager;
-struct im_packet_internal_t;
-
-extern unsigned char stages[79][5];
-extern char* allStagesUnlockedMemoryBlock;
-#ifndef ALL_STAGES_UNLOCKED_MEMORY_SIZE
-#define ALL_STAGES_UNLOCKED_MEMORY_SIZE 3536//3456
-#endif
-
-struct lookat_t
-{
-	D3DXVECTOR3* pEye;
-	D3DXVECTOR3* pAt;
-	D3DXVECTOR3* pUp;
-};
 
 struct interfaces_t
 {
@@ -43,10 +26,18 @@ struct interfaces_t
 	SteamUserWrapper* pSteamUserWrapper;
 	SteamUserStatsWrapper* pSteamUserStatsWrapper;
 	SteamUtilsWrapper* pSteamUtilsWrapper;
+
 	IDirect3DDevice9Ex* pD3D9ExWrapper;
+
 	NetworkManager* pNetworkManager;
+	RoomManager* pRoomManager;
 	SteamApiHelper* pSteamApiHelper;
+
 	PaletteManager* pPaletteManager;
+	OnlinePaletteManager* pOnlinePaletteManager;
+
+	GameModeManager* pGameModeManager;
+	OnlineGameModeManager* pOnlineGameModeManager;
 
 	Player player1;
 	Player player2;
@@ -54,49 +45,6 @@ struct interfaces_t
 
 struct gameVals_t
 {
-	//customPalettes[36] that contains vector<string[8]> per custom palette
-	//customPalettes[0][0][0] accessses ragna's first palette's name
-	//				 ^ charIndex
-	//customPalettes[0][0][1] accessses ragna's first palette's data
-	//					^ paletteIndex
-	//customPalettes[0][0][2] accessses ragna's first effect data
-	//					   ^ element
-	//ELEMENTS:
-	//0 filename str
-	//1 palette data
-	//2 effect1 data
-	//3 effect2 data
-	//4 effect3 data
-	//5 effect4 data
-	//6 effect5 data
-	//7 effect6 data
-	//8 effect7 data
-	//9 bloom bool
-	//10 creator str
-	//11 description str
-	std::vector<std::vector<std::vector<std::string>>> customPalettes;
-
-	//P1DefaultPalBackup[0] contains the sprite palette
-	//P1DefaultPalBackup[1-7] contains the effect palettes
-	std::vector<std::string> P1DefaultPalBackup;
-	std::vector<std::string> P2DefaultPalBackup;
-
-
-	CSteamID* ownSteamID;
-	CSteamID* opponentSteamID;
-
-	bool bOpponentUsingBBCFIM;
-	int iOpponentBBCFIMvernum;
-	std::string sOpponentBBCFIMvernum;
-
-	bool bP1UsingBBCFIM;
-	int iP1BBCFIMvernum;
-	std::string sP1BBCFIMvernum;
-
-	bool bP2UsingBBCFIM;
-	int iP2BBCFIMvernum;
-	std::string sP2BBCFIMvernum;
-
 	int* pGameState;
 	int* pGameMoney;
 	int* pGameMode;
@@ -110,60 +58,13 @@ struct gameVals_t
 	byte* playerAvatarAcc1;
 	byte* playerAvatarAcc2;
 
-	CharData* P1CharObjPointer;
-	CharData* P2CharObjPointer;
-	
-	int P1_selectedCharID;
-	int P2_selectedCharID;
-
-	int thisPlayerNum;
-
-	int origP1PaletteIndex;
-	int origP2PaletteIndex;
-	int* P1PaletteIndex;
-	int* P2PaletteIndex;
-
-	DWORD* P1PaletteBase;
-	DWORD* P2PaletteBase;
-
-	DWORD* P1CurPalette;
-	DWORD* P1Palette3;
-	DWORD* P1Palette4;
-
-	DWORD* P2CurPalette;
-	DWORD* P2Palette5;
-	DWORD* P2Palette6;
-
-	int P1_selected_custom_pal;
-	int P2_selected_custom_pal;
-
-	char isP1BloomOn = 0;
-	char isP2BloomOn = 0;
-
-	bool startMatchPalettesInit;
-
-	int paletteEditor_selectedFile;
-	int paletteEditor_selectedPlayer;
-
 	int isP1CPU;
-
-	int setMatchRoundsTo;
 
 	unsigned char* stageListMemory;
 	int *stageSelect_X;
 	int *stageSelect_Y;
 	int *musicSelect_X;
 	int *musicSelect_Y;
-
-	bool charSelectInit;
-
-	//spectators included
-	std::vector<CSteamID> playersInMatch;
-
-	uint32 totalReadPackets;
-
-	float *P1ScreenPosX;
-	float *P1ScreenPosY;
 
 	/////////////////
 	// New fields below
@@ -180,12 +81,13 @@ struct gameVals_t
 	unsigned framesToReach;
 	unsigned* pFrameCount;
 
-	lookat_t lookAtVector;
 	D3DXMATRIX* viewMatrix;
 	D3DXMATRIX* projMatrix;
 
 	int* pEntityList;
 	int entityCount;
+
+	Room* pRoom;
 };
 
 struct gameProc_t
@@ -202,20 +104,6 @@ struct temps_t
 	ISteamUser** ppSteamUser;
 	ISteamUserStats** ppSteamUserStats;
 	ISteamUtils** ppSteamUtils;
-
-	//temppackets store the unprocessed packets until they are handled properly
-	std::vector<im_packet_internal_t> tempPackets;
-
-	char PaletteEditorP1PalBackup[1020];
-	char PaletteEditorP2PalBackup[1020];
-
-	bool paledit_show_placeholder;
-	bool paledit_show_sel_by_highlight;
-
-	int PlayersCharIDVersusScreenCounter;
-
-	//storing the ID until we can delete it (game crashes if we do it right away after the match ends)
-	CSteamID* opponentIDToBeDeleted;
 };
 
 extern interfaces_t g_interfaces;
