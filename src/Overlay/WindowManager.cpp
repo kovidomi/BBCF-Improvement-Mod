@@ -1,23 +1,25 @@
 #include "WindowManager.h"
 
 #include "fonts.h"
+#include "NotificationBar/NotificationBar.h"
 #include "WindowContainer/WindowContainer.h"
 #include "Window/LogWindow.h"
 
+#include "Core/info.h"
 #include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/Settings.h"
 #include "Core/utils.h"
 #include "Web/update_check.h"
+
 #include <imgui.h>
 #include <imgui_impl_dx9.h>
-
 #include <ctime>
-#include <sstream>
 
 #define DEFAULT_ALPHA 0.87f
 
 int keyToggleMainWindow;
+int keyToggleRoomWindow;
 int keyToggleHud;
 
 WindowManager* WindowManager::m_instance = nullptr;
@@ -71,33 +73,74 @@ bool WindowManager::Initialize(void *hwnd, IDirect3DDevice9 *device)
 	style.ScrollbarSize = 14;
 	style.Alpha = DEFAULT_ALPHA;
 
+	// Add default font
+
+	float unicodeFontSize = 18;
+
 	if (Settings::settingsIni.menusize == 1)
 	{
 		ImFont* font = ImGui::GetIO().Fonts->AddFontFromMemoryCompressedBase85TTF(TinyFont_compressed_data_base85, 10);
-		font->DisplayOffset.y += 1;
+		unicodeFontSize = 14;
 	}
 	else if (Settings::settingsIni.menusize == 3)
 	{
 		ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(DroidSans_compressed_data, DroidSans_compressed_size, 20);
+		unicodeFontSize = 25;
 	}
+	else
+	{
+		ImGui::GetIO().Fonts->AddFontDefault();
+	}
+
+	// Add Unicode font
+
+	ImFontConfig config;
+	config.MergeMode = true;
+	config.OversampleH = 1;
+	config.OversampleV = 1;
+	config.PixelSnapH = true;
+
+	const ImWchar* ranges = ImGui::GetIO().Fonts->GetGlyphRangesJapanese();
+	ranges = ranges + 2; // Skip default ranges to prevent overwriting the default font
+
+	ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(mplusMedium_compressed_data, mplusMedium_compressed_size,
+		unicodeFontSize, &config, ranges);
+
+	// Set up toggle buttons
 
 	keyToggleMainWindow = Settings::getButtonValue(Settings::settingsIni.togglebutton);
 	m_pLogger->Log("[system] Toggling key set to '%s'\n", Settings::settingsIni.togglebutton.c_str());
 
+	keyToggleRoomWindow = Settings::getButtonValue(Settings::settingsIni.toggleOnlineButton);
+	m_pLogger->Log("[system] Online toggling key set to '%s'\n", Settings::settingsIni.toggleOnlineButton.c_str());
+
 	keyToggleHud = Settings::getButtonValue(Settings::settingsIni.toggleHUDbutton);
 	m_pLogger->Log("[system] HUD toggling key set to '%s'\n", Settings::settingsIni.toggleHUDbutton.c_str());
 
+	// Load custom palettes
+
 	g_interfaces.pPaletteManager->LoadAllPalettes();
 
-	/*Calling a frame to initialize beforehand to prevent a crash upon first call of
-	/Update if the game window is not focused. Simply calling ImGui_ImplDX9_CreateDeviceObjects() might be enough too.*/
+	// Calling a frame to initialize beforehand to prevent a crash upon first call of Update() if the game window is not focused.
+	// Simply calling ImGui_ImplDX9_CreateDeviceObjects() might be enough too
 	ImGui_ImplDX9_NewFrame();
 	ImGui::EndFrame();
 	///////
 
 	srand(time(NULL));
 
-	//StartAsyncUpdateCheck();
+	StartAsyncUpdateCheck();
+
+	std::string notificationText = MOD_WINDOW_TITLE;
+	notificationText += " ";
+	notificationText += MOD_VERSION_NUM;
+
+#ifdef _DEBUG
+	notificationText += " (DEBUG)";
+#endif
+
+	g_notificationBar->AddNotification("%s (Press %s to open the main window)",
+		notificationText.c_str(), Settings::settingsIni.togglebutton.c_str());
 
 	m_pLogger->Log("[system] Finished initialization\n");
 	m_pLogger->LogSeparator();
@@ -150,6 +193,11 @@ void WindowManager::Render()
 		return;
 	}
 
+	if (g_interfaces.pSteamApiHelper->IsSteamOverlayActive())
+	{
+		return;
+	}
+
 	LOG(7, "WindowManager::Render\n");
 
 	HandleButtons();
@@ -164,13 +212,26 @@ void WindowManager::Render()
 		m_windowContainer->GetWindow(WindowType_PaletteEditor)->IsOpen();
 	bool isLogWindowOpen =
 		m_windowContainer->GetWindow(WindowType_Log)->IsOpen();
+	bool isRoomWindowOpen =
+		m_windowContainer->GetWindow(WindowType_Room)->IsOpen();
 	bool isDebugWindowOpen =
 		m_windowContainer->GetWindow(WindowType_Debug)->IsOpen();
 
-	ImGui::GetIO().MouseDrawCursor = isMainWindowOpen | isLogWindowOpen | isPaletteEditorWindowOpen
-		| isUpdateNotifierWindowOpen | isDebugWindowOpen;
+	ImGui::GetIO().MouseDrawCursor = isMainWindowOpen || isLogWindowOpen || isPaletteEditorWindowOpen
+		|| isUpdateNotifierWindowOpen || isRoomWindowOpen || isDebugWindowOpen;
+
+	if (Settings::settingsIni.viewport == 2)
+	{
+		ImGui::GetIO().DisplaySize = ImVec2(Settings::settingsIni.renderwidth, Settings::settingsIni.renderheight);
+	}
+	else if (Settings::settingsIni.viewport == 3)
+	{
+		ImGui::GetIO().DisplaySize = ImVec2(1280, 768);
+	}
 
 	DrawAllWindows();
+
+	g_notificationBar->DrawNotifications();
 
 	ImGui::Render();
 }
@@ -182,14 +243,19 @@ void WindowManager::HandleButtons()
 		return;
 	}
 
-	if (ImGui::IsKeyPressed(keyToggleHud) && g_gameVals.pIsHUDHidden)
-	{
-		*g_gameVals.pIsHUDHidden ^= 1;
-	}
-
 	if (ImGui::IsKeyPressed(keyToggleMainWindow))
 	{
 		m_windowContainer->GetWindow(WindowType_Main)->ToggleOpen();
+	}
+
+	if (ImGui::IsKeyPressed(keyToggleRoomWindow))
+	{
+		m_windowContainer->GetWindow(WindowType_Room)->ToggleOpen();
+	}
+
+	if (ImGui::IsKeyPressed(keyToggleHud) && g_gameVals.pIsHUDHidden)
+	{
+		*g_gameVals.pIsHUDHidden ^= 1;
 	}
 }
 

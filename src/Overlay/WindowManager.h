@@ -1,6 +1,6 @@
 #pragma once
-#include "WindowContainer/WindowContainer.h"
 #include "Logger/Logger.h"
+#include "WindowContainer/WindowContainer.h"
 
 #include <d3d9.h>
 
@@ -15,6 +15,7 @@ public:
 	void InvalidateDeviceObjects();
 	void CreateDeviceObjects();
 	bool IsInitialized() const { return m_initialized; }
+
 private:
 	WindowManager() = default;
 	void HandleButtons();
