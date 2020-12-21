@@ -3,18 +3,16 @@
 // format: (type, cname, ininame, default value)
 
 SETTING(std::string, togglebutton, "ToggleButton", "F1");
-SETTING(bool, notificationpopups, "NotificationPopups", "1");
-SETTING(bool, viewport, "Viewport", "1");
+SETTING(std::string, toggleOnlineButton, "ToggleOnlineButton", "F2");
+SETTING(std::string, toggleHUDbutton, "ToggleHUDButton", "F3");
+SETTING(std::string, dinputDllWrapper, "DinputDllWrapper", "none");
 SETTING(int, renderwidth, "RenderingWidth", "1920");
 SETTING(int, renderheight, "RenderingHeight", "1080");
+SETTING(int, viewport, "Viewport", "1");
 SETTING(int, antialiasing, "AntiAliasing", "-1");
 SETTING(bool, vsync, "V-sync", "1");
 SETTING(int, menusize, "MenuSize", "2");
 SETTING(int, regionlock, "Regionlock", "3");
 SETTING(bool, cpuusagefix, "CpuUsageFix", "0");
+SETTING(bool, notifications, "Notifications", "1");
 SETTING(bool, checkupdates, "CheckUpdates", "1");
-
-SETTING(int, fullscreenhz, "FullscreenHz", "60");
-SETTING(int, forcepromptbuttonlayout, "ForcePromptButtonLayout", "2");
-SETTING(std::string, dinputDllWrapper, "DinputDllWrapper", "none");
-SETTING(std::string, toggleHUDbutton, "ToggleHUDButton", "F2");

@@ -3,17 +3,6 @@
 
 #include <string>
 
-#define VSYNC_OFF 0
-#define VSYNC_ON 1
-#define VIEWPORT_DEFAULT 1
-#define FORCE_PROMPT_LAYOUT_STEAM_CONTROLLER 0
-#define FORCE_PROMPT_LAYOUT_KEYBOARD 1
-#define FORCE_PROMPT_LAYOUT_OFF 2
-#define NOTIFICATIONPOPUPS_OFF 0
-#define NOTIFICATIONSPOPUPS_ON 1
-#define CHECKUPDATES_OFF 0
-#define CHECKUPDATES_ON 1
-
 struct settingsIni_t
 {
 	//X-Macro
