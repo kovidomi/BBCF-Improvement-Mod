@@ -12,23 +12,26 @@ class HitboxOverlay : public IWindow
 {
 public:
 	bool drawOriginLine = false;
-	bool drawCharacterHitbox[4] = {true, true, true, true};
+	bool drawCharacterHitbox[2] = {true, true};
 
 	HitboxOverlay(const std::string& windowTitle, bool windowClosable,
 		ImGuiWindowFlags windowFlags)
 		: IWindow(windowTitle, windowClosable, windowFlags) {}
 	void Update() override;
-	void DrawOriginLine(ImVec2 worldPos, float rotationRad);
-	void DrawCollisionAreas(const CharData* charObj, const ImVec2 playerWorldPos);
 	float& GetScale();
 	void DrawRectThicknessSlider();
 	void DrawRectFillTransparencySlider();
 	bool HasNullptrInData();
+
 protected:
 	void BeforeDraw() override;
 	void Draw() override;
 	void AfterDraw() override;
+
 private:
+	void DrawOriginLine(ImVec2 worldPos, float rotationRad);
+	void DrawCollisionAreas(const CharData* charObj, const ImVec2 playerWorldPos);
+
 	bool IsOwnerEnabled(CharData* ownerCharInfo);
 	bool WorldToScreen(LPDIRECT3DDEVICE9 pDevice, D3DXMATRIX* view, D3DXMATRIX* proj, D3DXVECTOR3* pos, D3DXVECTOR3* out);
 	ImVec2 CalculateObjWorldPosition(const CharData* charObj);
@@ -44,7 +47,7 @@ private:
 	void RenderRectFilled(const ImVec2& pointA, const ImVec2& pointB, const ImVec2& pointC, const ImVec2& pointD, uint32_t color);
 
 	// Literally a magic number as of now
-	float m_scale = 0.368f;
+	float m_scale = 0.346f;
 	float m_rectThickness = 2.5f;
 	float m_rectFillTransparency = 0.5f;
 

@@ -69,7 +69,7 @@ void HitboxOverlay::AfterDraw()
 
 bool HitboxOverlay::IsOwnerEnabled(CharData* ownerCharInfo)
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		if (ownerCharInfo == (CharData*)g_gameVals.pEntityList[i])
 		{
