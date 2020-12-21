@@ -3,22 +3,19 @@
 #include "Core/logger.h"
 #include "Overlay/Logger/ImGuiLogger.h"
 
-//note: commented out functions are not working
-
 SteamApiHelper::SteamApiHelper(ISteamUserStats* pSteamUserStats, ISteamFriends* pSteamFriends)
+	: m_pSteamUserStats(pSteamUserStats), m_pSteamFriends(pSteamFriends)
 {
 	LOG(2, "SteamApiHelper::SteamApiHelper, *pSteamUserStats: 0x%p, *pSteamFriends: 0x%p\n", *pSteamUserStats, *pSteamFriends);
-	this->pSteamUserStats = pSteamUserStats;
-	this->pSteamFriends = pSteamFriends;
-	current_players = -1;
+
 	UpdateNumberOfCurrentPlayers();
 }
 
 // Make the asynchronous request to receive the number of current players. 
 void SteamApiHelper::UpdateNumberOfCurrentPlayers()
 {
-	SteamAPICall_t hSteamAPICall = pSteamUserStats->GetNumberOfCurrentPlayers();
-	m_NumberOfCurrentPlayersCallResult.Set(hSteamAPICall, this, &SteamApiHelper::OnUpdateNumberOfCurrentPlayers);
+	SteamAPICall_t hSteamAPICall = m_pSteamUserStats->GetNumberOfCurrentPlayers();
+	m_numberOfCurrentPlayersCallResult.Set(hSteamAPICall, this, &SteamApiHelper::OnUpdateNumberOfCurrentPlayers);
 }
 
 // Callback for UpdateNumberOfCurrentPlayers()
@@ -27,29 +24,33 @@ void SteamApiHelper::OnUpdateNumberOfCurrentPlayers(NumberOfCurrentPlayers_t* pC
 	if (bIOFailure || !pCallback->m_bSuccess)
 	{
 		g_imGuiLogger->Log("[error] Failed to update the current number of ingame players\n");
-		current_players = -1;
+		m_currentPlayersCount = -1;
 		return;
 	}
-	//printf("Number of players currently playing: %d\n", pCallback->m_cPlayers);
+
 #ifdef ENABLE_LOGGING
 	g_imGuiLogger->Log("[debug] Updated the current number of ingame players: %d\n", pCallback->m_cPlayers);
 #endif
-	current_players = pCallback->m_cPlayers;
+
+	m_currentPlayersCount = pCallback->m_cPlayers;
 }
 
-//void SteamApiHelper::GetRequestUserInformation(CSteamID steamID)
-//{
-//	SteamAPICall_t hSteamAPICall = pSteamFriends->RequestUserInformation(steamID, true);
-//	m_RequestUserInformationCallResult.Set(hSteamAPICall, this, &SteamApiHelper::OnGetRequestUserInformation);
-//}
-//
-//void SteamApiHelper::OnGetRequestUserInformation(PersonaStateChange_t *pCallback, bool bIOFailure)
-//{
-//	if (bIOFailure)
-//	{
-//		g_imGuiLogger->Log("[system] Online match against '?????' has started\n");
-//		return;
-//	}
-//
-//	g_imGuiLogger->Log("[system] Online match against '%s' has started\n", pSteamFriends->GetPlayerNickname(pCallback->m_ulSteamID));
-//}
+const int SteamApiHelper::GetCurrentPlayersCount() const
+{
+	return m_currentPlayersCount;
+}
+
+std::string SteamApiHelper::GetCurrentPlayersCountString() const
+{
+	return m_currentPlayersCount < 0 ? "<No data>" : std::to_string(m_currentPlayersCount);
+}
+
+bool SteamApiHelper::IsSteamOverlayActive() const
+{
+	return m_isSteamOverlayActive;
+}
+
+void SteamApiHelper::OnGameOverlayActivated(GameOverlayActivated_t* callback)
+{
+	m_isSteamOverlayActive = callback->m_bActive;
+}
