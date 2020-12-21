@@ -7,16 +7,15 @@ enum MatchState_
 	MatchState_Fight = 3,
 	MatchState_FinishSign = 4,
 	MatchState_WinLoseSign = 5,
-	MatchState_VictoryScreen = 7,
-	MatchState_NotInMatch = 7, //self-defined, not present in the game
+	MatchState_VictoryScreen = 7
 };
 
-enum GameState_
+enum GameState
 {
 	GameState_ArcsysLogo = 2,
 	GameState_IntroVideoPlaying = 3,
 	GameState_TitleScreen = 4,
-	GameState_ChracterSelectionScreen = 6,
+	GameState_CharacterSelectionScreen = 6,
 	GameState_ArcadeActSelectScreen = 11,
 	GameState_ScoreAttackModeSelectScreen = 11,
 	GameState_SpeedStarModeSelectScreen = 11,
@@ -38,7 +37,7 @@ enum GameState_
 	GameState_DCodeEdit = 39,
 };
 
-enum GameMode_
+enum GameMode
 {
 	GameMode_Arcade = 1,
 	GameMode_Story = 4,
@@ -58,3 +57,6 @@ enum GameMode_
 
 bool isPaletteEditingEnabledInCurrentGameMode();
 bool isHitboxOverlayEnabledInCurrentGameMode();
+bool isGameModeSelectorEnabledInCurrentGameState();
+bool isGameModeSelectorEnabledInCurrentGameMode();
+bool isStageSelectorEnabledInCurrentGameMode();
