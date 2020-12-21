@@ -7,5 +7,6 @@ enum WindowType_
 	WindowType_Log,
 	WindowType_UpdateNotifier,
 	WindowType_PaletteEditor,
-	WindowType_HitboxOverlay
+	WindowType_HitboxOverlay,
+	WindowType_Room
 };
