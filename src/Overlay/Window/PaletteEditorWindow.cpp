@@ -5,7 +5,7 @@
 #include "Game/gamestates.h"
 #include "Overlay/imgui_utils.h"
 #include "Overlay/Logger/ImGuiLogger.h"
-#include "PaletteManager/impl_format.h"
+#include "Palette/impl_format.h"
 
 #include <imgui.h>
 
@@ -13,9 +13,9 @@
 
 #define NUMBER_OF_COLOR_BOXES (IMPL_PALETTE_DATALEN / sizeof(int)) // 256
 #define COLUMNS 16
+
 const int COLOR_BLACK = 0xFF000000;
 const int COLOR_WHITE = 0xFFFFFFFF;
-const ImVec4 COLOR_DONATOR(1.000f, 0.794f, 0.000f, 1.000f);
 const ImVec4 COLOR_ONLINE(0.260f, 0.590f, 0.980f, 1.000f);
 
 static char palNameBuf[IMPL_PALNAME_LENGTH] = "";
@@ -26,6 +26,41 @@ void PaletteEditorWindow::ShowAllPaletteSelections()
 {
 	if (HasNullPointer())
 	{
+		return;
+	}
+
+	if (g_interfaces.pRoomManager->IsRoomFunctional())
+	{
+		uint16_t thisPlayerMatchPlayerIndex = g_interfaces.pRoomManager->GetThisPlayerMatchPlayerIndex();
+
+		const ImVec2 spacing = ImVec2(14, 1);
+
+		if (thisPlayerMatchPlayerIndex == 0)
+		{
+			ShowPaletteSelectButton(g_interfaces.player1, "P1_palette", "select1-1");
+		}
+		else
+		{
+			ImGui::TextUnformatted(" "); ImGui::SameLine(); ImGui::Dummy(spacing); ImGui::SameLine();
+			if (ImGui::Button("P1_palette RESET"))
+			{
+				g_interfaces.pPaletteManager->RestoreOrigPal(g_interfaces.player1.GetPalHandle());
+			}
+		}
+
+		if (thisPlayerMatchPlayerIndex == 1)
+		{
+			ShowPaletteSelectButton(g_interfaces.player2, "P2_palette", "select2-1");
+		}
+		else
+		{
+			ImGui::TextUnformatted(" "); ImGui::SameLine(); ImGui::Dummy(spacing); ImGui::SameLine();
+			if (ImGui::Button("P2_palette RESET"))
+			{
+				g_interfaces.pPaletteManager->RestoreOrigPal(g_interfaces.player2.GetPalHandle());
+			}
+		}
+
 		return;
 	}
 
@@ -84,13 +119,8 @@ void PaletteEditorWindow::Draw()
 
 bool PaletteEditorWindow::HasNullPointer()
 {
-	if (g_interfaces.player1.IsCharDataNullPtr() ||
-		g_interfaces.player2.IsCharDataNullPtr())
-	{
-		return true;
-	}
-
-	return false;
+	return g_interfaces.player1.IsCharDataNullPtr() ||
+		g_interfaces.player2.IsCharDataNullPtr();
 }
 
 void PaletteEditorWindow::InitializeSelectedCharacters()
@@ -110,17 +140,18 @@ void PaletteEditorWindow::CharacterSelection()
 	{
 		ImGui::OpenPopup("select_char_pal");
 	}
-	ImGui::SameLine();
 
+	ImGui::SameLine();
 	ImGui::Text(m_selectedCharName);
 
 	if (ImGui::BeginPopup("select_char_pal"))
 	{
-		const int NUMBER_OF_CHARS = 4;
+		const int NUMBER_OF_CHARS = 2;
 		
 		for (int i = 0; i < NUMBER_OF_CHARS; i++)
 		{
 			ImGui::PushID(i);
+
 			if (ImGui::Selectable(m_allSelectedCharNames[i].c_str()))
 			{
 				DisableHighlightModes();
@@ -131,8 +162,10 @@ void PaletteEditorWindow::CharacterSelection()
 				m_selectedPalIndex = g_interfaces.pPaletteManager->GetCurrentCustomPalIndex(*m_selectedCharPalHandle);
 				CopyPalFileToEditorArray(m_selectedFile, *m_selectedCharPalHandle);
 			}
+
 			ImGui::PopID();
 		}
+
 		ImGui::EndPopup();
 	}
 }
@@ -147,7 +180,7 @@ void PaletteEditorWindow::PaletteSelection()
 	}
 
 	ImGui::SameLine();
-	ImGui::Text(m_customPaletteVector[m_selectedCharIndex][m_selectedPalIndex].palname);
+	ImGui::Text(m_customPaletteVector[m_selectedCharIndex][m_selectedPalIndex].palName);
 
 	ShowPaletteSelectPopup(*m_selectedCharPalHandle, m_selectedCharIndex, "select_custom_pal");
 }
@@ -160,8 +193,8 @@ void PaletteEditorWindow::FileSelection()
 	{
 		ImGui::OpenPopup("select_file_pal");
 	}
-	ImGui::SameLine();
 
+	ImGui::SameLine();
 	ImGui::Text(palFileNames[m_selectedFile]);
 
 	if (ImGui::BeginPopup("select_file_pal"))
@@ -175,6 +208,7 @@ void PaletteEditorWindow::FileSelection()
 				CopyPalFileToEditorArray(m_selectedFile, *m_selectedCharPalHandle);
 			}
 		}
+
 		ImGui::EndPopup();
 	}
 }
@@ -202,7 +236,7 @@ void PaletteEditorWindow::EditingModesSelection()
 	{
 		if (m_highlightMode)
 		{
-			//fill the array with black
+			// Fill the array with black
 			for (int i = 0; i < NUMBER_OF_COLOR_BOXES; i++)
 			{
 				((int*)m_highlightArray)[i] = COLOR_BLACK;
@@ -223,6 +257,7 @@ void PaletteEditorWindow::EditingModesSelection()
 	{
 		ImGui::OpenPopup("gradient");
 	}
+
 	ShowGradientPopup();
 
 	ImGui::Separator();
@@ -284,8 +319,10 @@ void PaletteEditorWindow::ShowPaletteBoxes()
 				ImGui::SameLine();
 			}
 		}
+
 		ImGui::PopID();
 	}
+
 	ImGui::PopStyleVar();
 }
 
@@ -331,20 +368,18 @@ void PaletteEditorWindow::SavePaletteToFile()
 	static bool show_overwrite_popup = false;
 
 	if (!pressed && !show_overwrite_popup)
-	{
 		return;
-	}
 
 	if (strncmp(palNameBuf, "", IMPL_PALNAME_LENGTH) == 0)
 	{
-		memcpy(message, "Error, no filename given", 25);
+		memcpy_s(message, sizeof(message), "Error, no filename given", 25);
 		g_imGuiLogger->Log("[error] Could not save custom palette, no filename was given\n");
 		return;
 	}
 
 	if (strncmp(palNameBuf, "Default", IMPL_PALNAME_LENGTH) == 0 || strncmp(palNameBuf, "Random", IMPL_PALNAME_LENGTH) == 0)
 	{
-		memcpy(message, "Error, not a valid filename", 28);
+		memcpy_s(message, sizeof(message), "Error, not a valid filename", 28);
 		g_imGuiLogger->Log("[error] Could not save custom palette: not a valid filename\n");
 		return;
 	}
@@ -373,9 +408,9 @@ void PaletteEditorWindow::SavePaletteToFile()
 
 		IMPL_data_t curPalData = g_interfaces.pPaletteManager->GetCurrentPalData(*m_selectedCharPalHandle);
 
-		strncpy(curPalData.creator, palCreatorBuf, IMPL_CREATOR_LENGTH);
-		strncpy(curPalData.palname, palNameBuf, IMPL_PALNAME_LENGTH);
-		strncpy(curPalData.desc, palDescBuf, IMPL_DESC_LENGTH);
+		strncpy_s(curPalData.creator, palCreatorBuf, IMPL_CREATOR_LENGTH);
+		strncpy_s(curPalData.palName, palNameBuf, IMPL_PALNAME_LENGTH);
+		strncpy_s(curPalData.desc, palDescBuf, IMPL_DESC_LENGTH);
 
 		std::string messageText = "'";
 		messageText += filenameTemp.c_str();
@@ -426,25 +461,29 @@ bool PaletteEditorWindow::ShowOverwritePopup(bool *p_open, const wchar_t* wFullP
 		ImGui::OpenPopup("Overwrite?");
 		*p_open = true;
 	}
+
 	if (ImGui::BeginPopupModal("Overwrite?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("'%s' already exists.\nAre you sure you want to overwrite it?\n\n", filename);
 		ImGui::Separator();
+
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
 			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
 			*p_open = false;
 			isOverwriteAllowed = true;
 			return isOverwriteAllowed;
 		}
+
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
 			ImGui::CloseCurrentPopup();
 			*p_open = false;
 		}
-		ImGui::EndPopup();
 
+		ImGui::EndPopup();
 		isOverwriteAllowed = false;
 	}
 
@@ -480,10 +519,11 @@ void PaletteEditorWindow::ShowPaletteSelectButton(Player & playerHandle, const c
 	{
 		ImGui::OpenPopup(popupID);
 	}
+
 	HoverTooltip(getCharacterNameByIndexA(playerHandle.GetData()->charIndex).c_str());
 
 	ImGui::SameLine();
-	ImGui::TextUnformatted(m_customPaletteVector[charIndex][selected_pal_index].palname);
+	ImGui::TextUnformatted(m_customPaletteVector[charIndex][selected_pal_index].palName);
 
 	ShowPaletteSelectPopup(charPalHandle, charIndex, popupID);
 }
@@ -508,12 +548,12 @@ void PaletteEditorWindow::ShowPaletteSelectPopup(CharPaletteHandle& charPalHandl
 				ImGui::PopStyleColor();
 			}
 
-			if (ImGui::Selectable(m_customPaletteVector[charIndex][i].palname))
+			if (ImGui::Selectable(m_customPaletteVector[charIndex][i].palName))
 			{
 				pressed = true;
 				g_interfaces.pPaletteManager->SwitchPalette(charIndex, charPalHandle, i);
 
-				//updating palette editor's array if this is the currently selected character
+				// Updating palette editor's array if this is the currently selected character
 				if (&charPalHandle == m_selectedCharPalHandle)
 				{
 					m_selectedPalIndex = i;
@@ -522,15 +562,24 @@ void PaletteEditorWindow::ShowPaletteSelectPopup(CharPaletteHandle& charPalHandl
 
 					CopyPalTextsToTextBoxes(charPalHandle);
 				}
+
+				if (g_interfaces.pRoomManager->IsRoomFunctional())
+				{
+					g_interfaces.pOnlinePaletteManager->SendPalettePacket();
+				}
 			}
+
 			if (ImGui::IsItemHovered())
 			{
 				hoveredPalIndex = i;
 			}
+
 			ShowHoveredPaletteToolTip(charPalHandle, charIndex, i);
 		}
+
 		ImGui::EndPopup();
 	}
+
 	HandleHoveredPaletteSelection(&charPalHandle, charIndex, hoveredPalIndex, popupID, pressed);
 }
 
@@ -554,8 +603,10 @@ void PaletteEditorWindow::ShowHoveredPaletteToolTip(CharPaletteHandle& charPalHa
 
 		if (isOnlinePal)
 			ImGui::TextColored(COLOR_ONLINE, "ONLINE PALETTE");
+
 		if (creatorLen)
 			ImGui::Text("Creator: %s", creatorText);
+
 		if (descLen)
 			ImGui::Text("Description: %s", descText);
 
@@ -577,8 +628,8 @@ void PaletteEditorWindow::HandleHoveredPaletteSelection(CharPaletteHandle* charP
 	{
 		paletteSwitched = false;
 	}
-	else if (!ImGui::IsPopupOpen(popupID) && strcmp(popupIDbkp, popupID) == 0 
-		&& paletteSwitched && prevCharHndl == charPalHandle && !pressed)
+	else if (!ImGui::IsPopupOpen(popupID) && strcmp(popupIDbkp, popupID) == 0 &&
+		paletteSwitched && prevCharHndl == charPalHandle && !pressed)
 	{
 		palFileAddr = g_interfaces.pPaletteManager->GetCustomPalFile(charIndex, origPalIndex, PaletteFile_Character, *charPalHandle);
 		g_interfaces.pPaletteManager->ReplacePaletteFile(palFileAddr, PaletteFile_Character, *charPalHandle);
@@ -603,10 +654,10 @@ void PaletteEditorWindow::HandleHoveredPaletteSelection(CharPaletteHandle* charP
 void PaletteEditorWindow::ShowPaletteRandomizerButton(const char * btnID, Player& playerHandle)
 {
 	int charIndex = playerHandle.GetData()->charIndex;
-	char buf[12];
-	sprintf(buf, "?##%s", btnID);
+	char buf[16];
+	sprintf_s(buf, "?##%s", btnID);
 	
-	ImGui::Text(" "); ImGui::SameLine();
+	ImGui::TextUnformatted(" "); ImGui::SameLine();
 	if (ImGui::Button(buf) && m_customPaletteVector[charIndex].size() > 1)
 	{
 		CharPaletteHandle& charPalHandle = playerHandle.GetPalHandle();
@@ -617,8 +668,15 @@ void PaletteEditorWindow::ShowPaletteRandomizerButton(const char * btnID, Player
 		{
 			newPalIndex = rand() % m_customPaletteVector[charIndex].size();
 		}
+
 		g_interfaces.pPaletteManager->SwitchPalette((CharIndex)charIndex, charPalHandle, newPalIndex);
+
+		if (g_interfaces.pRoomManager->IsRoomFunctional())
+		{
+			g_interfaces.pOnlinePaletteManager->SendPalettePacket();
+		}
 	}
+
 	if (ImGui::IsItemHovered())
 	{
 		ImGui::BeginTooltip();
@@ -634,7 +692,7 @@ void PaletteEditorWindow::CopyToEditorArray(const char * pSrc)
 
 void PaletteEditorWindow::CopyPalFileToEditorArray(PaletteFile palFile, CharPaletteHandle & charPalHandle)
 {
-	const char* fileAddr = g_interfaces.pPaletteManager->GetPalFileAddr(palFile, charPalHandle);
+	const char* fileAddr = g_interfaces.pPaletteManager->GetCurPalFileAddr(palFile, charPalHandle);
 	CopyToEditorArray(fileAddr);
 }
 
@@ -642,12 +700,12 @@ void PaletteEditorWindow::UpdateHighlightArray(int selectedBoxIndex)
 {
 	static int selected_highlight_box = 0;
 
-	//setting previously pressed box back to black
+	// Set previously pressed box back to black
 	((int*)m_highlightArray)[selected_highlight_box] = COLOR_BLACK;
 
 	selected_highlight_box = selectedBoxIndex;
 
-	//setting currently pressed box to white
+	// Set currently pressed box to white
 	((int*)m_highlightArray)[selected_highlight_box] = COLOR_WHITE;
 
 	g_interfaces.pPaletteManager->ReplacePaletteFile(m_highlightArray, m_selectedFile, *m_selectedCharPalHandle);
@@ -656,7 +714,7 @@ void PaletteEditorWindow::UpdateHighlightArray(int selectedBoxIndex)
 void PaletteEditorWindow::CopyPalTextsToTextBoxes(CharPaletteHandle & charPalHandle)
 {
 	IMPL_data_t palData = g_interfaces.pPaletteManager->GetCurrentPalData(charPalHandle);
-	strncpy(palNameBuf, palData.palname, IMPL_PALNAME_LENGTH);
+	strncpy(palNameBuf, palData.palName, IMPL_PALNAME_LENGTH);
 	strncpy(palDescBuf, palData.desc, IMPL_DESC_LENGTH);
 	strncpy(palCreatorBuf, palData.creator, IMPL_CREATOR_LENGTH);
 }

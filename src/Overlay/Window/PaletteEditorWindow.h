@@ -3,8 +3,8 @@
 
 #include "Core/interfaces.h"
 #include "Game/characters.h"
-#include "Game/CharPaletteHandle.h"
 #include "Game/Player.h"
+#include "Palette/CharPaletteHandle.h"
 
 #include <vector>
 
