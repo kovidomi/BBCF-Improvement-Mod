@@ -1,7 +1,7 @@
 #pragma once
-#include "PaletteManager/impl_format.h"
+#include "Palette/impl_format.h"
 
-#define MAX_PAL_INDEX 19
+#define MAX_PAL_INDEX 23
 #define TOTAL_PALETTE_FILES 8
 
 extern char* palFileNames[TOTAL_PALETTE_FILES];
@@ -26,7 +26,7 @@ class CharPaletteHandle
 	int m_origPalIndex;
 	const char* m_pPalBaseAddr;
 	IMPL_data_t m_origPalBackup;
-	IMPL_data_t m_CurrentPalData;
+	IMPL_data_t m_currentPalData;
 	int m_switchPalIndex1;
 	int m_switchPalIndex2;
 	int m_selectedCustomPalIndex;
@@ -35,16 +35,18 @@ class CharPaletteHandle
 public:
 	void SetPointerPalIndex(int* pPalIdx);
 	void SetPointerBasePal(char* pPalBaseAddr);
+	bool IsNullPointerPalBasePtr();
 	bool IsNullPointerPalIndex();
 	int& GetPalIndexRef();
+	int GetOrigPalIndex() const;
+	bool IsPalWithBloom() const;
 
 private:
 	void SetPaletteIndex(int palIndex);
-	int GetOrigPalIndex() const;
 	void ReplaceAllPalFiles(IMPL_data_t* newPaletteData);
 	void ReplaceSinglePalFile(const char* newPalData, PaletteFile palFile);
 	void OnMatchInit();
-	void OnMatchEnd();
+	void OnMatchRematch();
 	void LockUpdate();
 	void UnlockUpdate();
 	int GetSelectedCustomPalIndex();
@@ -55,6 +57,7 @@ private:
 	char* GetPalFileAddr(const char* base, int palIdx, int fileIdx);
 	void ReplacePalArrayInMemory(char* Dst, const void* Src);
 	void ReplaceAllPalFiles(IMPL_data_t* newPaletteData, int palIdx);
-	void BackupCurrentPal();
+	void BackupOrigPal();
+	void RestoreOrigPal();
 	void UpdatePalette();
 };

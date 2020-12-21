@@ -2,6 +2,8 @@
 
 #include "Core/logger.h"
 
+#define BLOOM_PALETTE_INDEX 21
+
 char* palFileNames[TOTAL_PALETTE_FILES] =
 {
 	"Character",
@@ -17,9 +19,17 @@ char* palFileNames[TOTAL_PALETTE_FILES] =
 char* CharPaletteHandle::GetPalFileAddr(const char* base, int palIndex, int fileID)
 {
 	//dereferencing the multi-level pointer:
-	// [[[[baseaddr] + 0x4] + palIndex * 0x20] + fileID * 0x4] + 0x1C
+	// [[[baseaddr + 0x4] + palIndex * 0x20] + fileID * 0x4] + 0x1C
 
-	return (char*)(*((int*)*((int*)(*(int*)m_pPalBaseAddr) + 1) + (palIndex * 8) + fileID) + 0x1C);
+	// Leave for debugging:
+	//DWORD* deref1 = (DWORD*)base + 1;
+	//DWORD* deref2 = (DWORD*)*deref1 + (palIndex * 8);
+	//DWORD* deref2Offset = deref2 + + fileID;
+	//DWORD* finalAddr = (DWORD*)*deref2Offset + 7;
+
+	DWORD* paletteAddress = (DWORD*)*((DWORD*)*((DWORD*)base + 1) + (palIndex * 8) + fileID) + 7;
+
+	return (char*)paletteAddress;
 }
 
 void CharPaletteHandle::SetPointerPalIndex(int* pPalIndex)
@@ -34,7 +44,7 @@ void CharPaletteHandle::SetPointerBasePal(char* pPalBaseAddr)
 
 void CharPaletteHandle::SetPaletteIndex(int palIndex)
 {
-	if (palIndex < 0 || MAX_PAL_INDEX < palIndex)
+	if (palIndex < 0 || palIndex > MAX_PAL_INDEX)
 		return;
 
 	*m_pCurPalIndex = palIndex;
@@ -43,6 +53,19 @@ void CharPaletteHandle::SetPaletteIndex(int palIndex)
 int CharPaletteHandle::GetOrigPalIndex() const
 {
 	return m_origPalIndex;
+}
+
+bool CharPaletteHandle::IsPalWithBloom() const
+{
+	return m_origPalIndex == BLOOM_PALETTE_INDEX;
+}
+
+bool CharPaletteHandle::IsNullPointerPalBasePtr()
+{
+	if (m_pPalBaseAddr)
+		return false;
+
+	return true;
 }
 
 bool CharPaletteHandle::IsNullPointerPalIndex()
@@ -60,13 +83,13 @@ int& CharPaletteHandle::GetPalIndexRef()
 
 void CharPaletteHandle::ReplaceAllPalFiles(IMPL_data_t* newPaletteData)
 {
-	if (strncmp(newPaletteData->palname, "Default", IMPL_PALNAME_LENGTH) == 0)
-		strncpy(m_CurrentPalData.palname, "", IMPL_PALNAME_LENGTH);
-	else
-		strncpy(m_CurrentPalData.palname, newPaletteData->palname, IMPL_PALNAME_LENGTH);
+	std::string palName = strncmp(newPaletteData->palName, "Default", IMPL_PALNAME_LENGTH) == 0
+		? ""
+		: newPaletteData->palName;
 
-	strncpy(m_CurrentPalData.creator, newPaletteData->creator, IMPL_CREATOR_LENGTH);
-	strncpy(m_CurrentPalData.desc, newPaletteData->desc, IMPL_DESC_LENGTH);
+	strncpy(m_currentPalData.palName, palName.c_str(), IMPL_PALNAME_LENGTH);
+	strncpy(m_currentPalData.creator, newPaletteData->creator, IMPL_CREATOR_LENGTH);
+	strncpy(m_currentPalData.desc, newPaletteData->desc, IMPL_DESC_LENGTH);
 
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex1);
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex2);
@@ -88,20 +111,20 @@ void CharPaletteHandle::OnMatchInit()
 {
 	m_origPalIndex = *m_pCurPalIndex;
 
-	BackupCurrentPal();
+	BackupOrigPal();
 
 	m_selectedCustomPalIndex = 0;
 
 	m_switchPalIndex1 = *m_pCurPalIndex;
-	if (m_switchPalIndex1 == MAX_PAL_INDEX)
-		m_switchPalIndex2 = m_switchPalIndex1 - 1;
-	else
-		m_switchPalIndex2 = m_switchPalIndex1 + 1;
+
+	m_switchPalIndex2 = m_switchPalIndex1 == MAX_PAL_INDEX
+		? m_switchPalIndex1 - 1
+		: m_switchPalIndex1 + 1;
 }
 
-void CharPaletteHandle::OnMatchEnd()
+void CharPaletteHandle::OnMatchRematch()
 {
-	//in case of a rematch we want to start with the original palindex
+	// In case of a rematch we want to start with the original palindex
 	*m_pCurPalIndex = m_origPalIndex;
 }
 
@@ -136,20 +159,19 @@ const IMPL_data_t& CharPaletteHandle::GetCurrentPalData()
 {
 	for (int i = 0; i < TOTAL_PALETTE_FILES; i++)
 	{
-		char* pDst = m_CurrentPalData.file0 + (i * IMPL_PALETTE_DATALEN);
+		char* pDst = m_currentPalData.file0 + (i * IMPL_PALETTE_DATALEN);
 		const char* pSrc = GetPalFileAddr(m_pPalBaseAddr, m_switchPalIndex1, i);
 		memcpy(pDst, pSrc, IMPL_PALETTE_DATALEN);
 		pDst += IMPL_PALETTE_DATALEN;
 	}
 
-	return m_CurrentPalData;
+	return m_currentPalData;
 }
 
 void CharPaletteHandle::ReplacePalArrayInMemory(char* Dst, const void* Src)
 {
-	//The palette datas are duplicated in the memory
-	//The duplication is found at offset 0x800
-	//We have to overwrite both, as some characters use the duplication's address instead
+	// The palette datas are duplicated in the memory at offset 0x800
+	// We have to overwrite both, as some characters use the duplication's address instead
 	memcpy(Dst, Src, IMPL_PALETTE_DATALEN);
 	memcpy(Dst + 0x800, Src, IMPL_PALETTE_DATALEN);
 }
@@ -158,23 +180,25 @@ void CharPaletteHandle::ReplaceAllPalFiles(IMPL_data_t* newPaletteData, int palI
 {
 	static const char NULLBLOCK[IMPL_PALETTE_DATALEN]{ 0 };
 
-	//If palname is "Default" then we load the original palette from backup
-	if (strncmp(newPaletteData->palname, "Default", 32) == 0)
+	// If palname is "Default" then we load the original palette from backup
+	if (strncmp(newPaletteData->palName, "Default", 32) == 0)
 		newPaletteData = &m_origPalBackup;
 
 	for (int i = 0; i < TOTAL_PALETTE_FILES; i++)
 	{
 		const char* pSrc = newPaletteData->file0 + (i * IMPL_PALETTE_DATALEN);
+
 		if (!memcmp(NULLBLOCK, pSrc, IMPL_PALETTE_DATALEN))
 			continue;
+
 		char* pDst = GetPalFileAddr(m_pPalBaseAddr, palIndex, i);
 		ReplacePalArrayInMemory(pDst, pSrc);
 	}
 }
 
-void CharPaletteHandle::BackupCurrentPal()
+void CharPaletteHandle::BackupOrigPal()
 {
-	LOG(2, "BackupCurrentPalette\n");
+	LOG(2, "CharPaletteHandle::BackupOrigPal\n");
 
 	const char* pSrc = 0;
 	char* pDst = m_origPalBackup.file0;
@@ -187,16 +211,22 @@ void CharPaletteHandle::BackupCurrentPal()
 	}
 }
 
+void CharPaletteHandle::RestoreOrigPal()
+{
+	LOG(2, "CharPaletteHandle::RestoreOrigPalette\n");
+
+	ReplaceAllPalFiles(&m_origPalBackup);
+}
+
 void CharPaletteHandle::UpdatePalette()
 {
-	//Must not switch more than once per frame, or palette doesn't get updated!
+	// Must not switch more than once per frame, or palette doesn't get updated!
 	if (m_updateLocked)
 		return;
 
-	if (*m_pCurPalIndex == m_switchPalIndex1)
-		*m_pCurPalIndex = m_switchPalIndex2;
-	else
-		*m_pCurPalIndex = m_switchPalIndex1;
+	*m_pCurPalIndex = *m_pCurPalIndex == m_switchPalIndex1
+		? m_switchPalIndex2
+		: m_switchPalIndex1;
 
 	LockUpdate();
 }
