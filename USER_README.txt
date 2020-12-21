@@ -1,10 +1,11 @@
-BBCF Improvement Mod (v2.07) by KoviDomi -- README
+BBCF Improvement Mod (v3.00) by KoviDomi -- README
 ==========================
 
 What this mod provides
 ==========================
 Unlocks the game's region restricted multiplayer.
 Adds extra game modes.
+Adds hitbox overlay.
 Create custom palettes and effects.
 Manage and load custom palettes without file modifications.
 See each other's custom palettes in online matches.
@@ -66,18 +67,36 @@ Keep in mind that the mod may partially, or completely stop working whenever a n
 Changelog
 ==========================
 
-??-??-???? -- version 2.07
+??-??-???? -- version 3.00
 ===============================
-- Added Highlight and Placeholder modes in the palette editor, to make it easier to find the corresponding colors
-- Added donate button
-- Players now send custom palettes and other datas to all spectators
-- When spectating, BBCFIM will show both player1 and player2 whether they use BBCFIM
-- Custom game modes are applied on spectators as well
+- Complete ground up rework of BBCFIM, online features are incompatible with previous versions
+- Added hitbox overlay in Training, Versus, and Replay modes
+- Added "palettes.ini" file for assigning custom palettes to the ingame palette slots
+- Added Highlight mode in the palette editor, to make it easier to find the corresponding colors
+- Added dinput dll chaining to settings.ini to use other dinput8.dll wrappers together with BBCFIM
+- Added toggling visibility of the ingame HUD
+- ??? -reword this- Added Online window with BBCFIM detection
+- Added gradient generator to the palette editor
+- Added indexing mode to the palette editor
+- Enabled palette editor in Versus mode
+- Palettes are now previewed when hovered over their selections
+- Palettes now use new IMPL file format
+- "Drag and drop" of the color boxes now work in the palette editor
+- Players now send custom palettes and other datas to spectators as well
+- All custom game modes are now playable in Training mode as well
+- ??? -reword this-  When spectating BBCFIM will show both player1 and player2 whether they use BBCFIM
+- Custom game modes are applied on spectators as well in online matches
 - Disabled stage selection slider in game modes other than online/training/versus
-- Fixed mistaking spectators as the opponent player
-- Fixed Steroid mode starting Overdrive mode instead
-- Fixed the vampire gamemodes' health draining not working when the timer is set to infinite in versus mode
+- Keyboard inputs are now not being passed to the game while any of BBCFIM's windows are focused
+- BBCFIM windows are now hidden when the Steam overlay is active
+- Detecting other BBCFIM players in online games is now consistent
+- ??? -need more info- Fixed the game with BBCFIM not launching in some cases on Windows 10
+- Removed palette placeholders in palette editor
+- Fixed the title of the main window being always visible
+- Fixed BBCFIM detection mistaking spectators as the opponent player
 - Fixed Jubei's stage missing from BBCFIM's stage selection slider
+- Fixed Steroid game mode starting a different game mode
+- Fixed Vampire game mode health draining not working when the timer is set to infinite in Versus mode
 
 31-03-2018 -- version 2.06
 ===============================
@@ -130,7 +149,7 @@ Changelog
 		* 200% of damage dealt is healed back
 		* Healing beyond full HP increases max HP
 		* Losing 1.5% max HP per second
-	One Punch Mode: 
+	One Punch Mode:
 		* Any damage results in instakill, unless blocked with barrier
 		* Each round 50% of the Burst Gauge is regenerated
 		* Each round lasts 15 seconds
