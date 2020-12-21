@@ -1,7 +1,6 @@
 #pragma once
 
-#define MOD_VERSION_NUM	"v2.07"
-#define MOD_VERSION_NUM_INTERNAL 207
+#define MOD_VERSION_NUM	"v3.00"
 #define MOD_WINDOW_TITLE "BBCF Improvement Mod"
 
 //Links
