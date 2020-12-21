@@ -5,6 +5,8 @@
 
 #include <string>
 
+extern Logger* g_imGuiLogger;
+
 struct ImGuiLogBuffer
 {
 	ImGuiTextBuffer textBuffer;
@@ -24,6 +26,7 @@ public:
 	void EnableLog(bool value) override { m_loggingEnabled = value; }
 	bool IsLogEnabled() const override { return m_loggingEnabled; }
 	const void* GetBuffer() const override { return &m_buffer; }
+
 private:
 	const std::string GetTime();
 	const std::string GetDate();
@@ -34,5 +37,3 @@ private:
 	ImGuiTextBuffer& m_textBuffer;
 	ImVector<int>& m_lineOffsets;
 };
-
-extern Logger* g_imGuiLogger;

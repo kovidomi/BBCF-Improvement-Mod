@@ -8,6 +8,15 @@ public:
 		ImGuiWindowFlags windowFlags = 0)
 		: IWindow(windowTitle, windowClosable, windowFlags) {}
 	~DebugWindow() override = default;
+
 protected:
 	void Draw() override;
+
+private:
+	void DrawImGuiSection();
+	void DrawGameValuesSection();
+	void DrawRoomSection();
+	void DrawNotificationSection();
+
+	bool m_showDemoWindow = false;
 };
