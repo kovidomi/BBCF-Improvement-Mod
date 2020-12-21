@@ -1,11 +1,12 @@
 #pragma once
 #include "CharData.h"
-#include "CharPaletteHandle.h"
+
+#include "Palette/CharPaletteHandle.h"
 
 class Player
 {
 public:
-	const CharData* GetData() const;
+	CharData* GetData() const;
 	CharPaletteHandle& GetPalHandle();
 
 	void SetCharDataPtr(const void* addr);

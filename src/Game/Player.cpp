@@ -13,7 +13,7 @@ bool Player::IsCharDataNullPtr() const
 	return *m_charData == 0;
 }
 
-const CharData* Player::GetData() const
+CharData* Player::GetData() const
 {
 	return *m_charData;
 }
