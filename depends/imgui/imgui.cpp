@@ -10522,14 +10522,31 @@ bool ImGui::ColorEdit4On32Bit(const char* label, unsigned char val[4], ImGuiColo
 	// Drag and Drop Target
 	if (window->DC.LastItemRectHoveredRect && BeginDragDropTarget()) // NB: The LastItemRectHoveredRect test is merely an optional micro-optimization
 	{
+		float plData[4];
 		if (const ImGuiPayload* payload = AcceptDragDropPayload(IMGUI_PAYLOAD_TYPE_COLOR_3F))
 		{
-			memcpy((float*)col, payload->Data, sizeof(float) * 3);
+			memcpy((float*)plData, payload->Data, sizeof(float) * 3);
+			unsigned char temp[] = {
+				(unsigned char)IM_F32_TO_INT8_UNBOUND(plData[2]),
+				(unsigned char)IM_F32_TO_INT8_UNBOUND(plData[1]),
+				(unsigned char)IM_F32_TO_INT8_UNBOUND(plData[0]) };
+			val[0] = temp[0];
+			val[1] = temp[1];
+			val[2] = temp[2];
 			value_changed = true;
 		}
 		if (const ImGuiPayload* payload = AcceptDragDropPayload(IMGUI_PAYLOAD_TYPE_COLOR_4F))
 		{
-			memcpy((float*)col, payload->Data, sizeof(float) * components);
+			memcpy((float*)plData, payload->Data, sizeof(float) * components);
+			unsigned char temp[] = {
+				(unsigned char)IM_F32_TO_INT8_UNBOUND(plData[2]),
+				(unsigned char)IM_F32_TO_INT8_UNBOUND(plData[1]),
+				(unsigned char)IM_F32_TO_INT8_UNBOUND(plData[0]),
+				(unsigned char)IM_F32_TO_INT8_UNBOUND(plData[3]) };
+			val[0] = temp[0];
+			val[1] = temp[1];
+			val[2] = temp[2];
+			val[3] = temp[3];
 			value_changed = true;
 		}
 		EndDragDropTarget();
