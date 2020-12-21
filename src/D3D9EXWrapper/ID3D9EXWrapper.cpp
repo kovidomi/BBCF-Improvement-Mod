@@ -7,6 +7,7 @@
 Direct3D9ExWrapper::Direct3D9ExWrapper(IDirect3D9Ex **ppIDirect3D9Ex)
 {
 	LOG(1, "cDirect3D9ExWrapper\n");
+
 	Direct3D9Ex = *ppIDirect3D9Ex;
 	*ppIDirect3D9Ex = this;
 }
@@ -21,6 +22,7 @@ HRESULT APIENTRY Direct3D9ExWrapper::RegisterSoftwareDevice(void* pInitializeFun
 HRESULT APIENTRY Direct3D9ExWrapper::QueryInterface(const IID &riid, void **ppvObj)
 {
 	HRESULT hRes = Direct3D9Ex->QueryInterface(riid, ppvObj);
+
 	if (hRes == S_OK)
 		*ppvObj = this;
 	else
@@ -37,9 +39,9 @@ ULONG APIENTRY Direct3D9ExWrapper::AddRef()
 ULONG APIENTRY Direct3D9ExWrapper::Release()
 {
 	ULONG res = Direct3D9Ex->Release();
-	if (res == 0) {
+
+	if (res == 0)
 		delete this;
-	}
 
 	return res;
 }
@@ -116,8 +118,10 @@ HMONITOR APIENTRY Direct3D9ExWrapper::GetAdapterMonitor(UINT Adapter)
 
 HRESULT APIENTRY Direct3D9ExWrapper::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DDevice9 **ppReturnedDeviceInterface)
 {
+	LOG(1, "CreateDevice\n")
+
 	HRESULT hRet = Direct3D9Ex->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
-	LOG(7, "CreateDevice\n")
+
 	if (SUCCEEDED(hRet))
 	{
 		Settings::applySettingsIni(pPresentationParameters);
@@ -144,11 +148,13 @@ HRESULT APIENTRY Direct3D9ExWrapper::GetAdapterDisplayModeEx(UINT Adapter, D3DDI
 HRESULT APIENTRY Direct3D9ExWrapper::CreateDeviceEx(UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, D3DDISPLAYMODEEX* pFullscreenDisplayMode, IDirect3DDevice9Ex** ppReturnedDeviceInterface)
 {
 	LOG(1, "CreateDeviceEx:\n");
-	//BehaviorFlags |= D3DCREATE_MULTITHREADED;
-	LOG(1, "\tAdapter: %d\n\tDeviceType: %d\n\thFocusWindow: 0x%x\n\tBehaviorFlags: 0x%x\n", 
+	LOG(1, "\tAdapter: %d\n\tDeviceType: %d\n\thFocusWindow: 0x%p\n\tBehaviorFlags: 0x%p\n",
 		Adapter, DeviceType, hFocusWindow, BehaviorFlags);
+
 	logD3DPParams(pPresentationParameters, true);
+
 	HRESULT hRet = Direct3D9Ex->CreateDeviceEx(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, pFullscreenDisplayMode, ppReturnedDeviceInterface);
+
 	if (SUCCEEDED(hRet))
 	{
 		LOG(1, "CreateDeviceEx created with original PresentationParameters\n");

@@ -123,6 +123,7 @@ bool HookManager::IsHookActivated(const char* label)
 
 bool HookManager::ActivateHook(const char* label)
 {
+	LOG(2, "Activating %s hook.\n", label);
 	int index = GetHookStructIndex(label);
 	if (index == -1)
 	{

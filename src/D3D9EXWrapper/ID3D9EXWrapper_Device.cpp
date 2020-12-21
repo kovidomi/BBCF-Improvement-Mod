@@ -4,6 +4,8 @@
 #include "Core/logger.h"
 #include "Game/MatchState.h"
 #include "Hooks/hooks_bbcf.h"
+#include "Hooks/hooks_customGameModes.h"
+#include "Hooks/hooks_palette.h"
 #include "Overlay/WindowManager.h"
 
 #include <steam_api.h>
@@ -18,11 +20,12 @@ Direct3DDevice9ExWrapper::Direct3DDevice9ExWrapper(IDirect3DDevice9Ex **ppReturn
 	*ppReturnedDeviceInterface = this;
 	m_Direct3D9Ex = pIDirect3D9Ex;
 
-	//grab pointer
 	g_interfaces.pD3D9ExWrapper = *ppReturnedDeviceInterface;
 
 	//place all other hooks that can only be placed after steamDRM unpacks the .exe in memory!!!
 	placeHooks_bbcf();
+	placeHooks_palette();
+	placeHooks_CustomGameModes();
 }
 
 Direct3DDevice9ExWrapper::~Direct3DDevice9ExWrapper() {}
@@ -32,6 +35,7 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::QueryInterface(const IID &riid, void 
 	LOG(7, "QueryInterface\n");
 
 	HRESULT hRes = m_Direct3DDevice9Ex->QueryInterface(riid, ppvObj);
+
 	if (hRes == S_OK)
 		*ppvObj = this;
 	else
@@ -49,10 +53,12 @@ ULONG APIENTRY Direct3DDevice9ExWrapper::AddRef()
 ULONG APIENTRY Direct3DDevice9ExWrapper::Release()
 {
 	LOG(7, "Release\n");
+
 	ULONG res = m_Direct3DDevice9Ex->Release();
-	if (res == 0) {
+
+	if (res == 0)
 		delete this;
-	}
+
 	return res;
 }
 
@@ -77,9 +83,12 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::EvictManagedResources()
 HRESULT APIENTRY Direct3DDevice9ExWrapper::GetDirect3D(IDirect3D9** ppD3D9)
 {
 	LOG(7, "GetDirect3D\n");
+
 	HRESULT hRet = m_Direct3DDevice9Ex->GetDirect3D(ppD3D9);
+
 	if (SUCCEEDED(hRet))
 		*ppD3D9 = m_Direct3D9Ex;
+
 	return hRet;
 }
 
@@ -183,13 +192,7 @@ void APIENTRY Direct3DDevice9ExWrapper::GetGammaRamp(UINT iSwapChaiTn, D3DGAMMAR
 HRESULT APIENTRY Direct3DDevice9ExWrapper::CreateTexture(UINT Width, UINT Height, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DTexture9** ppTexture, HANDLE* pSharedHandle)
 {
 	LOG(7, "CreateTexture %u %u %u\n", Width, Height, Levels);
-
-	HRESULT ret = m_Direct3DDevice9Ex->CreateTexture(Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle);
-	//if (SUCCEEDED(ret))
-	//{
-	//	LOG(2, "CreateTexture %x %x %x\n", *ppTexture, &ppTexture, *&ppTexture);
-	//}
-	return ret;
+	return m_Direct3DDevice9Ex->CreateTexture(Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle);
 }
 
 HRESULT APIENTRY Direct3DDevice9ExWrapper::CreateVolumeTexture(UINT Width, UINT Height, UINT Depth, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DVolumeTexture9** ppVolumeTexture, HANDLE* pSharedHandle)
@@ -254,13 +257,20 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::GetFrontBufferData(UINT iSwapChain, I
 
 HRESULT APIENTRY Direct3DDevice9ExWrapper::StretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect, D3DTEXTUREFILTERTYPE Filter)
 {
+	LOG(7, "StretchRect\n");
+
 	if (pSourceRect)
+	{
 		LOG(7, "StretchRect 0x%p : %ld %ld -- 0x%p\n", pSourceRect, pSourceRect->right, pSourceRect->bottom, pDestRect);
+	}
+
 	if (Settings::settingsIni.viewport != 1)
 	{
 		LOG(7, "/t- modifying to %ld %ld\n", Settings::savedSettings.newSourceRect.right, Settings::savedSettings.newSourceRect.bottom);
+
 		return m_Direct3DDevice9Ex->StretchRect(pSourceSurface, &Settings::savedSettings.newSourceRect, pDestSurface, pDestRect, Filter);
 	}
+
 	return m_Direct3DDevice9Ex->StretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter);
 }
 
@@ -371,6 +381,7 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::SetViewport(CONST D3DVIEWPORT9* pView
 		LOG(7, "MODIFYING VIEWPORT TO : %d %d\n", Settings::savedSettings.newViewport.Width, Settings::savedSettings.newViewport.Height);
 		return m_Direct3DDevice9Ex->SetViewport(&Settings::savedSettings.newViewport);
 	}
+
 	return m_Direct3DDevice9Ex->SetViewport(pViewport);
 }
 
@@ -505,14 +516,16 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::GetSamplerState(DWORD Sampler, D3DSAM
 HRESULT APIENTRY Direct3DDevice9ExWrapper::SetSamplerState(DWORD Sampler, D3DSAMPLERSTATETYPE Type, DWORD Value)
 {
 	LOG(7, "SetSamplerState\n");
+
 	if (Settings::settingsIni.viewport == 3)
 	{
 		if (Type == D3DSAMP_MINFILTER && Settings::savedSettings.isFiltering)
 		{
 			//Sampler = 2;
-			Value = D3DTEXF_LINEAR;//D3DTEXF_LINEAR;
+			Value = D3DTEXF_LINEAR; //D3DTEXF_LINEAR;
 		}
 	}
+
 	return m_Direct3DDevice9Ex->SetSamplerState(Sampler, Type, Value);
 }
 
@@ -890,6 +903,7 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::CreateRenderTargetEx(UINT Width, UINT
 	if (Settings::settingsIni.viewport != 1)
 	{
 		LOG(3, "\t- modifying to %u %u\n", Settings::settingsIni.renderwidth, Settings::settingsIni.renderheight);
+
 		Settings::savedSettings.origViewportRes.x = (float)Width;
 		Settings::savedSettings.origViewportRes.y = (float)Height;
 		Settings::savedSettings.newViewport.MinZ = 0.0;
@@ -900,6 +914,7 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::CreateRenderTargetEx(UINT Width, UINT
 
 	LOG(7, "SETTINGS\n - viewport %d\n - renderheight %d\n - renderheight %d\n",
 		Settings::settingsIni.viewport, Settings::settingsIni.renderheight, Settings::settingsIni.renderwidth);
+
 	LOG(7, " - SourceRect.right %u\n - SourceRect.bottom %u\n - Viewport.Width %d\n - Viewport.Height %d\n",
 		Settings::savedSettings.newSourceRect.right,
 		Settings::savedSettings.newSourceRect.bottom,
@@ -926,10 +941,15 @@ HRESULT APIENTRY Direct3DDevice9ExWrapper::CreateDepthStencilSurfaceEx(UINT Widt
 	if (Settings::settingsIni.viewport != 1)
 	{
 		LOG(3, "\t- modifying to %u %u\n", Settings::settingsIni.renderwidth, Settings::settingsIni.renderheight);
-		return m_Direct3DDevice9Ex->CreateDepthStencilSurfaceEx(Settings::settingsIni.renderwidth, Settings::settingsIni.renderheight, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle, Usage);
+		Width = Settings::settingsIni.renderwidth;
+		Height = Settings::settingsIni.renderheight;
 	}
 
-	return m_Direct3DDevice9Ex->CreateDepthStencilSurfaceEx(Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle, Usage);
+	HRESULT ret = m_Direct3DDevice9Ex->CreateDepthStencilSurfaceEx(Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle, Usage);
+
+	LOG(2, "\t- HRESULT: %ld\n", ret);
+
+	return ret;
 }
 
 HRESULT APIENTRY Direct3DDevice9ExWrapper::ResetEx(D3DPRESENT_PARAMETERS* pPresentationParameters, D3DDISPLAYMODEEX *pFullscreenDisplayMode)
