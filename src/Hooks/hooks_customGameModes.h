@@ -4,4 +4,4 @@
 
 extern DWORD steroid_HeatModifyJmpBackAddr;
 
-void CustomGameModeHooks();
+void placeHooks_CustomGameModes();
