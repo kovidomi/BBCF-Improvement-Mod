@@ -1,24 +1,21 @@
 #include "hooks_bbcf.h"
 
-#include "hooks_palette.h"
 #include "hooks_steamApiWrapper.h"
 
 #include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/utils.h"
-#include "Game/custom_gameModes.h"
+#include "Game/MatchState.h"
 #include "Game/gamestates.h"
+#include "Game/stages.h"
 #include "Hooks/HookManager.h"
-#include "Overlay/Logger/ImGuiLogger.h"
+#include "Network/RoomManager.h"
 #include "Overlay/WindowManager.h"
-#include "PaletteManager/custom_palette.h"
 
 DWORD GetGameStateTitleScreenJmpBackAddr = 0;
 void __declspec(naked)GetGameStateTitleScreen()
 {
-	_asm pushad
-	LOG(2, "GetGameStateTitleScreen\n");
-	_asm popad
+	LOG_ASM(2, "GetGameStateTitleScreen\n");
 
 	_asm
 	{
@@ -30,8 +27,7 @@ void __declspec(naked)GetGameStateTitleScreen()
 
 	placeHooks_steamApiWrapper();
 
-	WindowManager::GetInstance()
-		.Initialize(g_gameProc.hWndGameWindow, g_interfaces.pD3D9ExWrapper);
+	WindowManager::GetInstance().Initialize(g_gameProc.hWndGameWindow, g_interfaces.pD3D9ExWrapper);
 
 	__asm
 	{
@@ -41,42 +37,10 @@ void __declspec(naked)GetGameStateTitleScreen()
 	}
 }
 
-void ResetBackToMenu()
-{
-	//copying the same stuffs here as in GameStateLobby
-	if (g_gameVals.opponentSteamID)
-	{
-		g_tempVals.opponentIDToBeDeleted = g_gameVals.opponentSteamID;
-		g_gameVals.opponentSteamID = 0;
-	}
-
-	g_gameVals.thisPlayerNum = 0;
-	g_gameVals.bOpponentUsingBBCFIM = false;
-	g_gameVals.bP1UsingBBCFIM = false;
-	g_gameVals.bP2UsingBBCFIM = false;
-	ResettingDefaultPalettes();
-	g_gameVals.P1_selectedCharID = -1;
-	g_gameVals.P2_selectedCharID = -1;
-	g_gameVals.P1CurPalette = 0;
-	g_gameVals.P2CurPalette = 0;
-	g_gameVals.startMatchPalettesInit = false;
-	g_interfaces.pSteamApiHelper->UpdateNumberOfCurrentPlayers();
-	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
-	g_gameVals.charSelectInit = false;
-	g_gameVals.playersInMatch.clear();
-	g_gameVals.totalReadPackets = 0;
-	g_tempVals.paledit_show_sel_by_highlight = false;
-	g_tempVals.paledit_show_placeholder = false;
-
-	EndCustomGameMode();
-}
-
 DWORD GetGameStateMenuScreenJmpBackAddr = 0;
 void __declspec(naked)GetGameStateMenuScreen()
 {
-	_asm pushad
-	LOG(2, "GetGameStateMenuScreen\n");
-	_asm popad
+	LOG_ASM(2, "GetGameStateMenuScreen\n");
 
 	_asm
 	{
@@ -88,10 +52,9 @@ void __declspec(naked)GetGameStateMenuScreen()
 
 	placeHooks_steamApiWrapper();
 	
-	WindowManager::GetInstance()
-		.Initialize(g_gameProc.hWndGameWindow, g_interfaces.pD3D9ExWrapper);
+	WindowManager::GetInstance().Initialize(g_gameProc.hWndGameWindow, g_interfaces.pD3D9ExWrapper);
 
-	ResetBackToMenu();
+	MatchState::OnMatchEnd();
 
 	__asm
 	{
@@ -108,7 +71,7 @@ void __declspec(naked)GetGameStateLobby()
 
 	__asm pushad
 
-	ResetBackToMenu();
+	MatchState::OnMatchEnd();
 
 	__asm popad
 
@@ -119,56 +82,14 @@ void __declspec(naked)GetGameStateLobby()
 	}
 }
 
-DWORD GetGameStateMatchStartJmpBackAddr = 0;
-void __declspec(naked)GetGameStateMatchStart()
-{
-	_asm pushad
-	LOG(2, "GetGameStateMatchStart\n");
-	_asm popad
-	__asm pushad
-
-	g_gameVals.startMatchPalettesInit = false;
-	g_gameVals.isP1BloomOn = 0;
-	g_gameVals.isP2BloomOn = 0;
-	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
-
-	g_imGuiLogger->LogSeparator();
-
-	if (*g_gameVals.pGameMode == GameMode_Online)
-	{
-		//g_interfaces.pSteamApiHelper->GetRequestUserInformation(*g_gameVals.opponentSteamID);
-		//g_imGuiLogger->Log("[system] Online match against '%s' has started\n", g_interfaces.pSteamFriendsWrapper->GetFriendPersonaName(*g_gameVals.opponentSteamID));
-		g_imGuiLogger->Log("[system] Online match has started\n");
-#ifdef _DEBUG
-		g_imGuiLogger->Log("[debug] Local player is from %s\n", g_interfaces.pSteamUtilsWrapper->GetIPCountry());
-#endif
-	}
-	else
-	{
-		g_imGuiLogger->Log("[system] Local match has started\n");
-	}
-
-	__asm
-	{
-		popad
-		mov dword ptr[eax + 10Ch], 0Fh
-		jmp[GetGameStateMatchStartJmpBackAddr]
-	}
-}
-
 DWORD GetGameStateVictoryScreenJmpBackAddr = 0;
 void __declspec(naked)GetGameStateVictoryScreen()
 {
-	__asm pushad
-	LOG(2, "GetGameStateVictoryScreen\n");
+	LOG_ASM(2, "GetGameStateVictoryScreen\n");
 
-	ResettingDefaultPalettes();
-	g_gameVals.startMatchPalettesInit = false;
-	//restore original palette indexes so they will be correct on rematch
-	if (g_gameVals.P1PaletteIndex)
-		*g_gameVals.P1PaletteIndex = g_gameVals.origP1PaletteIndex;
-	if (g_gameVals.P2PaletteIndex)
-		*g_gameVals.P2PaletteIndex = g_gameVals.origP2PaletteIndex;
+	__asm pushad
+
+	MatchState::OnMatchRematch();
 
 	__asm popad
 
@@ -184,8 +105,6 @@ void __declspec(naked)GetGameStateVersusScreen()
 {
 	LOG_ASM(2, "GetGameStateVersusScreen\n");
 
-	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
-
 	__asm
 	{
 		mov dword ptr[eax + 10Ch], 0Eh
@@ -196,18 +115,12 @@ void __declspec(naked)GetGameStateVersusScreen()
 DWORD GetGameStateReplayMenuScreenJmpBackAddr = 0;
 void __declspec(naked)GetGameStateReplayMenuScreen()
 {
+	LOG_ASM(2, "GetGameStateReplayMenuScreen\n");
+
 	__asm pushad
-	LOG(2, "GetGameStateReplayMenuScreen\n");
 
-	ResettingDefaultPalettes();
-	g_gameVals.P1_selectedCharID = -1;
-	g_gameVals.P2_selectedCharID = -1;
-	g_gameVals.P1CurPalette = 0;
-	g_gameVals.P2CurPalette = 0;
-	g_gameVals.startMatchPalettesInit = false;
-	g_tempVals.PlayersCharIDVersusScreenCounter = 0;
+	MatchState::OnMatchEnd();
 
-	EndCustomGameMode();
 	__asm popad
 
 	__asm
@@ -223,20 +136,22 @@ void __declspec(naked)PassMsgToImGui()
 {
 	static bool isWindowManagerInitialized = false;
 
-	__asm
-	{
-		mov edi, [ebp + 0Ch]
-		mov ebx, ecx
-	}
-
 	LOG_ASM(7, "PassMsgToImGui\n");
+
 	__asm pushad
 	isWindowManagerInitialized = WindowManager::GetInstance().IsInitialized();
 	__asm popad
 
 	__asm
 	{
+		mov edi, [ebp + 0Ch]
+		mov ebx, ecx
+	}
+
+	__asm
+	{
 		pushad
+
 		movzx eax, isWindowManagerInitialized
 		cmp eax, 0
 		je SKIP
@@ -264,41 +179,75 @@ EXIT:
 	}
 }
 
-DWORD PacketProcessingFuncJmpBackAddr = 0;
-void __declspec(naked)PacketProcessingFunc()
+int PassKeyboardInputToGame()
 {
-	im_packet_internal_t* packet;
+	if (GetForegroundWindow() != g_gameProc.hWndGameWindow ||
+		ImGui::GetIO().WantCaptureKeyboard)
+	{
+		return 0;
+	}
 
-	LOG_ASM(7, "PacketProcessingFunc\n");
+	return 1;
+}
 
-	__asm mov packet, ecx;
+DWORD DenyKeyboardInputFromGameJmpBackAddr = 0;
+void __declspec(naked)DenyKeyboardInputFromGame()
+{
+	LOG_ASM(7, "DenyKeyboardInputFromGame\n");
 
 	__asm
 	{
-		movzx eax, [ecx + 2] // <-- - load the packet code into eax
-		cmp eax, 98h // <-- - palette packet code of BBCFIM 2.00 > is 0x98
-		je CUSTOMPACKET
-		cmp eax, 99h // <-- - palette packet code of BBCFIM 2.00 < is 0x99 (unsupported version but we still process the packet)
-		jne SHORT NOTCUSTOMPACKET
-		CUSTOMPACKET :
-		pushad
-			sub ecx, 2 //<-- - set ecx at packet.length2
-			mov packet, ecx //<-- - align packet pointer ontop of packet.length2
+		call PassKeyboardInputToGame
+		test eax, eax
+		jz EXIT
+
+		lea     eax, [esi + 28h]
+		push    eax // lpKeyState
+		call    ds : GetKeyboardState
+EXIT:
+		jmp[DenyKeyboardInputFromGameJmpBackAddr]
 	}
-	g_interfaces.pNetworkManager->PacketProcesser(packet);
+}
+
+DWORD PacketProcessingFuncJmpBackAddr = 0;
+void __declspec(naked)PacketProcessingFunc()
+{
+	static Packet* pPacket = nullptr;
+
+	LOG_ASM(7, "PacketProcessingFunc\n");
+
+	__asm
+	{
+		pushad
+		sub ecx, 2
+		mov pPacket, ecx
+	}
+
+	if (g_interfaces.pNetworkManager->IsIMPacket(pPacket))
+	{
+		g_interfaces.pNetworkManager->RecvPacket(pPacket);
+
+		__asm
+		{
+			popad
+			jmp SHORT EXIT
+		}
+	}
+
 	_asm
 	{
+NOT_CUSTOM_PACKET:
 		popad
-		jmp SHORT EXIT
-		NOTCUSTOMPACKET :
+		// original bytes
 		mov edx, [ebp - 08h]
-			lea edi, [ebp - 24h]
-			mov eax, [edx]
-			push edi
-			push ecx
-			mov ecx, edx
-			call dword ptr[eax + 00000090h]
-			EXIT:
+		lea edi, [ebp - 24h]
+		mov eax, [edx]
+		push edi
+		push ecx
+		mov ecx, edx
+		call dword ptr[eax + 00000090h]
+
+EXIT:
 		jmp[PacketProcessingFuncJmpBackAddr]
 	}
 }
@@ -323,13 +272,13 @@ void __declspec(naked)GetPlayerAvatarBaseFunc()
 	g_gameVals.playerAvatarAcc1 = reinterpret_cast<BYTE*>(g_gameVals.playerAvatarBaseAddr + 0x61C4);
 	g_gameVals.playerAvatarAcc2 = reinterpret_cast<BYTE*>(g_gameVals.playerAvatarBaseAddr + 0x61C5);
 
-	LOG(2, "g_gameVals.playerAvatarBaseAddr: 0x%x\n", g_gameVals.playerAvatarBaseAddr);
-	LOG(2, "g_gameVals.playerAvatarAddr: 0x%x\n", g_gameVals.playerAvatarAddr);
-	LOG(2, "g_gameVals.playerAvatarColAddr: 0x%x\n", g_gameVals.playerAvatarColAddr);
-	LOG(2, "g_gameVals.playerAvatarAcc1: 0x%x\n", g_gameVals.playerAvatarAcc1);
-	LOG(2, "g_gameVals.playerAvatarAcc2: 0x%x\n", g_gameVals.playerAvatarAcc2);
+	LOG(2, "g_gameVals.playerAvatarBaseAddr: 0x%p\n", g_gameVals.playerAvatarBaseAddr);
+	LOG(2, "g_gameVals.playerAvatarAddr: 0x%p\n", g_gameVals.playerAvatarAddr);
+	LOG(2, "g_gameVals.playerAvatarColAddr: 0x%p\n", g_gameVals.playerAvatarColAddr);
+	LOG(2, "g_gameVals.playerAvatarAcc1: 0x%p\n", g_gameVals.playerAvatarAcc1);
+	LOG(2, "g_gameVals.playerAvatarAcc2: 0x%p\n", g_gameVals.playerAvatarAcc2);
 	
-	//restore the original optcodes after grabbing the addresses, nothing else to do here
+	//restore the original opcodes after grabbing the addresses, nothing else to do here
 	HookManager::DeactivateHook("GetPlayerAvatarBaseFunc");
 
 	_asm
@@ -345,6 +294,7 @@ void __declspec(naked)CpuUsageFix()
 	__asm pushad
 	Sleep(1);
 	__asm popad
+
 	__asm
 	{
 		push esi
@@ -370,47 +320,48 @@ void __declspec(naked)GetGameModeIndexPointer()
 	}
 }
 
-DWORD GetSetMatchVariablesJmpBackAddr = 0;
-void __declspec(naked)GetSetMatchVariables()
+DWORD GetMatchVariablesJmpBackAddr = 0;
+void __declspec(naked)GetMatchVariables()
 {
-	LOG_ASM(2, "GetSetMatchVariables\n");
+	LOG_ASM(2, "GetMatchVariables\n");
 
 	__asm
 	{
 		//grab the pointers
-		push ecx
+		pushad
 		add ecx, 30h
-		mov[g_gameVals.pMatchState], ecx //ecx +30h
+		mov[g_gameVals.pMatchState], ecx
 		sub ecx, 18h
-		mov[g_gameVals.pMatchTimer], ecx //ecx +18h
+		mov[g_gameVals.pMatchTimer], ecx
 		sub ecx, 14h
-		mov[g_gameVals.pMatchRounds], ecx //ecx +4h
-		pop ecx
+		mov[g_gameVals.pMatchRounds], ecx
 	}
+
+	MatchState::OnMatchInit();
 
 	__asm
 	{
+		popad
 		mov dword ptr[ecx + 20Ch], 0
-		jmp[GetSetMatchVariablesJmpBackAddr]
+		jmp[GetMatchVariablesJmpBackAddr]
 	}
 }
 
-DWORD MatchStateFightStartJmpBackAddr = 0;
-void __declspec(naked)MatchStateFightStart()
+DWORD MatchIntroStartsPlayingJmpBackAddr = 0;
+void __declspec(naked)MatchIntroStartsPlayingFunc()
 {
-	LOG_ASM(2, "MatchStateFightStart\n");
+	// This function runs whenever the camera is forcibly taken control by the game
+	LOG_ASM(2, "MatchIntroStartsPlayingFunc\n");
 
 	__asm pushad
-	if (activatedGameMode == customGameMode_overdrive)
-	{
-		g_gameVals.P1CharObjPointer->overdriveTimeleft = 1;
-		g_gameVals.P2CharObjPointer->overdriveTimeleft = 1;
-	}
-	__asm popad
+
+	g_interfaces.pGameModeManager->InitGameMode();
+
 	__asm
 	{
-		mov dword ptr[esi + 30h], 3
-		jmp[MatchStateFightStartJmpBackAddr]
+		popad
+		and dword ptr[eax + 40626Ch], 0FFFFFFFDh
+		jmp[MatchIntroStartsPlayingJmpBackAddr]
 	}
 }
 
@@ -422,7 +373,7 @@ void __declspec(naked)GetStageSelectAddr()
 	__asm
 	{
 		mov dword ptr[ecx + 0F54h], 0
-		push eax
+		pushad
 		mov eax, ecx
 		add eax, 0A0h
 		mov g_gameVals.stageListMemory, eax
@@ -430,7 +381,13 @@ void __declspec(naked)GetStageSelectAddr()
 		mov g_gameVals.stageSelect_X, eax
 		add eax, 4h
 		mov g_gameVals.stageSelect_Y, eax
-		pop eax
+	}
+
+	LOG(2, "stageListMemory: 0x%p\n", g_gameVals.stageListMemory);
+
+	__asm
+	{
+		popad
 		jmp[GetStageSelectAddrJmpBackAddr]
 	}
 }
@@ -453,31 +410,243 @@ void __declspec(naked)GetMusicSelectAddr()
 	}
 }
 
-DWORD GetP1ScreenPosXJmpBackAddr = 0;
-void __declspec(naked)GetP1ScreenPosX()
+DWORD OverwriteStagesListJmpBackAddr = 0;
+void __declspec(naked)OverwriteStagesList()
 {
-	//LOG_ASM(2, "GetP1ScreenPosX\n");
+	LOG_ASM(2, "OverwriteStagesList\n");
 
-	__asm
+	__asm pushad
+
+	if (*g_gameVals.pGameMode == GameMode_Online ||
+		*g_gameVals.pGameMode == GameMode_Training ||
+		*g_gameVals.pGameMode == GameMode_Versus)
 	{
-		mov esi, [edi]
-
-		push esi
-		add esi, 1C0h
-		mov g_gameVals.P1ScreenPosX, esi
+		LOG(2, "Overwriting stages\n");
+		memcpy(g_gameVals.stageListMemory, allStagesUnlockedMemoryBlock, ALL_STAGES_UNLOCKED_MEMORY_SIZE);
 	}
 
-	//LOG_ASM(2, "g_gameVals.P1ScreenPosX: 0x%x\n", g_gameVals.P1ScreenPosX);
+	__asm popad
 
 	__asm
 	{
-		add esi, 4
-		mov g_gameVals.P1ScreenPosY, esi
-		pop esi
+		mov esi, [ebp - 04h]
+		lea eax, [ebp - 08h]
+		jmp[OverwriteStagesListJmpBackAddr]
+	}
+}
 
-		add esi, edx
-		push ecx
-		jmp[GetP1ScreenPosXJmpBackAddr]
+DWORD GetEntityListAddrJmpBackAddr = 0;
+int entityListSize = 0;
+void __declspec(naked)GetEntityListAddr()
+{
+	LOG_ASM(7, "GetEntityListAddr\n");
+
+	__asm mov [g_gameVals.pEntityList], eax
+
+	// Original:
+	// push    648h
+	// mov[esi + 62778h], eax
+	__asm
+	{
+		push[entityListSize]
+		mov[esi + 62778h], eax
+		jmp[GetEntityListAddrJmpBackAddr]
+	}
+}
+
+DWORD GetEntityListDeleteAddrJmpBackAddr = 0;
+void __declspec(naked)GetEntityListDeleteAddr()
+{
+	LOG_ASM(7, "GetEntityListDeleteAddr\n");
+
+	_asm
+	{
+		mov[g_gameVals.pEntityList], 0
+		mov[esi + 62778h], edi
+		jmp[GetEntityListDeleteAddrJmpBackAddr]
+	}
+}
+
+DWORD GetIsHUDHiddenJmpBackAddr = 0;
+void __declspec(naked)GetIsHUDHidden()
+{
+	LOG_ASM(2, "GetIsHUDHidden\n");
+
+	__asm
+	{
+		or dword ptr[eax + 40626Ch], 4
+		push eax
+		add eax, 40626Ch
+		mov g_gameVals.pIsHUDHidden, eax
+		pop eax
+		jmp[GetIsHUDHiddenJmpBackAddr]
+	}
+}
+
+DWORD GetViewAndProjMatrixesJmpBackAddr = 0;
+void __declspec(naked)GetViewAndProjMatrixes()
+{
+	__asm
+	{
+		push eax
+		mov eax, [esp + 8h]
+		mov g_gameVals.viewMatrix, eax;
+		mov eax, [esp + 0Ch]
+		mov g_gameVals.projMatrix, eax;
+		pop eax
+	}
+
+	__asm
+	{
+		movss[ebp - 20h], xmm0
+		mov DWORD PTR [ebp - 1Ch], 3F800000h
+		jmp[GetViewAndProjMatrixesJmpBackAddr]
+	}
+}
+
+DWORD GameUpdatePauseJmpBackAddr = 0;
+int restoredGameUpdatePauseAddr = 0;
+void __declspec(naked)GameUpdatePause()
+{
+	LOG_ASM(7, "GameUpdatePause\n");
+
+	__asm
+	{
+		pushad
+		cmp g_gameVals.pGameMode, 0 //check for nullpointer
+		je ORIG_CODE
+
+		call isPaletteEditingEnabledInCurrentGameMode
+		cmp al, 0
+		je ORIG_CODE
+
+		cmp g_gameVals.isFrameFrozen, 0
+		je ORIG_CODE
+
+		mov eax, g_gameVals.pFrameCount
+		mov eax, [eax]
+		cmp g_gameVals.framesToReach, eax
+		jle PAUSE_LOGIC
+
+ORIG_CODE:
+		popad
+		test byte ptr[ecx], 01
+		jz RESTORED_JMP
+		jmp[GameUpdatePauseJmpBackAddr]
+
+RESTORED_JMP:
+		jmp[restoredGameUpdatePauseAddr]
+
+PAUSE_LOGIC:
+		popad
+		mov eax, 1
+		ret
+	}
+}
+
+DWORD GetFrameCounterJmpBackAddr = 0;
+void __declspec(naked)GetFrameCounter()
+{
+	LOG_ASM(7, "GetFrameCounter\n");
+
+	_asm
+	{
+		push eax
+		mov eax, esi
+		add eax, 0Ch
+		mov g_gameVals.pFrameCount, eax
+		pop eax
+
+		// original code
+		mov eax, [esi]
+		inc dword ptr[esi + 0Ch]
+		jmp[GetFrameCounterJmpBackAddr]
+	}
+}
+
+DWORD GetRoomOneJmpBackAddr = 0;
+void __declspec(naked)GetRoomOne()
+{
+	LOG_ASM(2, "GetRoomOne\n");
+
+	_asm
+	{
+		mov[g_gameVals.pRoom], ebx
+
+		mov [ebx], 2h
+	}
+
+	__asm pushad
+
+	g_interfaces.pRoomManager->JoinRoom(g_gameVals.pRoom);
+
+	__asm popad
+
+	__asm
+	{
+		// original code
+		movzx eax, word ptr[esi]
+		push eax
+		mov ecx, ebx
+		jmp[GetRoomOneJmpBackAddr]
+	}
+}
+
+DWORD GetRoomTwoJmpBackAddr = 0;
+void __declspec(naked)GetRoomTwo()
+{
+	LOG_ASM(2, "GetRoomTwo\n");
+
+	_asm
+	{
+		mov esi, edi
+		add esi, 22CF0h
+		mov[g_gameVals.pRoom], esi
+
+		// original code
+		mov dword ptr[edi + 22CF0h], 2
+	}
+
+	__asm pushad
+
+	g_interfaces.pRoomManager->JoinRoom(g_gameVals.pRoom);
+
+	__asm popad
+
+	__asm
+	{
+		// original code
+		pop edi
+		jmp[GetRoomTwoJmpBackAddr]
+	}
+}
+
+DWORD GetFFAMatchThisPlayerIndexJmpBackAddr = 0;
+void __declspec(naked)GetFFAMatchThisPlayerIndex()
+{
+	static int* addr = nullptr;
+
+	LOG_ASM(2, "GetFFAMatchThisPlayerIndex\n");
+
+	_asm
+	{
+		pushad
+		add ebx, 704h
+		mov [addr], ebx
+	}
+
+	g_interfaces.pRoomManager->SetFFAThisPlayerIndex(addr);
+
+	// Restore the original opcodes after grabbing the address, nothing else to do here
+	HookManager::DeactivateHook("GetFFAMatchThisPlayerIndex");
+
+	__asm
+	{
+		popad
+
+		// original code
+		mov dword ptr[ebx + 704h], 0
+		jmp[GetFFAMatchThisPlayerIndexJmpBackAddr]
 	}
 }
 
@@ -486,134 +655,93 @@ bool placeHooks_bbcf()
 	LOG(2, "placeHooks_bbcf\n");
 
 	if (Settings::settingsIni.cpuusagefix)
-		CpuUsageFixJmpBackAddr = HookManager::SetHook(
-			"CpuBottleneckFix_new", 
-			"\x56\x8d\x45\xf8\x50\x8b\xf1",
-			"xxxxxxx", 
-			5, 
-			CpuUsageFix);
+	{
+		CpuUsageFixJmpBackAddr = HookManager::SetHook("CpuBottleneckFix_new", "\x56\x8d\x45\xf8\x50\x8b\xf1",
+			"xxxxxxx", 5, CpuUsageFix);
+	}
 
-	GetGameStateTitleScreenJmpBackAddr = HookManager::SetHook(
-		"GetGameStateTitleScreen",
-		"\xc7\x87\x0c\x01\x00\x00\x04\x00\x00\x00\x83\xc4\x1c",
-		"xxxxxxxxxxxxx",
-		10,
-		GetGameStateTitleScreen);
+	GetGameStateTitleScreenJmpBackAddr = HookManager::SetHook("GetGameStateTitleScreen", "\xc7\x87\x0c\x01\x00\x00\x04\x00\x00\x00\x83\xc4\x1c",
+		"xxxxxxxxxxxxx", 10, GetGameStateTitleScreen);
 	
-	GetGameStateMenuScreenJmpBackAddr = HookManager::SetHook(
-		"GetGameStateMenuScreen",
-		"\xc7\x80\x0c\x01\x00\x00\x1b\x00\x00\x00\xe8\x00\x00\x00\x00",
-		"xxxxxxxxxxx????",
-		10,
-		GetGameStateMenuScreen);
+	GetGameStateMenuScreenJmpBackAddr = HookManager::SetHook("GetGameStateMenuScreen", "\xc7\x80\x0c\x01\x00\x00\x1b\x00\x00\x00\xe8\x00\x00\x00\x00",
+		"xxxxxxxxxxx????", 10, GetGameStateMenuScreen);
 	
-	GetGameStateLobbyJmpBackAddress = HookManager::SetHook(
-		"GetGameStateLobby",
-		"\xc7\x80\x0c\x01\x00\x00\x1f\x00\x00\x00\xe8",
-		"xxxxxxxxxxx",
-		10,
-		GetGameStateLobby);
+	GetGameStateLobbyJmpBackAddress = HookManager::SetHook("GetGameStateLobby", "\xc7\x80\x0c\x01\x00\x00\x1f\x00\x00\x00\xe8",
+		"xxxxxxxxxxx", 10, GetGameStateLobby);
 	
-	GetGameStateMatchStartJmpBackAddr = HookManager::SetHook(
-		"GetGameStateMatchStart",
-		"\xc7\x80\x0c\x01\x00\x00\x0f\x00\x00\x00\xe8",
-		"xxxxxxxxxxx",
-		10,
-		GetGameStateMatchStart);
+	GetGameStateVictoryScreenJmpBackAddr = HookManager::SetHook("GetGameStateVictoryScreen", "\xc7\x80\x0c\x01\x00\x00\x10\x00\x00\x00\xe8",
+		"xxxxxxxxxxx", 10, GetGameStateVictoryScreen);
 	
-	GetGameStateVictoryScreenJmpBackAddr = HookManager::SetHook(
-		"GetGameStateVictoryScreen",
-		"\xc7\x80\x0c\x01\x00\x00\x10\x00\x00\x00\xe8",
-		"xxxxxxxxxxx",
-		10,
-		GetGameStateVictoryScreen);
+	GetGameStateVersusScreenJmpBackAddr = HookManager::SetHook("GetGameStateVersusScreen", "\xc7\x80\x0c\x01\x00\x00\x0e\x00\x00\x00\xe8",
+		"xxxxxxxxxxx", 10, GetGameStateVersusScreen);
 	
-	GetGameStateVersusScreenJmpBackAddr = HookManager::SetHook(
-		"GetGameStateVersusScreen",
-		"\xc7\x80\x0c\x01\x00\x00\x0e\x00\x00\x00\xe8",
-		"xxxxxxxxxxx",
-		10,
-		GetGameStateVersusScreen);
+	GetGameStateReplayMenuScreenJmpBackAddr = HookManager::SetHook("GetGameStateReplayMenuScreen", "\xc7\x80\x0c\x01\x00\x00\x1a\x00\x00\x00\xe8",
+		"xxxxxxxxxxx", 10, GetGameStateReplayMenuScreen);
 	
-	GetGameStateReplayMenuScreenJmpBackAddr = HookManager::SetHook(
-		"GetGameStateReplayMenuScreen",
-		"\xc7\x80\x0c\x01\x00\x00\x1a\x00\x00\x00\xe8",
-		"xxxxxxxxxxx",
-		10,
-		GetGameStateReplayMenuScreen);
-	
-	WindowMsgHandlerJmpBackAddr = HookManager::SetHook(
-		"WindowMsgHandler",
-		"\x8b\x7d\x0c\x8b\xd9\x83\xfe\x10\x77\x00\x74\x00\x8b\xc6",
-		"xxxxxxxxx?x?xx",
-		5,
-		PassMsgToImGui);
-	
-	PacketProcessingFuncJmpBackAddr = HookManager::SetHook(
-		"PacketProcessingFunc",
-		"\x8b\x55\xf8\x8d\x7d\xdc\x8b\x02",
-		"xxxxxxxx",
-		18,
-		PacketProcessingFunc);
-	
-	GetPlayerAvatarBaseAddr = HookManager::SetHook(
-		"GetPlayerAvatarBaseFunc",
-		"\x89\x83\xca\x00\x00\x00\xe8",
-		"xxxxxxx",
-		6,
-		GetPlayerAvatarBaseFunc);
-	
-	GetGameModeIndexPointerJmpBackAddr = HookManager::SetHook(
-		"GetGameModeIndexPointer",
-		"\xc7\x80\x08\x01\x00\x00\x0d\x00\x00\x00\x6a\x00",
-		"xxxxxxxxxxxx",
-		10,
-		GetGameModeIndexPointer);
-	
-	GetSetMatchVariablesJmpBackAddr = HookManager::SetHook(
-		"GetSetMatchVariables",
-		"\xc7\x81\x0c\x02\x00\x00\x00\x00\x00\x00\x8b\xce",
-		"xxxxxxxxxxxx",
-		10,
-		GetSetMatchVariables);
-	
-	MatchStateFightStartJmpBackAddr = HookManager::SetHook(
-		"MatchStateFightStart",
-		"\xc7\x46\x30\x03\x00\x00\x00\xb8",
-		"xxxxxxxx",
-		7,
-		MatchStateFightStart);
-	
-	GetStageSelectAddrJmpBackAddr = HookManager::SetHook(
-		"GetStageSelectAddr",
-		"\xc7\x81\x54\x0f\x00\x00\x00\x00\x00\x00\x8d\x41\x0c",
-		"xxxxxxxxxxxxx",
-		10,
-		GetStageSelectAddr);
-	
-	GetMusicSelectAddrJmpBackAddr = HookManager::SetHook(
-		"GetMusicSelectAddr",
-		"\xc7\x41\x04\x00\x00\x00\x00\x8d\x41\x0c",
-		"xxxxxxxxxx",
-		7,
-		GetMusicSelectAddr);
+	WindowMsgHandlerJmpBackAddr = HookManager::SetHook("WindowMsgHandler", "\x8b\x7d\x0c\x8b\xd9\x83\xfe\x10\x77\x00\x74\x00\x8b\xc6",
+		"xxxxxxxxx?x?xx", 5, PassMsgToImGui);
 
-	GetP1ScreenPosXJmpBackAddr = HookManager::SetHook(
-		"GetP1ScreenPosX",
-		"\x8b\x37\x03\xf2\x51",
-		"xxxxx",
-		5,
-		GetP1ScreenPosX);
+	DenyKeyboardInputFromGameJmpBackAddr = HookManager::SetHook("DenyKeyboardInputFromGame", "\x8d\x46\x28\x50\xff\x15\x00\x00\x00\x00",
+		"xxxxxx????", 10, DenyKeyboardInputFromGame);
+	
+	PacketProcessingFuncJmpBackAddr = HookManager::SetHook("PacketProcessingFunc", "\x8b\x55\xf8\x8d\x7d\xdc\x8b\x02",
+		"xxxxxxxx", 18, PacketProcessingFunc);
+	
+	GetPlayerAvatarBaseAddr = HookManager::SetHook("GetPlayerAvatarBaseFunc", "\x89\x83\xca\x00\x00\x00\xe8",
+		"xxxxxxx", 6, GetPlayerAvatarBaseFunc);
+	
+	GetGameModeIndexPointerJmpBackAddr = HookManager::SetHook("GetGameModeIndexPointer", "\xc7\x80\x08\x01\x00\x00\x0d\x00\x00\x00\x6a\x00",
+		"xxxxxxxxxxxx", 10, GetGameModeIndexPointer);
+	
+	GetMatchVariablesJmpBackAddr = HookManager::SetHook("GetMatchVariables", "\xc7\x81\x0c\x02\x00\x00\x00\x00\x00\x00\x8b\xce",
+		"xxxxxxxxxxxx", 10, GetMatchVariables);
 
-	HookManager::RegisterHook(
-		"GetMoneyAddr",
-		"\xff\x35\x00\x00\x00\x00\x8d\x45\xb4\x68\x00\x00\x00\x00\x50",
-		"xx????xxxx????x",
-		6);
+	MatchIntroStartsPlayingJmpBackAddr = HookManager::SetHook("MatchIntroStartsPlaying", "\x83\xa0\x6c\x62\x40\x00\xfd\x83\x66\x24\xef\x5f\x5e\x33\xc0",
+		"xxxxxxxxxxxxxxx", 7, MatchIntroStartsPlayingFunc);
+	
+	GetStageSelectAddrJmpBackAddr = HookManager::SetHook("GetStageSelectAddr", "\xc7\x81\x54\x0f\x00\x00\x00\x00\x00\x00\x8d\x41\x0c",
+		"xxxxxxxxxxxxx", 10, GetStageSelectAddr);
+	
+	GetMusicSelectAddrJmpBackAddr = HookManager::SetHook("GetMusicSelectAddr", "\xc7\x41\x04\x00\x00\x00\x00\x8d\x41\x0c",
+		"xxxxxxxxxx", 7, GetMusicSelectAddr);
+
+	OverwriteStagesListJmpBackAddr = HookManager::SetHook("OverwriteStagesList", "\x8b\x75\xfc\x8d\x45\xf8",
+		"xxxxxx", 6, OverwriteStagesList);
+
+	GetEntityListAddrJmpBackAddr = HookManager::SetHook("GetEntityListAddr", "\x68\x00\x00\x00\x00\x89\x86\x78\x27\x06\x00",
+		"x????xxxxxx", 11, GetEntityListAddr);
+	entityListSize = HookManager::GetOriginalBytes("GetEntityListAddr", 1, 4);
+	g_gameVals.entityCount = entityListSize / 4;
+
+	GetEntityListDeleteAddrJmpBackAddr = HookManager::SetHook("GetEntityListDeleteAddr", "\x89\xbe\x78\x27\x06\x00\x89\xbe\x7c\x27\x06\x00",
+		"xxxxxx", 6, GetEntityListDeleteAddr);
+
+	GetIsHUDHiddenJmpBackAddr = HookManager::SetHook("GetIsHUDHidden", "\x83\x88\x6c\x62\x40\x00\x04",
+		"xxxxxxx", 7, GetIsHUDHidden);
+
+	GetViewAndProjMatrixesJmpBackAddr = HookManager::SetHook("GetViewAndProjMatrixes", "\xf3\x0f\x11\x45\xe0\xc7\x45\xe4\x00\x00\x80\x3f",
+		"xxxxxxxxxxxx", 12, GetViewAndProjMatrixes);
+
+	GameUpdatePauseJmpBackAddr = HookManager::SetHook("GameUpdatePause", "\xf6\x01\x01\x74\x00\xe8\x00\x00\x00\x00",
+		"xxxx?x????", 5, GameUpdatePause, false);
+	restoredGameUpdatePauseAddr = GameUpdatePauseJmpBackAddr + HookManager::GetBytesFromAddr("GameUpdatePause", 4, 1);
+	HookManager::ActivateHook("GameUpdatePause");
+
+	GetFrameCounterJmpBackAddr = HookManager::SetHook("GetFrameCounter", "\x8b\x06\xff\x46\x0c",
+		"xxxxx", 5, GetFrameCounter);
+
+	GetRoomOneJmpBackAddr = HookManager::SetHook("GetRoomOne", "\x0f\xb7\x06\x50\x8b\xcb",
+		"xxxxxx", 6, GetRoomOne);
+	
+	GetRoomTwoJmpBackAddr = HookManager::SetHook("GetRoomTwo", "\xc7\x87\xf0\x2c\x02\x00\x02\x00\x00\x00\x5f",
+		"xxxxxxxxxxx", 11, GetRoomTwo);
+
+	GetFFAMatchThisPlayerIndexJmpBackAddr = HookManager::SetHook("GetFFAMatchThisPlayerIndex", "\xc7\x83\x04\x07\x00\x00\x00\x00\x00\x00\xc7\x83\xd8\x06\x00\x00\x00\x00\x00\x00",
+		"xxxxxxxxxxxxxxxxxxxx", 10, GetFFAMatchThisPlayerIndex);
+
+	HookManager::RegisterHook("GetMoneyAddr", "\xff\x35\x00\x00\x00\x00\x8d\x45\xb4\x68\x00\x00\x00\x00\x50",
+		"xx????xxxx????x", 6);
 	g_gameVals.pGameMoney = (int*)HookManager::GetBytesFromAddr("GetMoneyAddr", 2, 4);
-
-	placeHooks_palette();
-	CustomGameModeHooks();
 
 	return true;
 }

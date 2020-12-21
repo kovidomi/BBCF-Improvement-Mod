@@ -29,7 +29,7 @@ CreateWindowExW_t orig_CreateWindowExW;
 
 HRESULT __stdcall hook_Direct3DCreate9Ex(UINT sdkVers, IDirect3D9Ex** pD3DEx)
 {
-	LOG(1, "Direct3DCreate9EX pD3DEx: 0x%x\n", pD3DEx);
+	LOG(1, "Direct3DCreate9EX pD3DEx: 0x%p\n", pD3DEx);
 	HRESULT retval = orig_Direct3DCreate9Ex(sdkVers, pD3DEx); // real one
 
 	Direct3D9ExWrapper* ret = new Direct3D9ExWrapper(&*pD3DEx);
@@ -178,25 +178,20 @@ void __declspec(naked)GetSteamUserStats()
 bool WINAPI hook_SteamAPI_Init()
 {
 	LOG(1, "SteamAPI_Init\n");
+
 	bool ret = orig_SteamAPI_Init();
 
-	SteamMatchmakingFuncJmpBackAddr = HookManager::SetHook("SteamMatchmaking",
-		"\xff\x50\x28\x89\x46\x10\x85\xc0", "xxxxxxxx", 6, GetSteamMatchmaking);
+	SteamMatchmakingFuncJmpBackAddr = HookManager::SetHook("SteamMatchmaking", "\xff\x50\x28\x89\x46\x10\x85\xc0", "xxxxxxxx", 6, GetSteamMatchmaking);
 	
-	SteamNetworkingFuncJmpBackAddr = HookManager::SetHook("SteamNetworking",
-		"\xff\x50\x40\x89\x46\x20\x85\xc0", "xxxxxxxx", 6, GetSteamNetworking);
+	SteamNetworkingFuncJmpBackAddr = HookManager::SetHook("SteamNetworking", "\xff\x50\x40\x89\x46\x20\x85\xc0", "xxxxxxxx", 6, GetSteamNetworking);
 	
-	SteamUserFuncJmpBackAddr = HookManager::SetHook("SteamUser",
-		"\xff\x50\x14\x89\x46\x04", "xxxxxx", 6, GetSteamUser);
+	SteamUserFuncJmpBackAddr = HookManager::SetHook("SteamUser", "\xff\x50\x14\x89\x46\x04", "xxxxxx", 6, GetSteamUser);
 	
-	SteamFriendsFuncJmpBackAddr = HookManager::SetHook("SteamFriends",
-		"\xff\x50\x20\x89\x46\x08", "xxxxxx", 6, GetSteamFriends);
+	SteamFriendsFuncJmpBackAddr = HookManager::SetHook("SteamFriends", "\xff\x50\x20\x89\x46\x08", "xxxxxx", 6, GetSteamFriends);
 	
-	SteamUtilsFuncJmpBackAddr = HookManager::SetHook("SteamUtils",
-		"\xff\x50\x24\x89\x46\x0c", "xxxxxx", 6, GetSteamUtils);
+	SteamUtilsFuncJmpBackAddr = HookManager::SetHook("SteamUtils", "\xff\x50\x24\x89\x46\x0c", "xxxxxx", 6, GetSteamUtils);
 	
-	SteamUserStatsFuncJmpBackAddr = HookManager::SetHook("SteamUserStats",
-		"\xff\x50\x34\x89\x46\x14", "xxxxxx", 6, GetSteamUserStats);
+	SteamUserStatsFuncJmpBackAddr = HookManager::SetHook("SteamUserStats", "\xff\x50\x34\x89\x46\x14", "xxxxxx", 6, GetSteamUserStats);
 
 	return ret;
 }
@@ -209,10 +204,10 @@ HWND WINAPI hook_CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR l
 	HWND hWnd = orig_CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 	if (SUCCEEDED(hWnd))
 	{
-		LOG(7, "\tSuccess: 0x%x\n", hWnd);
+		LOG(7, "\tSuccess: 0x%p\n", hWnd);
 		if (counter == 2) // 2nd created window should be the correct one according to process hacker
 		{
-			LOG(2, "Correct window: 0x%x\n", hWnd);
+			LOG(2, "Correct window: 0x%p\n", hWnd);
 			g_gameProc.hWndGameWindow = hWnd;
 		}
 	}
@@ -223,6 +218,7 @@ HWND WINAPI hook_CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR l
 bool placeHooks_detours()
 {
 	LOG(1, "placeHooks_detours\n");
+
 	HMODULE hM_d3d9 = GetModuleHandleA("d3d9.dll");
 	HMODULE hM_d3dx9_43 = GetModuleHandleA("d3dx9_43.dll");
 	HMODULE hM_steam_api = GetModuleHandleA("steam_api.dll");
