@@ -24,20 +24,29 @@ public:
 
 	int GetOnlinePalsStartIndex(CharIndex charIndex);
 	void OverwriteIMPLDataPalName(std::string fileName, IMPL_data_t& palData);
+
+	// Return values:
+	// ret > 0, index found
+	// ret == -1, index not found
+	// ret == -2, charindex out of bound
+	// ret == -3, default palette or no name given
 	int FindCustomPalIndex(CharIndex charIndex, const char* palNameToFind);
-	bool& PaletteArchiveDownloaded();
+	bool PaletteArchiveDownloaded();
 	bool SwitchPalette(CharIndex charIndex, CharPaletteHandle& palHandle, int newCustomPalIndex);
 	void ReplacePaletteFile(const char* newPalData, PaletteFile palFile, CharPaletteHandle& palHandle);
 	void RestoreOrigPal(CharPaletteHandle& palHandle);
 	const char* GetCurPalFileAddr(PaletteFile palFile, CharPaletteHandle& palHandle);
 	const char* GetCustomPalFile(CharIndex charIndex, int palIndex, PaletteFile palFile, CharPaletteHandle& palHandle);
-	int GetCurrentCustomPalIndex(CharPaletteHandle& palHandle);
+	int GetCurrentCustomPalIndex(CharPaletteHandle& palHandle) const;
 	const IMPL_data_t &GetCurrentPalData(CharPaletteHandle& palHandle);
 	void LoadPaletteSettingsFile();
+
 	// Call it ONCE per frame
 	void OnUpdate(CharPaletteHandle& P1, CharPaletteHandle& P2);
+
 	// Call it ONCE upon match start
 	void OnMatchInit(Player& playerOne, Player& playerTwo);
+
 	void OnMatchRematch(Player& playerOne, Player& playerTwo);
 	void OnMatchEnd(CharPaletteHandle& playerOne, CharPaletteHandle& playerTwo);
 
@@ -52,6 +61,8 @@ private:
 	void InitCustomPaletteVector();
 	void LoadPalettesIntoVector(CharIndex charIndex, std::wstring& wFolderPath);
 	void LoadPalettesFromFolder();
+	void LoadImplFile(const std::string& fullPath, const std::string& fileName, CharIndex charIndex);
+	void LoadHplFile(const std::string& fullPath, const std::string& fileName, CharIndex charIndex);
 	void InitPaletteSlotsVector();
 	void InitOnlinePalsIndexVector();
 	void ApplyDefaultCustomPalette(CharIndex charIndex, CharPaletteHandle& charPalHandle);

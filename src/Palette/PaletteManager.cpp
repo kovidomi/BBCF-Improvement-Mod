@@ -1,5 +1,7 @@
 #include "PaletteManager.h"
 
+#include "impl_templates.h"
+
 #include "Core/logger.h"
 #include "Core/utils.h"
 #include "Game/characters.h"
@@ -133,7 +135,7 @@ void PaletteManager::LoadPalettesIntoVector(CharIndex charIndex, std::wstring& w
 		if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
 			std::wstring wSubfolderPath(wFolderPath.c_str());
-			wSubfolderPath.pop_back(); //delete "*" at the end
+			wSubfolderPath.pop_back(); // Delete "*" at the end
 			wSubfolderPath += data.cFileName;
 			wSubfolderPath += L"\\*";
 			LoadPalettesIntoVector(charIndex, wSubfolderPath);
@@ -149,58 +151,160 @@ void PaletteManager::LoadPalettesIntoVector(CharIndex charIndex, std::wstring& w
 		LOG(2, "\tFILE: %s", fileName.c_str());
 		LOG(2, "\t\tFull path: %s\n", fullPath.c_str());
 
-		if (fileName.find(".impl") == std::string::npos)
+		if (fileName.find(IMPL_FILE_EXTENSION) != std::string::npos)
 		{
-			g_imGuiLogger->Log("[error] Unable to open '%s' : not an .impl file\n", fileName.c_str());
-			continue;
+			LoadImplFile(fullPath, fileName, charIndex);
 		}
-
-		IMPL_t fileContents;
-		if(!utils_ReadFile(fullPath.c_str(), &fileContents, sizeof(IMPL_t), true))
+		else if (fileName.find(LEGACY_HPL_FILE_EXTENSION) != std::string::npos)
 		{
-			LOG(2, "\tCouldn't open %s!\n", strerror(errno));
-			g_imGuiLogger->Log("[error] Unable to open '%s' : %s\n", fileName.c_str(), strerror(errno));
-			continue;
-		}
-
-		//check for errors
-		if (strcmp(fileContents.header.fileSig, "IMPL") != 0)
-		{
-			LOG(2, "ERROR, unrecognized file format!\n");
-			g_imGuiLogger->Log("[error] '%s' unrecognized file format!\n", fileName.c_str());
-			continue;
-		}
-
-		if (fileContents.header.dataLen != sizeof(IMPL_data_t))
-		{
-			LOG(2, "ERROR, data size mismatch!\n");
-			g_imGuiLogger->Log("[error] '%s' data size mismatch!\n", fileName.c_str());
-			continue;
-		}
-
-		if (isCharacterIndexOutOfBound(charIndex))
-		{
-			LOG(2, "ERROR, '%s' has invalid character index in the header\n", fileName.c_str());
-			g_imGuiLogger->Log("[error] '%s' has invalid character index in the header\n", fileName.c_str());
-		}
-		else if (charIndex != fileContents.header.charIndex)
-		{
-			LOG(2, "ERROR, '%s' belongs to character %s, but is placed in folder %s\n",
-				fileName.c_str(), getCharacterNameByIndexA(fileContents.header.charIndex).c_str(),
-				getCharacterNameByIndexA(charIndex).c_str());
-
-			g_imGuiLogger->Log("[error] '%s' belongs to character '%s', but is placed in folder '%s'\n", 
-				fileName.c_str(), getCharacterNameByIndexA(fileContents.header.charIndex).c_str(),
-				getCharacterNameByIndexA(charIndex).c_str());
+			LoadHplFile(fullPath, fileName, charIndex);
 		}
 		else
 		{
-			OverwriteIMPLDataPalName(fileName, fileContents.palData);
-			PushImplFileIntoVector(charIndex, fileContents.palData);
+			LOG(2, "Unrecognized file format for '%s'\n", fileName.c_str());
+			g_imGuiLogger->Log("[error] Unable to open '%s' : not an %s file\n", fileName.c_str(), IMPL_FILE_EXTENSION);
 		}
 
 	} while (FindNextFile(hFind, &data));
 	FindClose(hFind);
+}
+
+void PaletteManager::LoadImplFile(const std::string& fullPath, const std::string& fileName, CharIndex charIndex)
+{
+	IMPL_t fileContents;
+
+	if (!utils_ReadFile(fullPath.c_str(), &fileContents, sizeof(fileContents), true))
+	{
+		LOG(2, "\tCouldn't open %s!\n", strerror(errno));
+		g_imGuiLogger->Log("[error] Unable to open '%s' : %s\n", fileName.c_str(), strerror(errno));
+		return;
+	}
+
+	// Check for errors
+	if (strcmp(fileContents.header.fileSig, IMPL_FILESIG) != 0)
+	{
+		LOG(2, "ERROR, unrecognized file format!\n");
+		g_imGuiLogger->Log("[error] '%s' unrecognized file format!\n", fileName.c_str());
+		return;
+	}
+
+	if (fileContents.header.dataLen != sizeof(IMPL_data_t))
+	{
+		LOG(2, "ERROR, data size mismatch!\n");
+		g_imGuiLogger->Log("[error] '%s' data size mismatch!\n", fileName.c_str());
+		return;
+	}
+
+	if (isCharacterIndexOutOfBound(fileContents.header.charIndex))
+	{
+		LOG(2, "ERROR, '%s' has invalid character index in the header\n", fileName.c_str());
+		g_imGuiLogger->Log("[error] '%s' has invalid character index in the header\n", fileName.c_str());
+	}
+	else if (charIndex != fileContents.header.charIndex)
+	{
+		LOG(2, "ERROR, '%s' belongs to character %s, but is placed in folder %s\n",
+			fileName.c_str(), getCharacterNameByIndexA(fileContents.header.charIndex).c_str(),
+			getCharacterNameByIndexA(charIndex).c_str());
+
+		g_imGuiLogger->Log("[error] '%s' belongs to character '%s', but is placed in folder '%s'\n",
+			fileName.c_str(), getCharacterNameByIndexA(fileContents.header.charIndex).c_str(),
+			getCharacterNameByIndexA(charIndex).c_str());
+	}
+	else
+	{
+		OverwriteIMPLDataPalName(fileName, fileContents.palData);
+		PushImplFileIntoVector(charIndex, fileContents.palData);
+	}
+}
+
+void PaletteManager::LoadHplFile(const std::string& fullPath, const std::string& fileName, CharIndex charIndex)
+{
+	if (fileName.find("_effectbloom") != std::string::npos)
+	{
+		std::string palName = fileName.substr(0, fileName.rfind("_effectbloom"));
+
+		int palIndex = FindCustomPalIndex(charIndex, palName.c_str());
+
+		if (palIndex < 0)
+		{
+			LOG(2, "ERROR, '%s' has no custom character palette to match with!\n", fileName.c_str());
+			g_imGuiLogger->Log("[error] '%s' has no custom character palette to match with! Create a character palette named '%s' to load this bloom file on!\n",
+				fileName.c_str(), (palName + ".hpl").c_str());
+			return;
+		}
+
+		m_customPalettes[charIndex][palIndex].hasBloom = true;
+
+		g_imGuiLogger->Log(
+			"[system] %s: Loaded '%s'\n",
+			getCharacterNameByIndexA(charIndex).c_str(),
+			fileName.c_str()
+		);
+
+		return;
+	}
+
+	char fileContents[LEGACY_HPL_HEADER_LEN + LEGACY_HPL_DATALEN];
+
+	if (!utils_ReadFile(fullPath.c_str(), &fileContents, sizeof(fileContents), true))
+	{
+		LOG(2, "\tCouldn't open %s!\n", strerror(errno));
+		g_imGuiLogger->Log("[error] Unable to open '%s' : %s\n", fileName.c_str(), strerror(errno));
+		return;
+	}
+
+	// Effect file:
+	if (fileName.find("_effect0") != std::string::npos)
+	{
+		std::string palName = fileName.substr(0, fileName.rfind("_effect0"));
+
+		int palIndex = FindCustomPalIndex(charIndex, palName.c_str());
+
+		if (palIndex < 0)
+		{
+			LOG(2, "ERROR, '%s' has no custom character palette to match with!\n", fileName.c_str());
+			g_imGuiLogger->Log("[error] '%s' has no custom character palette to match with! Create a character palette named '%s' to load this effect file on!\n",
+				fileName.c_str(), (palName + ".hpl").c_str());
+
+			return;
+		}
+
+		int fileIndex = fileName.find("_effect0");
+		std::string effectIndex = fileName.substr(fileName.find("_effect0") + 7, 2);
+
+		fileIndex = std::stoi(effectIndex);
+
+		if (fileIndex <= 0 || fileIndex > 7)
+		{
+			LOG(2, "ERROR, '%s'has wrong index of effect file!\n", fileName.c_str());
+			g_imGuiLogger->Log("[error] '%s' has wrong index!\n", fileName.c_str());
+			return;
+		}
+
+		IMPL_data_t& implData = m_customPalettes[charIndex][palIndex];
+		char* pImplEffectFile = (char*)&implData.file0 + fileIndex * IMPL_PALETTE_DATALEN;
+
+		memcpy_s(pImplEffectFile, IMPL_PALETTE_DATALEN, (char*)&fileContents + LEGACY_HPL_HEADER_LEN, LEGACY_HPL_DATALEN);
+
+		g_imGuiLogger->Log(
+			"[system] %s: Loaded '%s'\n",
+			getCharacterNameByIndexA(charIndex).c_str(),
+			fileName.c_str()
+		);
+	}
+	else // Palette file
+	{
+		IMPL_t implTemplate;
+
+		// Make a copy of template
+		memcpy_s(&implTemplate, sizeof(IMPL_t), implTemplates[charIndex], sizeof(IMPL_t));
+
+		// Copy .hpl data into impl template
+		memcpy_s(&implTemplate.palData.file0, IMPL_PALETTE_DATALEN, (char*)&fileContents + LEGACY_HPL_HEADER_LEN, LEGACY_HPL_DATALEN);
+
+		OverwriteIMPLDataPalName(fileName, implTemplate.palData);
+		PushImplFileIntoVector(charIndex, implTemplate.palData);
+	}
 }
 
 void PaletteManager::LoadPaletteSettingsFile()
@@ -232,14 +336,14 @@ void PaletteManager::LoadPaletteSettingsFile()
 	{
 		for (int iSlot = 1; iSlot <= MAX_NUM_OF_PAL_SLOTS; iSlot++)
 		{
-			GetPrivateProfileString(getCharacterNameByIndexW(i).c_str(), std::to_wstring(iSlot).c_str(),
-				L"", strBuffer.GetBuffer(MAX_PATH), MAX_PATH, wFullPath.c_str());
-			strBuffer.ReleaseBuffer();
+			GetPrivateProfileString(getCharacterNameByIndexW(i).c_str(), std::to_wstring(iSlot).c_str(), L"",
+				strBuffer.GetBuffer(MAX_PATH), MAX_PATH, wFullPath.c_str());
 
+			strBuffer.ReleaseBuffer();
 			strBuffer.Remove('\"');
 
 			// Delete file extension if found
-			int pos = strBuffer.Find(L".impl", 0);
+			int pos = strBuffer.Find(IMPL_FILE_EXTENSION_W, 0);
 			if(pos >= 0)
 			{ 
 				strBuffer.Delete(pos, strBuffer.StringLength(strBuffer));
@@ -297,10 +401,11 @@ bool PaletteManager::PushImplFileIntoVector(CharIndex charIndex, IMPL_data_t & f
 	m_customPalettes[charIndex].push_back(filledPalData);
 
 	g_imGuiLogger->Log(
-		"[system] %s: Loaded '%s.impl'\n",
+		"[system] %s: Loaded '%s\n",
 		getCharacterNameByIndexA(charIndex).c_str(),
 		filledPalData.palName
 	);
+
 	return true;
 }
 
@@ -308,7 +413,7 @@ bool PaletteManager::WritePaletteToFile(CharIndex charIndex, IMPL_data_t *filled
 {
 	LOG(2, "WritePaletteToFile\n");
 
-	std::string path = std::string("BBCF_IM\\Palettes\\") + getCharacterNameByIndexA(charIndex) + "\\" + filledPalData->palName + ".impl";
+	std::string path = std::string("BBCF_IM\\Palettes\\") + getCharacterNameByIndexA(charIndex) + "\\" + filledPalData->palName + IMPL_FILE_EXTENSION;
 
 	IMPL_t IMPL_file {};
 
@@ -364,12 +469,12 @@ void PaletteManager::OverwriteIMPLDataPalName(std::string fileName, IMPL_data_t 
 	if(pos != std::string::npos)
 		fileName = fileName.substr(pos + 1);
 
-	std::string fileNameWithoutExt = fileName.substr(0, fileName.length() - strlen(".impl"));
+	std::string fileNameWithoutExt = fileName.substr(0, fileName.rfind('.'));
 	memset(palData.palName, 0, IMPL_PALNAME_LENGTH);
 	strncpy(palData.palName, fileNameWithoutExt.c_str(), IMPL_PALNAME_LENGTH - 1);
 }
 
-//return values:
+// Return values:
 // ret > 0, index found
 // ret == -1, index not found
 // ret == -2, charindex out of bound
@@ -395,7 +500,7 @@ int PaletteManager::FindCustomPalIndex(CharIndex charIndex, const char * palName
 	return -1;
 }
 
-bool & PaletteManager::PaletteArchiveDownloaded()
+bool PaletteManager::PaletteArchiveDownloaded()
 {
 	return m_PaletteArchiveDownloaded;
 }
@@ -451,7 +556,7 @@ const char * PaletteManager::GetCustomPalFile(CharIndex charIndex, int palIndex,
 	return ptr;
 }
 
-int PaletteManager::GetCurrentCustomPalIndex(CharPaletteHandle& palHandle)
+int PaletteManager::GetCurrentCustomPalIndex(CharPaletteHandle& palHandle) const
 {
 	return palHandle.GetSelectedCustomPalIndex();
 }
