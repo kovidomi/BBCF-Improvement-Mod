@@ -58,7 +58,9 @@
     <ClCompile Include="src\Core\logger.cpp" />
     <ClCompile Include="src\Core\dllmain.cpp" />
     <ClCompile Include="src\Core\Settings.cpp" />
+    <ClCompile Include="src\Palette\impl_templates.cpp" />
     <ClCompile Include="src\Palette\PaletteManager.cpp" />
+    <ClCompile Include="src\Palette\impl_templates.h" />
     <ClCompile Include="src\SteamApiWrapper\SteamApiHelper.cpp" />
     <ClCompile Include="src\SteamApiWrapper\SteamFriendsWrapper.cpp" />
     <ClCompile Include="src\SteamApiWrapper\SteamMatchmakingWrapper.cpp" />

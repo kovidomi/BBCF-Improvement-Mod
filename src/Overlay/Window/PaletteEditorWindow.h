@@ -45,7 +45,7 @@ private:
 	void CopyToEditorArray(const char* pSrc);
 	void CopyPalFileToEditorArray(PaletteFile palFile, CharPaletteHandle &charPalHandle);
 	void UpdateHighlightArray(int selectedBoxIndex);
-	void CopyPalTextsToTextBoxes(CharPaletteHandle& charPalHandle);
+	void CopyImplDataToEditorFields(CharPaletteHandle& charPalHandle);
 	void ShowGradientPopup();
 	void GenerateGradient(int idx1, int idx2, int color1, int color2);
 
