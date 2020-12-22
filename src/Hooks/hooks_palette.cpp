@@ -55,19 +55,14 @@ void __declspec(naked)ForceBloomOn()
 	{
 		__asm jmp TURN_BLOOM_ON
 	}
-	else
-	{
-		__asm jmp EXIT
-	}
 
 	__asm
 	{
+		popad
+		jmp[restoredForceBloomOffAddr]
 TURN_BLOOM_ON:
 		popad
 		jmp[ForceBloomOnJmpBackAddr]
-EXIT:
-		popad
-		jmp[restoredForceBloomOffAddr]
 	}
 }
 
@@ -261,15 +256,16 @@ void __declspec(naked) GetPalBaseAddresses()
 		mov palPointer, eax
 	}
 
-	switch (counter)
+	if (counter == 0)
 	{
-	case 0:
 		g_interfaces.player1.GetPalHandle().SetPointerBasePal(palPointer);
-		break;
-	case 1:
+	}
+	else if (counter == 1)
+	{
 		g_interfaces.player2.GetPalHandle().SetPointerBasePal(palPointer);
-		break;
-	default:
+	}
+	else
+	{
 		counter = -1;
 	}
 
