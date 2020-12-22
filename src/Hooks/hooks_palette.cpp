@@ -51,7 +51,7 @@ void __declspec(naked)ForceBloomOn()
 		? &g_interfaces.player1.GetPalHandle()
 		: &g_interfaces.player2.GetPalHandle();
 
-	if (pCharHandle->IsPalWithBloom())
+	if (pCharHandle->IsCurrentPalWithBloom())
 	{
 		__asm jmp TURN_BLOOM_ON
 	}

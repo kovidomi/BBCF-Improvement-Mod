@@ -39,7 +39,7 @@ public:
 	bool IsNullPointerPalIndex();
 	int& GetPalIndexRef();
 	int GetOrigPalIndex() const;
-	bool IsPalWithBloom() const;
+	bool IsCurrentPalWithBloom() const;
 
 private:
 	void SetPaletteIndex(int palIndex);

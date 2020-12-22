@@ -1,13 +1,16 @@
 #pragma once
+#define IMPL_FILE_EXTENSION ".impl"
+#define IMPL_FILE_EXTENSION_W L".impl"
+#define IMPL_FILESIG "IMPLCF"
 #define IMPL_PALNAME_LENGTH 32
-#define IMPL_DESC_LENGTH 64
 #define IMPL_CREATOR_LENGTH 32
-#define IMPL_PALETTE_DATALEN 1024 // .hpl datalen
+#define IMPL_DESC_LENGTH 64
+#define IMPL_PALETTE_DATALEN 1024
 #define IMPL_PALETTE_FILES_COUNT 8
 
 struct IMPL_header_t
 {
-	const char fileSig[8] = "IMPL";
+	const char fileSig[8] = IMPL_FILESIG;
 	int headerLen;
 	int dataLen;
 	short charIndex;
@@ -16,9 +19,10 @@ struct IMPL_header_t
 
 struct IMPL_data_t
 {
-	char palName[IMPL_PALNAME_LENGTH];
-	char creator[IMPL_CREATOR_LENGTH];
-	char desc[IMPL_DESC_LENGTH];
+	char palName[IMPL_PALNAME_LENGTH] = {};
+	char creator[IMPL_CREATOR_LENGTH] = {};
+	char desc[IMPL_DESC_LENGTH] = {};
+	bool hasBloom = false;
 	char file0[IMPL_PALETTE_DATALEN];
 	char file1[IMPL_PALETTE_DATALEN];
 	char file2[IMPL_PALETTE_DATALEN];

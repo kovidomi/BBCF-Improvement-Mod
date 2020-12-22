@@ -55,25 +55,14 @@ int CharPaletteHandle::GetOrigPalIndex() const
 	return m_origPalIndex;
 }
 
-bool CharPaletteHandle::IsPalWithBloom() const
-{
-	return m_origPalIndex == BLOOM_PALETTE_INDEX;
-}
-
 bool CharPaletteHandle::IsNullPointerPalBasePtr()
 {
-	if (m_pPalBaseAddr)
-		return false;
-
-	return true;
+	return m_pPalBaseAddr == nullptr;
 }
 
 bool CharPaletteHandle::IsNullPointerPalIndex()
 {
-	if (m_pCurPalIndex)
-		return false;
-
-	return true;
+	return m_pCurPalIndex == nullptr;
 }
 
 int& CharPaletteHandle::GetPalIndexRef()
@@ -90,6 +79,7 @@ void CharPaletteHandle::ReplaceAllPalFiles(IMPL_data_t* newPaletteData)
 	strncpy(m_currentPalData.palName, palName.c_str(), IMPL_PALNAME_LENGTH);
 	strncpy(m_currentPalData.creator, newPaletteData->creator, IMPL_CREATOR_LENGTH);
 	strncpy(m_currentPalData.desc, newPaletteData->desc, IMPL_DESC_LENGTH);
+	m_currentPalData.hasBloom = newPaletteData->hasBloom;
 
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex1);
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex2);
@@ -166,6 +156,12 @@ const IMPL_data_t& CharPaletteHandle::GetCurrentPalData()
 	}
 
 	return m_currentPalData;
+}
+
+bool CharPaletteHandle::IsCurrentPalWithBloom() const
+{
+	return m_origPalIndex == BLOOM_PALETTE_INDEX ||
+		m_currentPalData.hasBloom;
 }
 
 void CharPaletteHandle::ReplacePalArrayInMemory(char* Dst, const void* Src)
