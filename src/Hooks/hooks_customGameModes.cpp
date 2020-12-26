@@ -158,9 +158,14 @@ void __declspec(naked)vampire_HealthModify()
 
 		opponentHealing = (thisPlayerObj->previousHP - newHP) * vampire_healing_percent;
 
-		otherPlayerObj = thisPlayerObj == g_interfaces.player1.GetData()
-			? g_interfaces.player2.GetData()
-			: g_interfaces.player1.GetData();
+		if (thisPlayerObj == g_interfaces.player1.GetData())
+		{
+			otherPlayerObj = g_interfaces.player2.GetData();
+		}
+		else
+		{
+			otherPlayerObj = g_interfaces.player1.GetData();
+		}
 
 		//LOG(2, "Healing: ((previousHP (%d) - newHP (%d)) * vampire_healing(%.3f)) = %d\n", thisPlayerObj->previousHP, newHP, vampire_healing_percent, opponentHealing);
 		//if (thisPlayerObj->previousHP > thisPlayerObj->maxHP)
@@ -284,9 +289,14 @@ void __declspec(naked)exVampire_HealthModify()
 
 		opponentHealing = (thisPlayerObj->previousHP - newHP) * exVampire_healing_percent;
 
-		otherPlayerObj = thisPlayerObj == g_interfaces.player1.GetData()
-			? g_interfaces.player2.GetData()
-			: g_interfaces.player1.GetData();
+		if (thisPlayerObj == g_interfaces.player1.GetData())
+		{
+			otherPlayerObj = g_interfaces.player2.GetData();
+		}
+		else
+		{
+			otherPlayerObj = g_interfaces.player1.GetData();
+		}
 
 		//LOG(2, "Healing: ((previousHP (%d) - newHP (%d)) * exVampire_healing(%.3f)) = %d\n", thisPlayerObj->previousHP, newHP, exVampire_healing_percent, opponentHealing);
 		//if (thisPlayerObj->previousHP > thisPlayerObj->maxHP)
@@ -554,9 +564,14 @@ void __declspec(naked)tugofwar_HealthModify()
 		newHP = thisPlayerObj->previousHP; //we want to do exactly 20% max hp damage
 		newHP -= thisPlayerObj->maxHP / 10;
 
-		otherPlayerObj = thisPlayerObj == g_interfaces.player1.GetData()
-			? g_interfaces.player2.GetData()
-			: g_interfaces.player1.GetData();
+		if (thisPlayerObj == g_interfaces.player1.GetData())
+		{
+			otherPlayerObj = g_interfaces.player2.GetData();
+		}
+		else
+		{
+			otherPlayerObj = g_interfaces.player1.GetData();
+		}
 
 		//heal the other player
 		otherPlayerObj->currentHP += otherPlayerObj->maxHP / 10;

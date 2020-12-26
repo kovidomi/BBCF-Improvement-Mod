@@ -47,9 +47,14 @@ void __declspec(naked)ForceBloomOn()
 		pushad
 	}
 
-	pCharHandle = pCharObj == g_interfaces.player1.GetData()
-		? &g_interfaces.player1.GetPalHandle()
-		: &g_interfaces.player2.GetPalHandle();
+	if (pCharObj == g_interfaces.player1.GetData())
+	{
+		pCharHandle = &g_interfaces.player1.GetPalHandle();
+	}
+	else
+	{
+		pCharHandle = &g_interfaces.player2.GetPalHandle();
+	}
 
 	if (pCharHandle->IsCurrentPalWithBloom())
 	{
