@@ -725,7 +725,12 @@ void PaletteEditorWindow::UpdateHighlightArray(int selectedBoxIndex)
 void PaletteEditorWindow::CopyImplDataToEditorFields(CharPaletteHandle & charPalHandle)
 {
 	IMPL_data_t palData = g_interfaces.pPaletteManager->GetCurrentPalData(charPalHandle);
-	strncpy(palNameBuf, palData.palName, IMPL_PALNAME_LENGTH);
+
+	std::string newPalName = strncmp(palData.palName, "Default", IMPL_PALNAME_LENGTH) == 0
+		? ""
+		: palData.palName;
+
+	strncpy(palNameBuf, newPalName.c_str(), IMPL_PALNAME_LENGTH);
 	strncpy(palDescBuf, palData.desc, IMPL_DESC_LENGTH);
 	strncpy(palCreatorBuf, palData.creator, IMPL_CREATOR_LENGTH);
 	palBoolEffect = palData.hasBloom;

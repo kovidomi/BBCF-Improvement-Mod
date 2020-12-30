@@ -72,15 +72,7 @@ int& CharPaletteHandle::GetPalIndexRef()
 
 void CharPaletteHandle::ReplaceAllPalFiles(IMPL_data_t* newPaletteData)
 {
-	std::string palName = strncmp(newPaletteData->palName, "Default", IMPL_PALNAME_LENGTH) == 0
-		? ""
-		: newPaletteData->palName;
-
-	strncpy(m_currentPalData.palName, palName.c_str(), IMPL_PALNAME_LENGTH);
-	strncpy(m_currentPalData.creator, newPaletteData->creator, IMPL_CREATOR_LENGTH);
-	strncpy(m_currentPalData.desc, newPaletteData->desc, IMPL_DESC_LENGTH);
-	m_currentPalData.hasBloom = newPaletteData->hasBloom;
-
+	SetPaletteInfo(newPaletteData->palName, newPaletteData->creator, newPaletteData->desc, newPaletteData->hasBloom);
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex1);
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex2);
 
@@ -177,7 +169,7 @@ void CharPaletteHandle::ReplaceAllPalFiles(IMPL_data_t* newPaletteData, int palI
 	static const char NULLBLOCK[IMPL_PALETTE_DATALEN]{ 0 };
 
 	// If palname is "Default" then we load the original palette from backup
-	if (strncmp(newPaletteData->palName, "Default", 32) == 0)
+	if (strncmp(newPaletteData->palName, "Default", IMPL_PALNAME_LENGTH) == 0)
 		newPaletteData = &m_origPalBackup;
 
 	for (int i = 0; i < TOTAL_PALETTE_FILES; i++)
@@ -212,6 +204,14 @@ void CharPaletteHandle::RestoreOrigPal()
 	LOG(2, "CharPaletteHandle::RestoreOrigPalette\n");
 
 	ReplaceAllPalFiles(&m_origPalBackup);
+}
+
+void CharPaletteHandle::SetPaletteInfo(const char* palName, const char* creatorName, const char* description, bool hasBloom)
+{
+	strncpy(m_currentPalData.palName, palName, IMPL_PALNAME_LENGTH);
+	strncpy(m_currentPalData.creator, creatorName, IMPL_CREATOR_LENGTH);
+	strncpy(m_currentPalData.desc, description, IMPL_DESC_LENGTH);
+	m_currentPalData.hasBloom = hasBloom;
 }
 
 void CharPaletteHandle::UpdatePalette()

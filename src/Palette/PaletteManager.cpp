@@ -88,25 +88,26 @@ void PaletteManager::ApplyDefaultCustomPalette(CharIndex charIndex, CharPaletteH
 		return;
 
 	const int curPalIndex = charPalHandle.GetOrigPalIndex();
-	const char* palName = m_paletteSlots[charIndex][curPalIndex].c_str();
+	const char* curPalName = m_paletteSlots[charIndex][curPalIndex].c_str();
 
-	if (strcmp(palName, "") == 0 || strcmp(palName, "Default") == 0)
+	if (strncmp(curPalName, "", IMPL_PALNAME_LENGTH) == 0 ||
+		strncmp(curPalName, "Default", IMPL_PALNAME_LENGTH) == 0)
 		return;
 
 	int foundCustomPalIndex = 0;
 
-	if (strcmp(palName, "Random") == 0)
+	if (strncmp(curPalName, "Random", IMPL_PALNAME_LENGTH) == 0)
 	{
 		foundCustomPalIndex = rand() % m_customPalettes[charIndex].size();
 	}
 	else
 	{
-		foundCustomPalIndex = FindCustomPalIndex(charIndex, palName);
+		foundCustomPalIndex = FindCustomPalIndex(charIndex, curPalName);
 	}
 
 	if (foundCustomPalIndex < 0)
 	{
-		g_imGuiLogger->Log("[error] Palette file '%s' cannot be set as default: File not found.\n", palName);
+		g_imGuiLogger->Log("[error] Palette file '%s' cannot be set as default: File not found.\n", curPalName);
 		return;
 	}
 
@@ -181,7 +182,7 @@ void PaletteManager::LoadImplFile(const std::string& fullPath, const std::string
 	}
 
 	// Check for errors
-	if (strcmp(fileContents.header.fileSig, IMPL_FILESIG) != 0)
+	if (strncmp(fileContents.header.fileSig, IMPL_FILESIG, sizeof(fileContents.header.fileSig)) != 0)
 	{
 		LOG(2, "ERROR, unrecognized file format!\n");
 		g_imGuiLogger->Log("[error] '%s' unrecognized file format!\n", fileName.c_str());
@@ -486,12 +487,13 @@ int PaletteManager::FindCustomPalIndex(CharIndex charIndex, const char * palName
 	if (charIndex > getCharactersCount())
 		return -2;
 
-	if (strcmp(palNameToFind, "") == 0 || strcmp(palNameToFind, "Default") == 0)
+	if (strncmp(palNameToFind, "", IMPL_PALNAME_LENGTH) == 0 ||
+		strncmp(palNameToFind, "Default", IMPL_PALNAME_LENGTH) == 0)
 		return -3;
 
 	for (int i = 0; i < m_customPalettes[charIndex].size(); i++)
 	{
-		if (strcmp(palNameToFind, m_customPalettes[charIndex][i].palName) == 0)
+		if (strncmp(palNameToFind, m_customPalettes[charIndex][i].palName, IMPL_PALNAME_LENGTH) == 0)
 		{
 			return i;
 		}

@@ -60,4 +60,5 @@ private:
 	void BackupOrigPal();
 	void RestoreOrigPal();
 	void UpdatePalette();
+	void SetPaletteInfo(const char* palName, const char* creatorName, const char* description, bool hasBloom);
 };
