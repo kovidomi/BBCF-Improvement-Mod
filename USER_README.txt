@@ -6,8 +6,7 @@ What this mod provides
 - Unlocks the game's region restricted multiplayer
 - Adds extra game modes
 - Adds hitbox overlay
-- Create custom palettes and effects
-- Manage and load custom palettes without file modifications
+- Create and load custom palettes and effects without file modifications
 - See each other's custom palettes in online matches
 - Options to improve the performance of the game even further
 - More flexibility to change the graphics options
@@ -74,29 +73,28 @@ Changelog
 - Added "palettes.ini" file for assigning custom palettes to the ingame palette slots
 - Added Highlight mode in the palette editor, to make it easier to find the corresponding colors
 - Added dinput dll chaining to settings.ini to use other dinput8.dll wrappers together with BBCFIM
-- Added toggling visibility of the ingame HUD
-- ??? -reword this- Added Online window with BBCFIM detection
+- Added option to toggle the visibility of the ingame HUD
+- Added "Online window" for BBCFIM detection and quick access to certain features in online games
 - Added gradient generator to the palette editor
 - Added indexing mode to the palette editor
 - Enabled palette editor in Versus mode
 - Palettes are now previewed when hovered over their selections
 - Custom palettes now use a new IMPL file format (.hpl format is still supported)
 - "Drag and drop" of the color boxes now work in the palette editor
-- Players now send custom palettes and other datas to spectators as well
+- Players now send custom palettes and game mode requests to spectators as well
 - All custom game modes are now playable in Training mode as well
-- ??? -reword this-  When spectating BBCFIM will show both player1 and player2 whether they use BBCFIM
 - Custom game modes are applied on spectators as well in online matches
 - Disabled stage selection slider in game modes other than online/training/versus
 - Keyboard inputs are now not being passed to the game while any of BBCFIM's windows are focused
 - BBCFIM windows are now hidden when the Steam overlay is active
 - Detecting other BBCFIM players in online games is now consistent
-- ??? -need more info- Fixed the game with BBCFIM not launching in some cases on Windows 10
 - Removed palette placeholders in palette editor
+- Fixed the game with BBCFIM not launching on Windows 10 in some cases
 - Fixed the title of the main window being always visible
-- Fixed BBCFIM detection mistaking spectators as the opponent player
+- Fixed online BBCFIM detection mistaking spectators as the opponent player
 - Fixed Jubei's stage missing from BBCFIM's stage selection slider
 - Fixed Steroid game mode starting a different game mode
-- Fixed Vampire game mode health draining not working when the timer is set to infinite in Versus mode
+- Fixed Vampire game mode's health draining not working when the timer is set to infinite in Versus mode
 
 31-03-2018 -- version 2.06
 ===============================
