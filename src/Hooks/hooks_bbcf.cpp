@@ -1,7 +1,5 @@
 #include "hooks_bbcf.h"
 
-#include "hooks_steamApiWrapper.h"
-
 #include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/utils.h"
@@ -11,6 +9,7 @@
 #include "Hooks/HookManager.h"
 #include "Network/RoomManager.h"
 #include "Overlay/WindowManager.h"
+#include "SteamApiWrapper/steamApiWrappers.h"
 
 DWORD GetGameStateTitleScreenJmpBackAddr = 0;
 void __declspec(naked)GetGameStateTitleScreen()
@@ -20,12 +19,17 @@ void __declspec(naked)GetGameStateTitleScreen()
 	_asm
 	{
 		pushad
-		add edi, 10Ch
+		add edi, 108h
+		lea ebx, g_gameVals.pGameMode
+		mov[ebx], edi
+
+		add edi, 4h
 		lea ebx, g_gameVals.pGameState
 		mov[ebx], edi
 	}
 
-	placeHooks_steamApiWrapper();
+	InitSteamApiWrappers();
+	InitManagers();
 
 	WindowManager::GetInstance().Initialize(g_gameProc.hWndGameWindow, g_interfaces.pD3D9ExWrapper);
 
@@ -45,12 +49,17 @@ void __declspec(naked)GetGameStateMenuScreen()
 	_asm
 	{
 		pushad
-		add eax, 10Ch
+		add eax, 108h
+		lea ebx, g_gameVals.pGameMode
+		mov[ebx], eax
+
+		add eax, 4h
 		lea ebx, g_gameVals.pGameState
 		mov[ebx], eax
 	}
 
-	placeHooks_steamApiWrapper();
+	InitSteamApiWrappers();
+	InitManagers();
 	
 	WindowManager::GetInstance().Initialize(g_gameProc.hWndGameWindow, g_interfaces.pD3D9ExWrapper);
 
@@ -301,22 +310,6 @@ void __declspec(naked)CpuUsageFix()
 		lea eax, [ebp - 8h]
 		push eax
 		jmp[CpuUsageFixJmpBackAddr]
-	}
-}
-
-DWORD GetGameModeIndexPointerJmpBackAddr = 0;
-void __declspec(naked)GetGameModeIndexPointer()
-{
-	LOG_ASM(2, "GetGameModeIndexPointer\n");
-
-	__asm
-	{
-		push eax
-		add eax, 108h
-		mov[g_gameVals.pGameMode], eax
-		pop eax
-		mov dword ptr[eax + 108h], 0Dh
-		jmp[GetGameModeIndexPointerJmpBackAddr]
 	}
 }
 
@@ -689,9 +682,6 @@ bool placeHooks_bbcf()
 	
 	GetPlayerAvatarBaseAddr = HookManager::SetHook("GetPlayerAvatarBaseFunc", "\x89\x83\xca\x00\x00\x00\xe8",
 		"xxxxxxx", 6, GetPlayerAvatarBaseFunc);
-	
-	GetGameModeIndexPointerJmpBackAddr = HookManager::SetHook("GetGameModeIndexPointer", "\xc7\x80\x08\x01\x00\x00\x0d\x00\x00\x00\x6a\x00",
-		"xxxxxxxxxxxx", 10, GetGameModeIndexPointer);
 	
 	GetMatchVariablesJmpBackAddr = HookManager::SetHook("GetMatchVariables", "\xc7\x81\x0c\x02\x00\x00\x00\x00\x00\x00\x8b\xce",
 		"xxxxxxxxxxxx", 10, GetMatchVariables);

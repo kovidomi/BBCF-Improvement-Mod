@@ -111,4 +111,5 @@ extern gameProc_t g_gameProc;
 extern gameVals_t g_gameVals;
 extern temps_t g_tempVals;
 
+void InitManagers();
 void CleanupInterfaces();
