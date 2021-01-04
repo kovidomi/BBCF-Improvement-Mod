@@ -43,8 +43,7 @@ public:
 
 private:
 	void SetPaletteIndex(int palIndex);
-	void ReplaceAllPalFiles(IMPL_data_t* newPaletteData);
-	void ReplaceSinglePalFile(const char* newPalData, PaletteFile palFile);
+	void ReplacePalData(IMPL_data_t* newPaletteData);
 	void OnMatchInit();
 	void OnMatchRematch();
 	void LockUpdate();
@@ -53,12 +52,14 @@ private:
 	void SetSelectedCustomPalIndex(int index);
 	const char* GetCurPalFileAddr(PaletteFile palFile);
 	const char* GetOrigPalFileAddr(PaletteFile palFile);
+	const IMPL_info_t& GetCurrentPalInfo() const;
 	const IMPL_data_t& GetCurrentPalData();
 	char* GetPalFileAddr(const char* base, int palIdx, int fileIdx);
 	void ReplacePalArrayInMemory(char* Dst, const void* Src);
+	void ReplaceSinglePalFile(const char* newPalData, PaletteFile palFile);
 	void ReplaceAllPalFiles(IMPL_data_t* newPaletteData, int palIdx);
 	void BackupOrigPal();
 	void RestoreOrigPal();
 	void UpdatePalette();
-	void SetPaletteInfo(const char* palName, const char* creatorName, const char* description, bool hasBloom);
+	void SetPaletteInfo(IMPL_info_t* pPalInfo);
 };

@@ -38,7 +38,9 @@ public:
 	const char* GetCurPalFileAddr(PaletteFile palFile, CharPaletteHandle& palHandle);
 	const char* GetCustomPalFile(CharIndex charIndex, int palIndex, PaletteFile palFile, CharPaletteHandle& palHandle);
 	int GetCurrentCustomPalIndex(CharPaletteHandle& palHandle) const;
-	const IMPL_data_t &GetCurrentPalData(CharPaletteHandle& palHandle);
+	const IMPL_info_t& GetCurrentPalInfo(CharPaletteHandle& palHandle) const;
+	const IMPL_data_t& GetCurrentPalData(CharPaletteHandle& palHandle);
+	void SetPaletteInfo(CharPaletteHandle& palHandle, IMPL_info_t& palInfo);
 	void LoadPaletteSettingsFile();
 
 	// Call it ONCE per frame

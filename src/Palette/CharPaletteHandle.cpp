@@ -70,9 +70,9 @@ int& CharPaletteHandle::GetPalIndexRef()
 	return *m_pCurPalIndex;
 }
 
-void CharPaletteHandle::ReplaceAllPalFiles(IMPL_data_t* newPaletteData)
+void CharPaletteHandle::ReplacePalData(IMPL_data_t* newPaletteData)
 {
-	SetPaletteInfo(newPaletteData->palName, newPaletteData->creator, newPaletteData->desc, newPaletteData->hasBloom);
+	SetPaletteInfo(&newPaletteData->palInfo);
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex1);
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex2);
 
@@ -137,6 +137,11 @@ const char* CharPaletteHandle::GetOrigPalFileAddr(PaletteFile palFile)
 	return ret;
 }
 
+const IMPL_info_t& CharPaletteHandle::GetCurrentPalInfo() const
+{
+	return m_currentPalData.palInfo;
+}
+
 const IMPL_data_t& CharPaletteHandle::GetCurrentPalData()
 {
 	for (int i = 0; i < TOTAL_PALETTE_FILES; i++)
@@ -153,7 +158,7 @@ const IMPL_data_t& CharPaletteHandle::GetCurrentPalData()
 bool CharPaletteHandle::IsCurrentPalWithBloom() const
 {
 	return m_origPalIndex == BLOOM_PALETTE_INDEX ||
-		m_currentPalData.hasBloom;
+		m_currentPalData.palInfo.hasBloom;
 }
 
 void CharPaletteHandle::ReplacePalArrayInMemory(char* Dst, const void* Src)
@@ -169,7 +174,7 @@ void CharPaletteHandle::ReplaceAllPalFiles(IMPL_data_t* newPaletteData, int palI
 	static const char NULLBLOCK[IMPL_PALETTE_DATALEN]{ 0 };
 
 	// If palname is "Default" then we load the original palette from backup
-	if (strncmp(newPaletteData->palName, "Default", IMPL_PALNAME_LENGTH) == 0)
+	if (strncmp(newPaletteData->palInfo.palName, "Default", IMPL_PALNAME_LENGTH) == 0)
 		newPaletteData = &m_origPalBackup;
 
 	for (int i = 0; i < TOTAL_PALETTE_FILES; i++)
@@ -203,15 +208,12 @@ void CharPaletteHandle::RestoreOrigPal()
 {
 	LOG(2, "CharPaletteHandle::RestoreOrigPalette\n");
 
-	ReplaceAllPalFiles(&m_origPalBackup);
+	ReplacePalData(&m_origPalBackup);
 }
 
-void CharPaletteHandle::SetPaletteInfo(const char* palName, const char* creatorName, const char* description, bool hasBloom)
+void CharPaletteHandle::SetPaletteInfo(IMPL_info_t* pPalInfo)
 {
-	strncpy(m_currentPalData.palName, palName, IMPL_PALNAME_LENGTH);
-	strncpy(m_currentPalData.creator, creatorName, IMPL_CREATOR_LENGTH);
-	strncpy(m_currentPalData.desc, description, IMPL_DESC_LENGTH);
-	m_currentPalData.hasBloom = hasBloom;
+	memcpy_s(&m_currentPalData.palInfo, sizeof(IMPL_info_t), pPalInfo, sizeof(IMPL_info_t));
 }
 
 void CharPaletteHandle::UpdatePalette()

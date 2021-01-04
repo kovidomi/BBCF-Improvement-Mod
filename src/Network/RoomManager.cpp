@@ -15,7 +15,7 @@ void RoomManager::SendAnnounce()
 {
 	LOG(2, "RoomManager::SendAnnounce\n");
 
-	Packet packet = Packet(nullptr, 0, PacketType_IMID_Announce, GetThisPlayerRoomMemberIndex());
+	Packet packet = Packet(NULL, NULL, PacketType_IMID_Announce, GetThisPlayerRoomMemberIndex());
 
 	// Send to every other player in the room
 	for (int i = 0; i < MAX_PLAYERS_IN_ROOM; i++)
@@ -36,7 +36,7 @@ void RoomManager::SendAcknowledge(Packet* packet)
 	IMPlayer otherPlayer = IMPlayer(packet->roomMemberIndex, packet->steamID, GetPlayerSteamName(packet->steamID));
 	AddIMPlayerToRoom(otherPlayer);
 
-	Packet ackPacket = Packet(nullptr, NULL, PacketType_IMID_Acknowledge, GetThisPlayerRoomMemberIndex());
+	Packet ackPacket = Packet(NULL, NULL, PacketType_IMID_Acknowledge, GetThisPlayerRoomMemberIndex());
 	m_pNetworkManager->SendPacket(&otherPlayer.steamID, &ackPacket);
 }
 

@@ -11,8 +11,8 @@ enum PacketType : uint16_t
 {
 	PacketType_IMID_Announce,
 	PacketType_IMID_Acknowledge,
-	PacketType_Palette,
-	PacketType_Bloom,
+	PacketType_PaletteInfo,
+	PacketType_PaletteData,
 	PacketType_GameMode
 };
 
@@ -36,7 +36,7 @@ struct Packet
 		packetSize = sizeof(Packet) - MAX_DATA_SIZE + dataSize;
 		__packetSize = packetSize;
 
-		if (dataSize && dataSrc)
+		if (dataSrc && dataSize)
 		{
 			memcpy_s(data, MAX_DATA_SIZE, dataSrc, dataSize);
 		}

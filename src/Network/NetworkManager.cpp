@@ -61,10 +61,17 @@ void NetworkManager::RecvPacket(Packet* packet)
 		g_interfaces.pRoomManager->AcceptAcknowledge(packet);
 		break;
 
-	case PacketType_Palette:
+	case PacketType_PaletteInfo:
 		if (g_interfaces.pRoomManager->IsPacketFromSameMatchNonSpectator(packet))
 		{
-			g_interfaces.pOnlinePaletteManager->RecvPalettePacket(packet);
+			g_interfaces.pOnlinePaletteManager->RecvPaletteInfoPacket(packet);
+		}
+		break;
+
+	case PacketType_PaletteData:
+		if (g_interfaces.pRoomManager->IsPacketFromSameMatchNonSpectator(packet))
+		{
+			g_interfaces.pOnlinePaletteManager->RecvPaletteDataPacket(packet);
 		}
 		break;
 

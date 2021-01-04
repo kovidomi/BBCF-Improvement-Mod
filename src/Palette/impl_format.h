@@ -17,12 +17,17 @@ struct IMPL_header_t
 	short RESERVED = 0; // padding
 };
 
-struct IMPL_data_t
+struct IMPL_info_t
 {
 	char palName[IMPL_PALNAME_LENGTH] = {};
 	char creator[IMPL_CREATOR_LENGTH] = {};
 	char desc[IMPL_DESC_LENGTH] = {};
 	bool hasBloom = false;
+};
+
+struct IMPL_data_t
+{
+	IMPL_info_t palInfo = {};
 	char file0[IMPL_PALETTE_DATALEN];
 	char file1[IMPL_PALETTE_DATALEN];
 	char file2[IMPL_PALETTE_DATALEN];

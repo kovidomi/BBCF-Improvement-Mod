@@ -30,43 +30,38 @@ void PaletteEditorWindow::ShowAllPaletteSelections()
 		return;
 	}
 
+	const char* p1BtnText = "Player1";
+	const char* p2BtnText = "Player2";
+	const char* p1PopupID = "select1-1";
+	const char* p2PopupID = "select2-1";
+
 	if (g_interfaces.pRoomManager->IsRoomFunctional())
 	{
 		uint16_t thisPlayerMatchPlayerIndex = g_interfaces.pRoomManager->GetThisPlayerMatchPlayerIndex();
 
-		const ImVec2 spacing = ImVec2(14, 1);
-
 		if (thisPlayerMatchPlayerIndex == 0)
 		{
-			ShowPaletteSelectButton(g_interfaces.player1, "P1_palette", "select1-1");
+			ShowPaletteSelectButton(g_interfaces.player1, p1BtnText, p1PopupID);
 		}
 		else
 		{
-			ImGui::TextUnformatted(" "); ImGui::SameLine(); ImGui::Dummy(spacing); ImGui::SameLine();
-			if (ImGui::Button("P1_palette RESET"))
-			{
-				g_interfaces.pPaletteManager->RestoreOrigPal(g_interfaces.player1.GetPalHandle());
-			}
+			ShowOnlinePaletteResetButton(g_interfaces.player1, thisPlayerMatchPlayerIndex, p1BtnText);
 		}
 
 		if (thisPlayerMatchPlayerIndex == 1)
 		{
-			ShowPaletteSelectButton(g_interfaces.player2, "P2_palette", "select2-1");
+			ShowPaletteSelectButton(g_interfaces.player2, p2BtnText, p2PopupID);
 		}
 		else
 		{
-			ImGui::TextUnformatted(" "); ImGui::SameLine(); ImGui::Dummy(spacing); ImGui::SameLine();
-			if (ImGui::Button("P2_palette RESET"))
-			{
-				g_interfaces.pPaletteManager->RestoreOrigPal(g_interfaces.player2.GetPalHandle());
-			}
+			ShowOnlinePaletteResetButton(g_interfaces.player2, thisPlayerMatchPlayerIndex, p2BtnText);
 		}
 
 		return;
 	}
 
-	ShowPaletteSelectButton(g_interfaces.player1, "P1_palette", "select1-1");
-	ShowPaletteSelectButton(g_interfaces.player2, "P2_palette", "select2-1");
+	ShowPaletteSelectButton(g_interfaces.player1, p1BtnText, p1PopupID);
+	ShowPaletteSelectButton(g_interfaces.player2, p2BtnText, p2PopupID);
 }
 
 void PaletteEditorWindow::ShowReloadAllPalettesButton()
@@ -181,7 +176,7 @@ void PaletteEditorWindow::PaletteSelection()
 	}
 
 	ImGui::SameLine();
-	ImGui::Text(m_customPaletteVector[m_selectedCharIndex][m_selectedPalIndex].palName);
+	ImGui::Text(m_customPaletteVector[m_selectedCharIndex][m_selectedPalIndex].palInfo.palName);
 
 	ShowPaletteSelectPopup(*m_selectedCharPalHandle, m_selectedCharIndex, "select_custom_pal");
 }
@@ -418,10 +413,10 @@ void PaletteEditorWindow::SavePaletteToFile()
 
 		IMPL_data_t curPalData = g_interfaces.pPaletteManager->GetCurrentPalData(*m_selectedCharPalHandle);
 
-		strncpy(curPalData.creator, palCreatorBuf, IMPL_CREATOR_LENGTH);
-		strncpy(curPalData.palName, palNameBuf, IMPL_PALNAME_LENGTH);
-		strncpy(curPalData.desc, palDescBuf, IMPL_DESC_LENGTH);
-		curPalData.hasBloom = palBoolEffect;
+		strncpy(curPalData.palInfo.creator, palCreatorBuf, IMPL_CREATOR_LENGTH);
+		strncpy(curPalData.palInfo.palName, palNameBuf, IMPL_PALNAME_LENGTH);
+		strncpy(curPalData.palInfo.desc, palDescBuf, IMPL_DESC_LENGTH);
+		curPalData.palInfo.hasBloom = palBoolEffect;
 
 		std::string messageText = "'";
 		messageText += filenameTemp.c_str();
@@ -505,11 +500,40 @@ void PaletteEditorWindow::CheckSelectedPalOutOfBound()
 {
 	if (m_selectedPalIndex != 0 && m_selectedPalIndex >= m_customPaletteVector[m_selectedCharIndex].size())
 	{
-		//reset back to default
+		// Reset back to default
 		m_selectedPalIndex = 0;
 		g_interfaces.pPaletteManager->SwitchPalette(m_selectedCharIndex, *m_selectedCharPalHandle, m_selectedPalIndex);
 		CopyPalFileToEditorArray(m_selectedFile, *m_selectedCharPalHandle);
 	}
+}
+
+void PaletteEditorWindow::ShowOnlinePaletteResetButton(Player& playerHandle, uint16_t thisPlayerMatchPlayerIndex, const char* btnText)
+{
+	CharPaletteHandle& charPalHandle = playerHandle.GetPalHandle();
+	CharIndex charIndex = (CharIndex)playerHandle.GetData()->charIndex;
+
+	char buf[16];
+	sprintf_s(buf, "X##%s", btnText);
+
+	ImGui::TextUnformatted(" "); ImGui::SameLine();
+	if (ImGui::Button(buf))
+	{
+		g_interfaces.pPaletteManager->RestoreOrigPal(charPalHandle);
+	}
+
+	HoverTooltip("Reset palette");
+
+	// Dummy button
+	ImGui::Button(btnText);
+
+	HoverTooltip(getCharacterNameByIndexA(charIndex).c_str());
+
+	ImGui::SameLine();
+
+	const IMPL_info_t& palInfo = g_interfaces.pPaletteManager->GetCurrentPalInfo(charPalHandle);
+	ImGui::TextUnformatted(palInfo.palName);
+
+	ShowHoveredPaletteInfoToolTip(palInfo, charIndex, 0);
 }
 
 void PaletteEditorWindow::ShowPaletteSelectButton(Player & playerHandle, const char * btnText, const char * popupID)
@@ -533,8 +557,11 @@ void PaletteEditorWindow::ShowPaletteSelectButton(Player & playerHandle, const c
 
 	HoverTooltip(getCharacterNameByIndexA(playerHandle.GetData()->charIndex).c_str());
 
+	const IMPL_info_t& palInfo = m_customPaletteVector[charIndex][selected_pal_index].palInfo;
+
 	ImGui::SameLine();
-	ImGui::TextUnformatted(m_customPaletteVector[charIndex][selected_pal_index].palName);
+	ImGui::TextUnformatted(palInfo.palName);
+	ShowHoveredPaletteInfoToolTip(palInfo, charIndex, 0);
 
 	ShowPaletteSelectPopup(charPalHandle, charIndex, popupID);
 }
@@ -552,6 +579,8 @@ void PaletteEditorWindow::ShowPaletteSelectPopup(CharPaletteHandle& charPalHandl
 		ImGui::Separator();
 		for (int i = 0; i < m_customPaletteVector[charIndex].size(); i++)
 		{
+			const IMPL_info_t& palInfo = m_customPaletteVector[charIndex][i].palInfo;
+
 			if (i == onlinePalsStartIndex)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Separator, COLOR_ONLINE);
@@ -559,7 +588,7 @@ void PaletteEditorWindow::ShowPaletteSelectPopup(CharPaletteHandle& charPalHandl
 				ImGui::PopStyleColor();
 			}
 
-			if (ImGui::Selectable(m_customPaletteVector[charIndex][i].palName))
+			if (ImGui::Selectable(palInfo.palName))
 			{
 				pressed = true;
 				g_interfaces.pPaletteManager->SwitchPalette(charIndex, charPalHandle, i);
@@ -576,7 +605,7 @@ void PaletteEditorWindow::ShowPaletteSelectPopup(CharPaletteHandle& charPalHandl
 
 				if (g_interfaces.pRoomManager->IsRoomFunctional())
 				{
-					g_interfaces.pOnlinePaletteManager->SendPalettePacket();
+					g_interfaces.pOnlinePaletteManager->SendPalettePackets();
 				}
 			}
 
@@ -585,7 +614,7 @@ void PaletteEditorWindow::ShowPaletteSelectPopup(CharPaletteHandle& charPalHandl
 				hoveredPalIndex = i;
 			}
 
-			ShowHoveredPaletteToolTip(charPalHandle, charIndex, i);
+			ShowHoveredPaletteInfoToolTip(palInfo, charIndex, i);
 		}
 
 		ImGui::EndPopup();
@@ -594,20 +623,21 @@ void PaletteEditorWindow::ShowPaletteSelectPopup(CharPaletteHandle& charPalHandl
 	HandleHoveredPaletteSelection(&charPalHandle, charIndex, hoveredPalIndex, popupID, pressed);
 }
 
-void PaletteEditorWindow::ShowHoveredPaletteToolTip(CharPaletteHandle& charPalHandle, CharIndex charIndex, int palIndex)
+void PaletteEditorWindow::ShowHoveredPaletteInfoToolTip(const IMPL_info_t& palInfo, CharIndex charIndex, int palIndex)
 {
 	if (!ImGui::IsItemHovered())
 	{
 		return;
 	}
 
-	const char* creatorText = m_customPaletteVector[charIndex][palIndex].creator;
-	const char* descText = m_customPaletteVector[charIndex][palIndex].desc;
+	const char* creatorText = palInfo.creator;
+	const char* descText = palInfo.desc;
 	const int creatorLen = strnlen(creatorText, IMPL_CREATOR_LENGTH);
 	const int descLen = strnlen(descText, IMPL_DESC_LENGTH);
 	bool isOnlinePal = palIndex >= g_interfaces.pPaletteManager->GetOnlinePalsStartIndex(charIndex);
+	bool hasBloom = palInfo.hasBloom;
 
-	if (creatorLen || descLen || isOnlinePal)
+	if (creatorLen || descLen || isOnlinePal || hasBloom)
 	{
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(300.0f);
@@ -620,6 +650,9 @@ void PaletteEditorWindow::ShowHoveredPaletteToolTip(CharPaletteHandle& charPalHa
 
 		if (descLen)
 			ImGui::Text("Description: %s", descText);
+
+		if (hasBloom)
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Has bloom effect");
 
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
@@ -684,7 +717,7 @@ void PaletteEditorWindow::ShowPaletteRandomizerButton(const char * btnID, Player
 
 		if (g_interfaces.pRoomManager->IsRoomFunctional())
 		{
-			g_interfaces.pOnlinePaletteManager->SendPalettePacket();
+			g_interfaces.pOnlinePaletteManager->SendPalettePackets();
 		}
 	}
 
@@ -724,16 +757,16 @@ void PaletteEditorWindow::UpdateHighlightArray(int selectedBoxIndex)
 
 void PaletteEditorWindow::CopyImplDataToEditorFields(CharPaletteHandle & charPalHandle)
 {
-	IMPL_data_t palData = g_interfaces.pPaletteManager->GetCurrentPalData(charPalHandle);
+	const IMPL_info_t& palInfo = g_interfaces.pPaletteManager->GetCurrentPalInfo(charPalHandle);
 
-	std::string newPalName = strncmp(palData.palName, "Default", IMPL_PALNAME_LENGTH) == 0
+	std::string newPalName = strncmp(palInfo.palName, "Default", IMPL_PALNAME_LENGTH) == 0
 		? ""
-		: palData.palName;
+		: palInfo.palName;
 
 	strncpy(palNameBuf, newPalName.c_str(), IMPL_PALNAME_LENGTH);
-	strncpy(palDescBuf, palData.desc, IMPL_DESC_LENGTH);
-	strncpy(palCreatorBuf, palData.creator, IMPL_CREATOR_LENGTH);
-	palBoolEffect = palData.hasBloom;
+	strncpy(palDescBuf, palInfo.desc, IMPL_DESC_LENGTH);
+	strncpy(palCreatorBuf, palInfo.creator, IMPL_CREATOR_LENGTH);
+	palBoolEffect = palInfo.hasBloom;
 }
 
 void PaletteEditorWindow::ShowGradientPopup()

@@ -37,9 +37,10 @@ private:
 	void ReloadSavedPalette(const char* palName);
 	bool ShowOverwritePopup(bool *p_open, const wchar_t* wFullPath, const char* filename);
 	void CheckSelectedPalOutOfBound();
+	void ShowOnlinePaletteResetButton(Player& playerHandle, uint16_t thisPlayerMatchPlayerIndex, const char* btnText);
 	void ShowPaletteSelectButton(Player & playerHandle, const char* btnText, const char* popupID);
 	void ShowPaletteSelectPopup(CharPaletteHandle& charPalHandle, CharIndex charIndex, const char* popupID);
-	void ShowHoveredPaletteToolTip(CharPaletteHandle& charPalHandle, CharIndex charIndex, int palIndex);
+	void ShowHoveredPaletteInfoToolTip(const IMPL_info_t& palInfo, CharIndex charIndex, int palIndex);
 	void HandleHoveredPaletteSelection(CharPaletteHandle* charPalHandle, CharIndex charIndex, int palIndex, const char* popupID, bool pressed);
 	void ShowPaletteRandomizerButton(const char * btnID, Player& playerHandle);
 	void CopyToEditorArray(const char* pSrc);

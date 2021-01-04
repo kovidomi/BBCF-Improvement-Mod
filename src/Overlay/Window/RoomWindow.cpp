@@ -50,6 +50,8 @@ void RoomWindow::Draw()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 
+	// stage selection
+
 	DrawGameModeSelection();
 	ImGui::Spacing();
 

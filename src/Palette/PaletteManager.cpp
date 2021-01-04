@@ -234,7 +234,7 @@ void PaletteManager::LoadHplFile(const std::string& fullPath, const std::string&
 			return;
 		}
 
-		m_customPalettes[charIndex][palIndex].hasBloom = true;
+		m_customPalettes[charIndex][palIndex].palInfo.hasBloom = true;
 
 		g_imGuiLogger->Log(
 			"[system] %s: Loaded '%s'\n",
@@ -389,13 +389,13 @@ bool PaletteManager::PushImplFileIntoVector(CharIndex charIndex, IMPL_data_t & f
 		return false;
 	}
 
-	if (FindCustomPalIndex(charIndex, filledPalData.palName) > 0)
+	if (FindCustomPalIndex(charIndex, filledPalData.palInfo.palName) > 0)
 	{
 		g_imGuiLogger->Log(
 			"[error] Custom palette couldn't be loaded: a palette with name '%s' is already loaded.\n",
-			filledPalData.palName
+			filledPalData.palInfo.palName
 		);
-		LOG(2, "ERROR, A custom palette with name '%s' is already loaded.\n", filledPalData.palName);
+		LOG(2, "ERROR, A custom palette with name '%s' is already loaded.\n", filledPalData.palInfo.palName);
 		return false;
 	}
 
@@ -404,7 +404,7 @@ bool PaletteManager::PushImplFileIntoVector(CharIndex charIndex, IMPL_data_t & f
 	g_imGuiLogger->Log(
 		"[system] %s: Loaded '%s\n",
 		getCharacterNameByIndexA(charIndex).c_str(),
-		filledPalData.palName
+		filledPalData.palInfo.palName
 	);
 
 	return true;
@@ -414,7 +414,7 @@ bool PaletteManager::WritePaletteToFile(CharIndex charIndex, IMPL_data_t *filled
 {
 	LOG(2, "WritePaletteToFile\n");
 
-	std::string path = std::string("BBCF_IM\\Palettes\\") + getCharacterNameByIndexA(charIndex) + "\\" + filledPalData->palName + IMPL_FILE_EXTENSION;
+	std::string path = std::string("BBCF_IM\\Palettes\\") + getCharacterNameByIndexA(charIndex) + "\\" + filledPalData->palInfo.palName + IMPL_FILE_EXTENSION;
 
 	IMPL_t IMPL_file {};
 
@@ -471,8 +471,8 @@ void PaletteManager::OverwriteIMPLDataPalName(std::string fileName, IMPL_data_t 
 		fileName = fileName.substr(pos + 1);
 
 	std::string fileNameWithoutExt = fileName.substr(0, fileName.rfind('.'));
-	memset(palData.palName, 0, IMPL_PALNAME_LENGTH);
-	strncpy(palData.palName, fileNameWithoutExt.c_str(), IMPL_PALNAME_LENGTH - 1);
+	memset(palData.palInfo.palName, 0, IMPL_PALNAME_LENGTH);
+	strncpy(palData.palInfo.palName, fileNameWithoutExt.c_str(), IMPL_PALNAME_LENGTH - 1);
 }
 
 // Return values:
@@ -493,7 +493,7 @@ int PaletteManager::FindCustomPalIndex(CharIndex charIndex, const char * palName
 
 	for (int i = 0; i < m_customPalettes[charIndex].size(); i++)
 	{
-		if (strncmp(palNameToFind, m_customPalettes[charIndex][i].palName, IMPL_PALNAME_LENGTH) == 0)
+		if (strncmp(palNameToFind, m_customPalettes[charIndex][i].palInfo.palName, IMPL_PALNAME_LENGTH) == 0)
 		{
 			return i;
 		}
@@ -515,7 +515,7 @@ bool PaletteManager::SwitchPalette(CharIndex charIndex, CharPaletteHandle& palHa
 		return false;
 
 	palHandle.SetSelectedCustomPalIndex(newCustomPalIndex);
-	palHandle.ReplaceAllPalFiles(&m_customPalettes[charIndex][newCustomPalIndex]);
+	palHandle.ReplacePalData(&m_customPalettes[charIndex][newCustomPalIndex]);
 
 	return true;
 }
@@ -563,9 +563,19 @@ int PaletteManager::GetCurrentCustomPalIndex(CharPaletteHandle& palHandle) const
 	return palHandle.GetSelectedCustomPalIndex();
 }
 
+const IMPL_info_t& PaletteManager::GetCurrentPalInfo(CharPaletteHandle& palHandle) const
+{
+	return palHandle.GetCurrentPalInfo();
+}
+
 const IMPL_data_t & PaletteManager::GetCurrentPalData(CharPaletteHandle& palHandle)
 {
 	return palHandle.GetCurrentPalData();
+}
+
+void PaletteManager::SetPaletteInfo(CharPaletteHandle& palHandle, IMPL_info_t& palInfo)
+{
+	palHandle.SetPaletteInfo(&palInfo);
 }
 
 void PaletteManager::OnUpdate(CharPaletteHandle & P1, CharPaletteHandle & P2)

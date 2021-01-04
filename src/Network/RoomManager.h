@@ -51,7 +51,6 @@ public:
 	void SetFFAThisPlayerIndex(int* pFFAThisPlayerIndex);
 	uint16_t GetThisPlayerMatchPlayerIndex() const;
 	uint16_t GetPlayerMatchPlayerIndexByRoomMemberIndex(uint16_t index) const;
-	const char* GetPlayerSteamName(uint64_t steamID) const;
 	const std::string GetRoomTypeName() const;
 	std::vector<IMPlayer> GetIMPlayersInCurrentMatch() const;
 	std::vector<IMPlayer> GetIMPlayersInCurrentRoom() const;
@@ -67,6 +66,7 @@ private:
 	const RoomMemberEntry* GetRoomMemberEntryByIndex(uint16_t index) const;
 	bool IsPlayerInRoom(const IMPlayer& player) const;
 	bool IsThisPlayer(const uint64_t otherSteamID) const;
+	const char* GetPlayerSteamName(uint64_t steamID) const;
 
 	std::vector<IMPlayer> m_imPlayers;
 	CSteamID m_thisPlayerSteamID;
