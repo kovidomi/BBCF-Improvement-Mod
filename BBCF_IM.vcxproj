@@ -31,7 +31,7 @@
     <ClCompile Include="src\Hooks\hooks_customGameModes.cpp" />
     <ClCompile Include="src\Hooks\hooks_detours.cpp" />
     <ClCompile Include="src\Hooks\hooks_palette.cpp" />
-    <ClCompile Include="src\Hooks\hooks_steamApiWrapper.cpp" />
+    <ClCompile Include="src\SteamApiWrapper\steamApiWrappers.cpp" />
     <ClCompile Include="src\Core\interfaces.cpp" />
     <ClCompile Include="src\Core\crashdump.cpp" />
     <ClCompile Include="src\Network\NetworkManager.cpp" />
@@ -100,7 +100,7 @@
     <ClInclude Include="src\Hooks\hooks_customGameModes.h" />
     <ClInclude Include="src\Hooks\hooks_detours.h" />
     <ClInclude Include="src\Hooks\hooks_palette.h" />
-    <ClInclude Include="src\Hooks\hooks_steamApiWrapper.h" />
+    <ClInclude Include="src\SteamApiWrapper\steamApiWrappers.h" />
     <ClInclude Include="src\Game\CharData.h" />
     <ClInclude Include="src\Core\interfaces.h" />
     <ClInclude Include="src\Core\crashdump.h" />

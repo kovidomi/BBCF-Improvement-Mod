@@ -89,7 +89,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Hooks\hooks_detours.cpp" />
-    <ClCompile Include="src\Hooks\hooks_steamApiWrapper.cpp" />
     <ClCompile Include="src\Hooks\hooks_bbcf.cpp" />
     <ClCompile Include="src\D3D9EXWrapper\D3DXMath.cpp">
       <Filter>src\D3D9EXWrapper</Filter>
@@ -131,6 +130,7 @@
     <ClCompile Include="src\Web\url_downloader.cpp" />
     <ClCompile Include="src\Palette\impl_templates.h" />
     <ClCompile Include="src\Palette\impl_templates.cpp" />
+    <ClCompile Include="src\SteamApiWrapper\steamApiWrappers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="depends\imgui\imgui.h" />
@@ -191,7 +191,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="src\Hooks\hooks_detours.h" />
-    <ClInclude Include="src\Hooks\hooks_steamApiWrapper.h" />
     <ClInclude Include="src\Hooks\hooks_bbcf.h" />
     <ClInclude Include="src\D3D9EXWrapper\D3DXMath.h">
       <Filter>include\D3D9ExWrapper</Filter>
@@ -243,6 +242,7 @@
     <ClInclude Include="src\Overlay\Window\RoomWindow.h" />
     <ClInclude Include="src\Overlay\NotificationBar\NotificationBar.h" />
     <ClInclude Include="src\Web\url_downloader.h" />
+    <ClInclude Include="src\SteamApiWrapper\steamApiWrappers.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="export\dinput8.def">

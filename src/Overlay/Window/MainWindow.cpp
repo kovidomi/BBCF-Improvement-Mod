@@ -70,7 +70,6 @@ void MainWindow::Draw()
 	DrawCustomPalettesSection();
 	DrawHitboxOverlaySection();
 	DrawAvatarSection();
-	DrawHudSection();
 	DrawLoadedSettingsValuesSection();
 	DrawUtilButtons();
 	DrawCurrentPlayersCount();
@@ -99,15 +98,6 @@ void MainWindow::DrawCurrentPlayersCount() const
 
 	std::string currentPlayersCount = g_interfaces.pSteamApiHelper ? g_interfaces.pSteamApiHelper->GetCurrentPlayersCountString() : "<No data>";
 	ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "%s", currentPlayersCount.c_str());
-}
-
-void MainWindow::DrawHudSection() const
-{
-	if (!ImGui::CollapsingHeader("HUD"))
-		return;
-
-	ImGui::TextUnformatted(" "); ImGui::SameLine();
-	ImGui::Checkbox("Hide HUD", (bool*)g_gameVals.pIsHUDHidden);
 }
 
 void MainWindow::DrawAvatarSection() const
@@ -281,6 +271,12 @@ void MainWindow::DrawGameplaySettingSection() const
 	else
 	{
 		ImGui::TextDisabled("Stage selection not available");
+	}
+
+	if (*g_gameVals.pGameState == GameState_InMatch)
+	{
+		ImGui::TextUnformatted(" "); ImGui::SameLine();
+		ImGui::Checkbox("Hide HUD", (bool*)g_gameVals.pIsHUDHidden);
 	}
 
 	std::string selectedGameMode = g_interfaces.pGameModeManager->GetCurrentGameModeName();

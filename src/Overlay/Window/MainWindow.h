@@ -20,7 +20,6 @@ private:
 	void DrawCurrentPlayersCount() const;
 	void DrawLinkButtons() const;
 	void DrawLoadedSettingsValuesSection() const;
-	void DrawHudSection() const;
 	void DrawCustomPalettesSection() const;
 	void DrawHitboxOverlaySection() const;
 	void DrawGameplaySettingSection() const;
