@@ -1,6 +1,6 @@
 #pragma once
-#define IMPL_FILE_EXTENSION ".impl"
-#define IMPL_FILE_EXTENSION_W L".impl"
+#define IMPL_FILE_EXTENSION ".cfpl"
+#define IMPL_FILE_EXTENSION_W L".cfpl"
 #define IMPL_FILESIG "IMPLCF"
 #define IMPL_PALNAME_LENGTH 32
 #define IMPL_CREATOR_LENGTH 32

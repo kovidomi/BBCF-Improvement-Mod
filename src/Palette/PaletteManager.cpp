@@ -300,7 +300,7 @@ void PaletteManager::LoadHplFile(const std::string& fullPath, const std::string&
 		// Make a copy of template
 		memcpy_s(&implTemplate, sizeof(IMPL_t), implTemplates[charIndex], sizeof(IMPL_t));
 
-		// Copy .hpl data into impl template
+		// Copy .hpl data into cfpl template
 		memcpy_s(&implTemplate.palData.file0, IMPL_PALETTE_DATALEN, (char*)&fileContents + LEGACY_HPL_HEADER_LEN, LEGACY_HPL_DATALEN);
 
 		OverwriteIMPLDataPalName(fileName, implTemplate.palData);

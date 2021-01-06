@@ -13,10 +13,10 @@ What this mod provides
 - Change avatars and accessories in online rooms/lobbies without going back into menu
 - Freely adjustable ingame currency value
 
-Where to place your custom palette files (.hpl and .impl files)
+Where to place your custom palette files (.hpl and .cfpl files)
 ==========================
 - The palette folders are created in the path "..\BlazBlue Centralfiction\BBCF_IM\Palettes\" upon the first launch of the mod.
-- Place your .hpl or .impl files into the character's corresponding palette folder (at "..\BlazBlue Centralfiction\BBCF_IM\Palettes\") to have the mod automatically load them upon start, and making them selectable ingame via the mod's menu.
+- Place your .hpl or .cfpl files into the character's corresponding palette folder (at "..\BlazBlue Centralfiction\BBCF_IM\Palettes\") to have the mod automatically load them upon start, and making them selectable ingame via the mod's menu.
 - Effect files for the .hpl format must end with the naming convention of "_effectXX.hpl". Where XX is the index of the effect file. 
 For example, if you have a custom palette file named "Nyx_Izanami.hpl", then in the same palette folder a file named "Nyx_Izanami_effect01.hpl" will be loaded as that palette's first effect, and a file named "Nyx_Izanami_effect06.hpl" will be loaded as sixth, etc.
 - A file created with its name ending with "_effectbloom.hpl" will turn on the bloom effect for that custom palette in the game. (Once activated, the bloom effect will keep the color it was first activated on, and can't be changed unless a new round is started)
@@ -79,7 +79,7 @@ Changelog
 - Added indexing mode to the palette editor
 - Enabled palette editor in Versus mode
 - Palettes are now previewed when hovered over their selections
-- Custom palettes now use a new IMPL file format (.hpl format is still supported)
+- Custom palettes now use a new CFPL file format (.hpl format is still supported)
 - "Drag and drop" of the color boxes now work in the palette editor
 - Players now send custom palettes and game mode requests to spectators as well
 - All custom game modes are now playable in Training mode as well
