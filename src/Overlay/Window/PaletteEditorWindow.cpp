@@ -30,8 +30,8 @@ void PaletteEditorWindow::ShowAllPaletteSelections()
 		return;
 	}
 
-	const char* p1BtnText = "Player1";
-	const char* p2BtnText = "Player2";
+	const char* p1BtnText = " Player1 ";
+	const char* p2BtnText = " Player2 ";
 	const char* p1PopupID = "select1-1";
 	const char* p2PopupID = "select2-1";
 
@@ -513,7 +513,7 @@ void PaletteEditorWindow::ShowOnlinePaletteResetButton(Player& playerHandle, uin
 	CharIndex charIndex = (CharIndex)playerHandle.GetData()->charIndex;
 
 	char buf[16];
-	sprintf_s(buf, "X##%s", btnText);
+	sprintf_s(buf, " X ##%s", btnText);
 
 	ImGui::TextUnformatted(" "); ImGui::SameLine();
 	if (ImGui::Button(buf))
@@ -699,7 +699,7 @@ void PaletteEditorWindow::ShowPaletteRandomizerButton(const char * btnID, Player
 {
 	int charIndex = playerHandle.GetData()->charIndex;
 	char buf[16];
-	sprintf_s(buf, "?##%s", btnID);
+	sprintf_s(buf, " ? ##%s", btnID);
 	
 	ImGui::TextUnformatted(" "); ImGui::SameLine();
 	if (ImGui::Button(buf) && m_customPaletteVector[charIndex].size() > 1)
