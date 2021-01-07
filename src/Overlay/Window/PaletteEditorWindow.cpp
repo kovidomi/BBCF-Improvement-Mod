@@ -528,6 +528,7 @@ void PaletteEditorWindow::ShowOnlinePaletteResetButton(Player& playerHandle, uin
 	ImGui::HoverTooltip("Reset palette");
 
 	// Dummy button
+	ImGui::SameLine();
 	ImGui::Button(btnText);
 
 	ImGui::HoverTooltip(getCharacterNameByIndexA(charIndex).c_str());
@@ -725,12 +726,7 @@ void PaletteEditorWindow::ShowPaletteRandomizerButton(const char * btnID, Player
 		}
 	}
 
-	if (ImGui::IsItemHovered())
-	{
-		ImGui::BeginTooltip();
-		ImGui::Text("Random selection");
-		ImGui::EndTooltip();
-	}
+	ImGui::HoverTooltip("Random selection");
 }
 
 void PaletteEditorWindow::CopyToEditorArray(const char * pSrc)
