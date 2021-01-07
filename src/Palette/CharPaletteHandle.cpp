@@ -104,7 +104,7 @@ void CharPaletteHandle::OnMatchInit()
 		: m_switchPalIndex1 + 1;
 
 	// Clear palette info
-	IMPL_info_t palInfo = {};
+	IMPL_info_t palInfo = { "Default" };
 	SetCurrentPalInfo(&palInfo);
 }
 
