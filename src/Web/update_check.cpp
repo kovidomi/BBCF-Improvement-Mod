@@ -2,8 +2,8 @@
 
 #include "url_downloader.h"
 
-#include "Core/logger.h"
 #include "Core/info.h"
+#include "Core/logger.h"
 #include "Overlay/Logger/ImGuiLogger.h"
 #include "Overlay/WindowManager.h"
 
@@ -67,6 +67,9 @@ void CheckUpdate()
 
 void StartAsyncUpdateCheck()
 {
+	if (MOD_FORCE_DISABLE_UPDATE_CHECK)
+		return;
+
 	if (Settings::settingsIni.checkupdates)
 	{
 		CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)CheckUpdate, nullptr, 0, nullptr));
