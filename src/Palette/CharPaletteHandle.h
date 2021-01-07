@@ -53,6 +53,7 @@ private:
 	const char* GetCurPalFileAddr(PaletteFile palFile);
 	const char* GetOrigPalFileAddr(PaletteFile palFile);
 	const IMPL_info_t& GetCurrentPalInfo() const;
+	void SetCurrentPalInfo(IMPL_info_t* pPalInfo);
 	const IMPL_data_t& GetCurrentPalData();
 	char* GetPalFileAddr(const char* base, int palIdx, int fileIdx);
 	void ReplacePalArrayInMemory(char* Dst, const void* Src);
@@ -61,5 +62,4 @@ private:
 	void BackupOrigPal();
 	void RestoreOrigPal();
 	void UpdatePalette();
-	void SetPaletteInfo(IMPL_info_t* pPalInfo);
 };

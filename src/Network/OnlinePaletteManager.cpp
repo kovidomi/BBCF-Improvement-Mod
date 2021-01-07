@@ -54,7 +54,7 @@ void OnlinePaletteManager::RecvPaletteInfoPacket(Packet* packet)
 		return;
 	}
 
-	m_pPaletteManager->SetPaletteInfo(charPalHandle, *(IMPL_info_t*)packet->data);
+	m_pPaletteManager->SetCurrentPalInfo(charPalHandle, *(IMPL_info_t*)packet->data);
 }
 
 void OnlinePaletteManager::ProcessSavedPalettePackets()
@@ -128,7 +128,7 @@ void OnlinePaletteManager::ProcessSavedPaletteInfoPackets()
 
 		CharPaletteHandle& charPalHandle = GetPlayerCharPaletteHandle(palInfo.matchPlayerIndex);
 
-		m_pPaletteManager->SetPaletteInfo(charPalHandle, palInfo.palInfo);
+		m_pPaletteManager->SetCurrentPalInfo(charPalHandle, palInfo.palInfo);
 
 		m_unprocessedPaletteInfos.pop();
 	}

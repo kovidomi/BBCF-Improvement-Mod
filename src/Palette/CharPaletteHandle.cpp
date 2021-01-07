@@ -72,7 +72,7 @@ int& CharPaletteHandle::GetPalIndexRef()
 
 void CharPaletteHandle::ReplacePalData(IMPL_data_t* newPaletteData)
 {
-	SetPaletteInfo(&newPaletteData->palInfo);
+	SetCurrentPalInfo(&newPaletteData->palInfo);
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex1);
 	ReplaceAllPalFiles(newPaletteData, m_switchPalIndex2);
 
@@ -102,6 +102,10 @@ void CharPaletteHandle::OnMatchInit()
 	m_switchPalIndex2 = m_switchPalIndex1 == MAX_PAL_INDEX
 		? m_switchPalIndex1 - 1
 		: m_switchPalIndex1 + 1;
+
+	// Clear palette info
+	IMPL_info_t palInfo = {};
+	SetCurrentPalInfo(&palInfo);
 }
 
 void CharPaletteHandle::OnMatchRematch()
@@ -140,6 +144,11 @@ const char* CharPaletteHandle::GetOrigPalFileAddr(PaletteFile palFile)
 const IMPL_info_t& CharPaletteHandle::GetCurrentPalInfo() const
 {
 	return m_currentPalData.palInfo;
+}
+
+void CharPaletteHandle::SetCurrentPalInfo(IMPL_info_t* pPalInfo)
+{
+	memcpy_s(&m_currentPalData.palInfo, sizeof(IMPL_info_t), pPalInfo, sizeof(IMPL_info_t));
 }
 
 const IMPL_data_t& CharPaletteHandle::GetCurrentPalData()
@@ -209,11 +218,6 @@ void CharPaletteHandle::RestoreOrigPal()
 	LOG(2, "CharPaletteHandle::RestoreOrigPalette\n");
 
 	ReplacePalData(&m_origPalBackup);
-}
-
-void CharPaletteHandle::SetPaletteInfo(IMPL_info_t* pPalInfo)
-{
-	memcpy_s(&m_currentPalData.palInfo, sizeof(IMPL_info_t), pPalInfo, sizeof(IMPL_info_t));
 }
 
 void CharPaletteHandle::UpdatePalette()

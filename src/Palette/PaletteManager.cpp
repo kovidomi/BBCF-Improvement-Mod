@@ -573,9 +573,9 @@ const IMPL_data_t & PaletteManager::GetCurrentPalData(CharPaletteHandle& palHand
 	return palHandle.GetCurrentPalData();
 }
 
-void PaletteManager::SetPaletteInfo(CharPaletteHandle& palHandle, IMPL_info_t& palInfo)
+void PaletteManager::SetCurrentPalInfo(CharPaletteHandle& palHandle, IMPL_info_t& palInfo)
 {
-	palHandle.SetPaletteInfo(&palInfo);
+	palHandle.SetCurrentPalInfo(&palInfo);
 }
 
 void PaletteManager::OnUpdate(CharPaletteHandle & P1, CharPaletteHandle & P2)
