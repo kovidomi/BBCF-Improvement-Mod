@@ -71,38 +71,6 @@ TURN_BLOOM_ON:
 	}
 }
 
-DWORD GetCPUsPaletteIndexArcadeJmpBackAddr = 0;
-void __declspec(naked)GetCPUsPaletteIndexArcade()
-{
-	static int* pPalIndex = nullptr;
-
-	LOG_ASM(2, "GetCPUsPaletteIndexArcade\n");
-
-	__asm
-	{
-		pushad
-		mov ebx, edi
-		add ebx, 1650h
-		mov pPalIndex, ebx
-	}
-
-	if (g_gameVals.isP1CPU)
-	{
-		g_interfaces.player1.GetPalHandle().SetPointerPalIndex(pPalIndex);
-	}
-	else
-	{
-		g_interfaces.player2.GetPalHandle().SetPointerPalIndex(pPalIndex);
-	}
-
-	__asm
-	{
-		popad
-		mov[edi + 1648h], eax
-		jmp[GetCPUsPaletteIndexArcadeJmpBackAddr]
-	}
-}
-
 DWORD GetIsP1CPUJmpBackAddr = 0;
 void __declspec(naked)GetIsP1CPU()
 {
@@ -121,128 +89,12 @@ void __declspec(naked)GetGameStateCharacterSelect()
 {
 	LOG_ASM(2, "GetGameStateCharacterSelect\n");
 
-	// Add logging
+	//
 
 	__asm
 	{
 		mov dword ptr[ebx + 10Ch], 6
 		jmp[GetGameStateCharacterSelectJmpBackAddr]
-	}
-}
-
-DWORD GetPlayersPaletteIndexSPJmpBackAddr = 0;
-void __declspec(naked) GetPlayersPaletteIndexSPPointer()
-{
-	static int* pPalIndex = nullptr;
-
-	LOG_ASM(2, "GetPlayersPaletteIndexSPPointer\n");
-
-	__asm
-	{
-		pushad
-
-		mov eax, edi
-		add eax, 1650h
-		mov pPalIndex, eax
-	}
-
-	if (g_gameVals.isP1CPU || !g_interfaces.player1.GetPalHandle().IsNullPointerPalIndex())
-	{
-		g_interfaces.player2.GetPalHandle().SetPointerPalIndex(pPalIndex);
-	}
-	else
-	{
-		g_interfaces.player1.GetPalHandle().SetPointerPalIndex(pPalIndex);
-	}
-
-	__asm
-	{
-		popad
-		mov[edi + 1650h], eax
-		jmp[GetPlayersPaletteIndexSPJmpBackAddr]
-	}
-}
-
-DWORD GetCPUsPaletteIndexSPJmpBackAddr = 0;
-void __declspec(naked) GetCPUsPaletteIndexSPPointer()
-{
-	static int* pPalIndex = nullptr;
-
-	LOG_ASM(2, "GetCPUsPaletteIndexSPPointer\n");
-
-	__asm
-	{
-		pushad
-		mov eax, esi
-		add eax, 1650h
-		mov pPalIndex, eax
-	}
-
-	if (g_gameVals.isP1CPU)
-	{
-		g_interfaces.player1.GetPalHandle().SetPointerPalIndex(pPalIndex);
-	}
-	else
-	{
-		g_interfaces.player2.GetPalHandle().SetPointerPalIndex(pPalIndex);
-	}
-
-	__asm {
-		popad
-		mov[esi + 1650h], eax
-		jmp[GetCPUsPaletteIndexSPJmpBackAddr]
-	}
-}
-
-DWORD P1PaletteIndexMPJmpBackAddr = 0;
-void __declspec(naked) GetP1PaletteIndexMPPointer()
-{
-	static int* pPalIndex = nullptr;
-
-	LOG_ASM(2, "GetP1PaletteIndexMPPointer\n");
-
-	__asm
-	{
-		pushad
-		add eax, 8
-		mov pPalIndex, eax
-	}
-	
-	g_interfaces.player1.GetPalHandle().SetPointerPalIndex(pPalIndex);
-
-	__asm
-	{
-		popad
-		//..
-		mov[eax + 8], ecx //orig
-		movzx esi, byte ptr[ebx + 000003A8h]
-		jmp[P1PaletteIndexMPJmpBackAddr] //jump back
-	}
-}
-
-DWORD P2PaletteIndexMPJmpBackAddr = 0;
-void __declspec(naked) GetP2PaletteIndexMPPointer()
-{
-	static int* pPalIndex = nullptr;
-
-	LOG_ASM(2, "GetP2PaletteIndexMPPointer\n");
-
-	__asm
-	{
-		pushad
-		add eax, 8
-		mov pPalIndex, eax
-	}
-
-	g_interfaces.player2.GetPalHandle().SetPointerPalIndex(pPalIndex);
-
-	__asm
-	{
-		popad
-		//..
-		mov[eax + 8], ecx
-		movzx esi, byte ptr[ebx + 00000414h]
-		jmp[P2PaletteIndexMPJmpBackAddr]
 	}
 }
 
@@ -285,6 +137,40 @@ void __declspec(naked) GetPalBaseAddresses()
 	}
 }
 
+DWORD GetPaletteIndexPointersJmpBackAddr = 0;
+void __declspec(naked) GetPaletteIndexPointers()
+{
+	static int* pPalIndex = nullptr;
+
+	LOG_ASM(2, "GetPaletteIndexPointers\n");
+
+	__asm
+	{
+		pushad
+		add esi, 8h
+		mov pPalIndex, esi
+	}
+
+	LOG_ASM(2, "\t- P1 palIndex: 0x%p\n", pPalIndex);
+	g_interfaces.player1.GetPalHandle().SetPointerPalIndex(pPalIndex);
+
+	__asm
+	{
+		add esi, 20h
+		mov pPalIndex, esi
+	}
+
+	LOG_ASM(2, "\t- P2 palIndex: 0x%p\n", pPalIndex);
+	g_interfaces.player2.GetPalHandle().SetPointerPalIndex(pPalIndex);
+
+	__asm
+	{
+		popad
+		lea edi, [edx + 24D8h]
+		jmp[GetPaletteIndexPointersJmpBackAddr]
+	}
+}
+
 bool placeHooks_palette()
 {
 	GetCharObjPointersJmpBackAddr = HookManager::SetHook("GetCharObjPointers", "\x89\xb4\xb8\xe8\x25\x00\x00\x8b\x45\xfc",
@@ -293,20 +179,8 @@ bool placeHooks_palette()
 	GetPalBaseAddressesJmpBackAddr = HookManager::SetHook("GetPalBaseAddresses", "\x89\x81\x30\x08\x00\x00\x8b\xc8\xe8\x00\x00\x00\x00\x5f",
 		"xxxxxxxxx????x", 6, GetPalBaseAddresses);
 
-	GetPlayersPaletteIndexSPJmpBackAddr = HookManager::SetHook("GetPlayersPaletteIndexSPPointerFunc", "\x89\x87\x50\x16\x00\x00\x8b\x83\x48\x06\x00\x00",
-		"xxxxxxxxxxxx", 6, GetPlayersPaletteIndexSPPointer);
-
-	GetCPUsPaletteIndexSPJmpBackAddr = HookManager::SetHook("GetCPUsPaletteIndexSPPointerFunc", "\x89\x86\x50\x16\x00\x00\x8b\x84\x0a\x48\x06\x00\x00",
-		"xxxxxxxxxxxxx", 6, GetCPUsPaletteIndexSPPointer);
-
-	GetCPUsPaletteIndexArcadeJmpBackAddr = HookManager::SetHook("GetCPUsPaletteIndexArcade","\x89\x87\x48\x16\x00\x00\xc7\x87\x50\x16\x00\x00\x00\x00\x00\x00",
-		"xxxxxxxxxxxxxxxx", 6, GetCPUsPaletteIndexArcade);
-
-	P1PaletteIndexMPJmpBackAddr = HookManager::SetHook("P1PaletteIndexMPPointerFunc", "\x89\x48\x08\x0f\xb6\xb3\xa8\x03\x00\x00\x6a\x00",
-		"xxxxxxxxxxxx", 10, GetP1PaletteIndexMPPointer);
-
-	P2PaletteIndexMPJmpBackAddr = HookManager::SetHook("P2PaletteIndexMPPointerFunc", "\x89\x48\x08\x0f\xb6\xb3\x14\x04\x00\x00\x6a\x01",
-		"xxxxxxxxxxxx", 10, GetP2PaletteIndexMPPointer);
+	GetPaletteIndexPointersJmpBackAddr = HookManager::SetHook("GetPaletteIndexPointers", "\x8d\xba\xd8\x24\x00\x00\xb9\x00\x00\x00\x00",
+		"xxxxxxx????", 6, GetPaletteIndexPointers);
 
 	GetGameStateCharacterSelectJmpBackAddr = HookManager::SetHook("GetGameStateCharacterSelect", "\xc7\x83\x0c\x01\x00\x00\x06\x00\x00\x00\xe8",
 		"xxxxxxxxxxx", 10, GetGameStateCharacterSelect);
