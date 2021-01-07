@@ -211,6 +211,8 @@ void CharPaletteHandle::BackupOrigPal()
 		memcpy(pDst, pSrc, IMPL_PALETTE_DATALEN);
 		pDst += IMPL_PALETTE_DATALEN;
 	}
+
+	strncpy(m_origPalBackup.palInfo.palName, "Default", IMPL_PALNAME_LENGTH);
 }
 
 void CharPaletteHandle::RestoreOrigPal()
