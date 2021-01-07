@@ -235,6 +235,23 @@ std::vector<IMPlayer> RoomManager::GetIMPlayersInCurrentRoom() const
 	return currentRoomIMPlayers;
 }
 
+std::vector<const RoomMemberEntry*> RoomManager::GetOtherRoomMemberEntriesInCurrentMatch() const
+{
+	std::vector<const RoomMemberEntry*> currentMatchRoomMembers;
+
+	for (int i = 0; i < MAX_PLAYERS_IN_ROOM; i++)
+	{
+		const RoomMemberEntry* pRoomMemberEntry = GetRoomMemberEntryByIndex(i);
+
+		if (pRoomMemberEntry && !IsThisPlayer(pRoomMemberEntry->steamId))
+		{
+			currentMatchRoomMembers.push_back(pRoomMemberEntry);
+		}
+	}
+
+	return currentMatchRoomMembers;
+}
+
 void RoomManager::AddIMPlayerToRoom(const IMPlayer& imPlayer)
 {
 	m_imPlayers[imPlayer.roomMemberIndex] = imPlayer;

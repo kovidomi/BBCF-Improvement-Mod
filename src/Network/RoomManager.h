@@ -54,6 +54,7 @@ public:
 	const std::string GetRoomTypeName() const;
 	std::vector<IMPlayer> GetIMPlayersInCurrentMatch() const;
 	std::vector<IMPlayer> GetIMPlayersInCurrentRoom() const;
+	std::vector<const RoomMemberEntry*> GetOtherRoomMemberEntriesInCurrentMatch() const;
 
 private:
 	void SendAnnounce();

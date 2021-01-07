@@ -39,6 +39,12 @@ void MatchState::OnMatchInit()
 
 		// Activate settled game mode
 		g_interfaces.pOnlineGameModeManager->OnMatchInit();
+
+		// Add players to steam's "recent games" list
+		for (const RoomMemberEntry* player : g_interfaces.pRoomManager->GetOtherRoomMemberEntriesInCurrentMatch())
+		{
+			g_interfaces.pSteamFriendsWrapper->SetPlayedWith(CSteamID(player->steamId));
+		}
 	}
 
 	g_gameVals.isFrameFrozen = false;
