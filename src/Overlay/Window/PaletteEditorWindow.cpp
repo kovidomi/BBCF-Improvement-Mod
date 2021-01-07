@@ -277,14 +277,18 @@ void PaletteEditorWindow::ShowPaletteBoxes()
 
 		bool pressed = false;
 		int curColorBoxOffset = (i * sizeof(int));
+		int idx = m_showIndexes ? i + 1 : 0;
 
 		if (m_highlightMode)
 		{
-			pressed = ImGui::ColorButtonOn32Bit("##PalColorButton", (unsigned char*)m_paletteEditorArray + curColorBoxOffset, m_colorEditFlags);
+			ImGui::ColorButtonOn32Bit("##PalColorButton", idx, (unsigned char*)m_paletteEditorArray + curColorBoxOffset, m_colorEditFlags);
+
+			if (ImGui::IsItemHovered())
+				pressed = true;
 		}
 		else
 		{
-			pressed = ImGui::ColorEdit4On32Bit("##PalColorEdit", (unsigned char*)m_paletteEditorArray + curColorBoxOffset, m_colorEditFlags);
+			pressed = ImGui::ColorEdit4On32Bit("##PalColorEdit", idx, (unsigned char*)m_paletteEditorArray + curColorBoxOffset, m_colorEditFlags);
 		}
 
 		if (pressed)
@@ -301,7 +305,7 @@ void PaletteEditorWindow::ShowPaletteBoxes()
 
 		if (col < COLUMNS)
 		{
-			//continue the row
+			// Continue the row
 			ImGui::SameLine();
 			col++;
 		}
@@ -345,7 +349,7 @@ void PaletteEditorWindow::SavePaletteToFile()
 
 
 	ImGui::Checkbox("Save with bloom effect", &palBoolEffect);
-	HoverTooltip("Bloom effects cannot be changed until a new round is started");
+	ImGui::HoverTooltip("Bloom effects cannot be changed until a new round is started");
 	ImGui::Spacing();
 
 	ImGui::Text("Palette name:");
@@ -521,12 +525,12 @@ void PaletteEditorWindow::ShowOnlinePaletteResetButton(Player& playerHandle, uin
 		g_interfaces.pPaletteManager->RestoreOrigPal(charPalHandle);
 	}
 
-	HoverTooltip("Reset palette");
+	ImGui::HoverTooltip("Reset palette");
 
 	// Dummy button
 	ImGui::Button(btnText);
 
-	HoverTooltip(getCharacterNameByIndexA(charIndex).c_str());
+	ImGui::HoverTooltip(getCharacterNameByIndexA(charIndex).c_str());
 
 	ImGui::SameLine();
 
@@ -555,7 +559,7 @@ void PaletteEditorWindow::ShowPaletteSelectButton(Player & playerHandle, const c
 		ImGui::OpenPopup(popupID);
 	}
 
-	HoverTooltip(getCharacterNameByIndexA(playerHandle.GetData()->charIndex).c_str());
+	ImGui::HoverTooltip(getCharacterNameByIndexA(playerHandle.GetData()->charIndex).c_str());
 
 	const IMPL_info_t& palInfo = m_customPaletteVector[charIndex][selected_pal_index].palInfo;
 
@@ -791,8 +795,8 @@ void PaletteEditorWindow::ShowGradientPopup()
 		static int color2 = 0xFFFFFFFF;
 		int alpha_flag = m_colorEditFlags & ImGuiColorEditFlags_NoAlpha;
 
-		ImGui::ColorEdit4On32Bit("Start color", (unsigned char*)&color1, alpha_flag);
-		ImGui::ColorEdit4On32Bit("End color", (unsigned char*)&color2, alpha_flag);
+		ImGui::ColorEdit4On32Bit("Start color", NULL,(unsigned char*)&color1, alpha_flag);
+		ImGui::ColorEdit4On32Bit("End color", NULL, (unsigned char*)&color2, alpha_flag);
 
 		if (ImGui::Button("Swap colors"))
 		{

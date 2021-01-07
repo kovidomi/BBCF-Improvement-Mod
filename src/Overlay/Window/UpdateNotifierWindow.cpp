@@ -13,19 +13,19 @@ void UpdateNotifierWindow::BeforeDraw()
 
 void UpdateNotifierWindow::Draw()
 {
-	TextAlignedHorizontalCenter("BBCF Improvement Mod %s has been released!", GetNewVersionNum().c_str());
+	ImGui::TextAlignedHorizontalCenter("BBCF Improvement Mod %s has been released!", GetNewVersionNum().c_str());
 	ImGui::Spacing();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 7));
 
 	const ImVec2 buttonSize = ImVec2(120, 23);
-	AlignItemHorizontalCenter(buttonSize.x);
-	if (ButtonUrl("Download", MOD_LINK_FORUM, buttonSize))
+	ImGui::AlignItemHorizontalCenter(buttonSize.x);
+	if (ImGui::ButtonUrl("Download", MOD_LINK_FORUM, buttonSize))
 	{
 		Close();
 	}
 
-	AlignItemHorizontalCenter(buttonSize.x);
+	ImGui::AlignItemHorizontalCenter(buttonSize.x);
 	if (ImGui::Button("Remind me later", buttonSize))
 	{
 		Close();

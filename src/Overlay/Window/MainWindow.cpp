@@ -185,13 +185,13 @@ void MainWindow::DrawHitboxOverlaySection() const
 		{
 			ImGui::TextUnformatted(" "); ImGui::SameLine();
 			ImGui::Checkbox("Player1", &m_pWindowContainer->GetWindow<HitboxOverlay>(WindowType_HitboxOverlay)->drawCharacterHitbox[0]);
-			HoverTooltip(getCharacterNameByIndexA(g_interfaces.player1.GetData()->charIndex).c_str());
+			ImGui::HoverTooltip(getCharacterNameByIndexA(g_interfaces.player1.GetData()->charIndex).c_str());
 			ImGui::SameLine(); ImGui::TextUnformatted(" "); ImGui::SameLine();
 			ImGui::TextUnformatted(g_interfaces.player1.GetData()->currentAction);
 
 			ImGui::TextUnformatted(" "); ImGui::SameLine();
 			ImGui::Checkbox("Player2", &m_pWindowContainer->GetWindow<HitboxOverlay>(WindowType_HitboxOverlay)->drawCharacterHitbox[1]);
-			HoverTooltip(getCharacterNameByIndexA(g_interfaces.player2.GetData()->charIndex).c_str());
+			ImGui::HoverTooltip(getCharacterNameByIndexA(g_interfaces.player2.GetData()->charIndex).c_str());
 			ImGui::SameLine(); ImGui::TextUnformatted(" "); ImGui::SameLine();
 			ImGui::TextUnformatted(g_interfaces.player2.GetData()->currentAction);
 		}
@@ -324,13 +324,13 @@ void MainWindow::DrawGameplaySettingSection() const
 
 void MainWindow::DrawLinkButtons() const
 {
-	ButtonUrl("Discord", MOD_LINK_DISCORD, BTN_SIZE);
+	ImGui::ButtonUrl("Discord", MOD_LINK_DISCORD, BTN_SIZE);
 
 	ImGui::SameLine();
-	ButtonUrl("Forum", MOD_LINK_FORUM, BTN_SIZE);
+	ImGui::ButtonUrl("Forum", MOD_LINK_FORUM, BTN_SIZE);
 
 	ImGui::SameLine();
-	ButtonUrl("GitHub", MOD_LINK_GITHUB, BTN_SIZE);
+	ImGui::ButtonUrl("GitHub", MOD_LINK_GITHUB, BTN_SIZE);
 }
 
 void MainWindow::DrawLoadedSettingsValuesSection() const
