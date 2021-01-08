@@ -88,6 +88,7 @@ Changelog
 - Keyboard inputs are now not being passed to the game while any of BBCFIM's windows are focused
 - BBCFIM windows are now hidden when the Steam overlay is active
 - Detecting other BBCFIM players in online games is now consistent
+- Players you play online games with are now added to Steam's "Recent games" list
 - Removed palette placeholders in palette editor
 - Fixed the game with BBCFIM not launching on Windows 10 in some cases
 - Fixed the title of the main window being always visible
