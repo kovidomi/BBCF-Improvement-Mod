@@ -402,9 +402,10 @@ bool PaletteManager::PushImplFileIntoVector(CharIndex charIndex, IMPL_data_t & f
 	m_customPalettes[charIndex].push_back(filledPalData);
 
 	g_imGuiLogger->Log(
-		"[system] %s: Loaded '%s\n",
+		"[system] %s: Loaded '%s%s'\n",
 		getCharacterNameByIndexA(charIndex).c_str(),
-		filledPalData.palInfo.palName
+		filledPalData.palInfo.palName,
+		IMPL_FILE_EXTENSION
 	);
 
 	return true;
