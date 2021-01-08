@@ -131,6 +131,17 @@ void ImGui::AlignItemHorizontalCenter(float itemWidth)
 	SetCursorPosX(GetWindowSize().x / 2 - (itemWidth / 2));
 }
 
+void ImGui::Spacing(ImVec2& size)
+{
+	ImGuiWindow* window = GetCurrentWindow();
+	if (window->SkipItems)
+		return;
+
+	PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+	ItemSize(size);
+	PopStyleVar();
+}
+
 void ImGui::VerticalSpacing(float height)
 {
 	ImGuiWindow* window = GetCurrentWindow();
@@ -140,6 +151,19 @@ void ImGui::VerticalSpacing(float height)
 	PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 	ItemSize(ImVec2(0, height));
 	PopStyleVar();
+}
+
+void ImGui::HorizontalSpacing(float width)
+{
+	ImGuiWindow* window = GetCurrentWindow();
+	if (window->SkipItems)
+		return;
+
+	PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+	ItemSize(ImVec2(width, 0));
+	PopStyleVar();
+
+	SameLine();
 }
 
 bool ImGui::SliderByte(const char* label, unsigned char* v, unsigned char v_min, unsigned char v_max, const char* display_format)

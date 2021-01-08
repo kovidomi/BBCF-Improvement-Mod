@@ -10,7 +10,9 @@ namespace ImGui
 	IMGUI_API void TextAlignedHorizontalCenter(const char* text, ...);
 	IMGUI_API void TextColoredAlignedHorizontalCenter(const ImVec4 color, const char* text);
 	IMGUI_API void AlignItemHorizontalCenter(float itemWidth);
-	IMGUI_API void VerticalSpacing(float height);
+	IMGUI_API void Spacing(ImVec2& size);
+	IMGUI_API void VerticalSpacing(float height = 1);
+	IMGUI_API void HorizontalSpacing(float width = 1);
 
 	IMGUI_API bool SliderByte(const char* label, unsigned char* v, unsigned char v_min, unsigned char v_max, const char* display_format = "%.0f");
 	IMGUI_API bool DragByte(const char* label, unsigned char* v, float v_speed, unsigned char v_min, unsigned char v_max, const char* display_format = "%.0f");

@@ -3,6 +3,7 @@
 #include "Core/interfaces.h"
 #include "Core/utils.h"
 #include "Game/gamestates.h"
+#include "Overlay/imgui_utils.h"
 #include "Overlay/WindowManager.h"
 #include "Overlay/Window/PaletteEditorWindow.h"
 
@@ -167,7 +168,7 @@ void RoomWindow::DrawGameModeSelection()
 
 	for (int i = 0; i < g_interfaces.pGameModeManager->GetGameModesCount(); i++)
 	{
-		ImGui::TextUnformatted(" "); ImGui::SameLine();
+		ImGui::HorizontalSpacing();
 		std::string gameModeName = g_interfaces.pGameModeManager->GetGameModeName((CustomGameMode)i);
 		std::string gameModeDesc = g_interfaces.pGameModeManager->GetGameModeDesc((CustomGameMode)i);
 

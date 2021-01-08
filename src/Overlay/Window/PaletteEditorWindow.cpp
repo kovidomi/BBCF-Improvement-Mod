@@ -263,7 +263,7 @@ void PaletteEditorWindow::ShowPaletteBoxes()
 {
 	LOG(7, "PaletteEditorWindow ShowPaletteBoxes\n");
 
-	ImGui::TextUnformatted("");
+	ImGui::VerticalSpacing(10);
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
 
 	if (m_showIndexes)
@@ -336,7 +336,7 @@ void PaletteEditorWindow::SavePaletteToFile()
 {
 	static char message[200] = "";
 
-	ImGui::Text("");
+	ImGui::VerticalSpacing(10);
 	ImGui::Separator();
 
 	if (m_highlightMode)
@@ -519,7 +519,7 @@ void PaletteEditorWindow::ShowOnlinePaletteResetButton(Player& playerHandle, uin
 	char buf[16];
 	sprintf_s(buf, " X ##%s", btnText);
 
-	ImGui::TextUnformatted(" "); ImGui::SameLine();
+	ImGui::HorizontalSpacing();
 	if (ImGui::Button(buf))
 	{
 		g_interfaces.pPaletteManager->RestoreOrigPal(charPalHandle);
@@ -706,7 +706,7 @@ void PaletteEditorWindow::ShowPaletteRandomizerButton(const char * btnID, Player
 	char buf[16];
 	sprintf_s(buf, " ? ##%s", btnID);
 	
-	ImGui::TextUnformatted(" "); ImGui::SameLine();
+	ImGui::HorizontalSpacing();
 	if (ImGui::Button(buf) && m_customPaletteVector[charIndex].size() > 1)
 	{
 		CharPaletteHandle& charPalHandle = playerHandle.GetPalHandle();
