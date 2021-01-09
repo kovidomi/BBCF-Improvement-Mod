@@ -604,9 +604,6 @@ void PaletteManager::OnMatchEnd(CharPaletteHandle& playerOne, CharPaletteHandle&
 {
 	playerOne.SetPointerBasePal(nullptr);
 	playerTwo.SetPointerBasePal(nullptr);
-
-	playerOne.SetPointerPalIndex(nullptr);
-	playerTwo.SetPointerPalIndex(nullptr);
 }
 
 std::vector<std::vector<IMPL_data_t>>& PaletteManager::GetCustomPalettesVector()
