@@ -12,7 +12,7 @@ void HitboxOverlay::Update()
 		return;
 	}
 
-	if (!isHitboxOverlayEnabledInCurrentGameMode())
+	if (!isHitboxOverlayEnabledInCurrentState())
 	{
 		return;
 	}

@@ -2,36 +2,56 @@
 
 #include "Core/interfaces.h"
 
-bool isPaletteEditingEnabledInCurrentGameMode()
+bool isPaletteEditingEnabledInCurrentState()
 {
-	return *g_gameVals.pGameMode == GameMode_Training ||
+	bool isEnabledInCurrentState =
+		*g_gameVals.pGameState == GameState_InMatch;
+
+	bool isEnabledInCurrentMode =
+		*g_gameVals.pGameMode == GameMode_Training ||
 		*g_gameVals.pGameMode == GameMode_Versus;
+
+	return isEnabledInCurrentState && isEnabledInCurrentMode;
 }
 
-bool isHitboxOverlayEnabledInCurrentGameMode()
+bool isHitboxOverlayEnabledInCurrentState()
 {
-	return *g_gameVals.pGameMode == GameMode_Training ||
+	bool isEnabledInCurrentState =
+		*g_gameVals.pGameState == GameState_InMatch;
+
+	bool isEnabledInCurrentMode =
+		*g_gameVals.pGameMode == GameMode_Training ||
 		*g_gameVals.pGameMode == GameMode_Versus ||
 		*g_gameVals.pGameMode == GameMode_ReplayTheater;
+
+	return isEnabledInCurrentState && isEnabledInCurrentMode;
 }
 
-bool isGameModeSelectorEnabledInCurrentGameState()
+bool isGameModeSelectorEnabledInCurrentState()
 {
-	return *g_gameVals.pGameState == GameState_CharacterSelectionScreen ||
+	bool isEnabledInCurrentState =
+		*g_gameVals.pGameState == GameState_CharacterSelectionScreen ||
 		*g_gameVals.pGameState == GameState_ReplayMenu;
-}
 
-bool isGameModeSelectorEnabledInCurrentGameMode()
-{
-	return *g_gameVals.pGameMode == GameMode_Versus ||
+	bool isEnabledInCurrentMode =
+		*g_gameVals.pGameMode == GameMode_Versus ||
 		*g_gameVals.pGameMode == GameMode_Online ||
-		*g_gameVals.pGameMode == GameMode_Training ||
-		*g_gameVals.pGameState == GameState_ReplayMenu; // Using GameState instead for replay menu
+		*g_gameVals.pGameMode == GameMode_Training;
+
+	return isEnabledInCurrentState && isEnabledInCurrentMode;
 }
 
-bool isStageSelectorEnabledInCurrentGameMode()
+bool isStageSelectorEnabledInCurrentState()
 {
-	return *g_gameVals.pGameMode == GameMode_Online ||
-		*g_gameVals.pGameMode == GameMode_Training ||
-		*g_gameVals.pGameMode == GameMode_Versus;
+	return *g_gameVals.pGameState == GameState_CharacterSelectionScreen;
+}
+
+bool isInMatch()
+{
+	return *g_gameVals.pGameState == GameState_InMatch;
+}
+
+bool isOnCharacterSelectionScreen()
+{
+	return *g_gameVals.pGameState == GameState_CharacterSelectionScreen;
 }

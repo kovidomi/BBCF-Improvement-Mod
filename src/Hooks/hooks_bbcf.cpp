@@ -509,7 +509,7 @@ void __declspec(naked)GameUpdatePause()
 		cmp g_gameVals.pGameMode, 0 //check for nullpointer
 		je ORIG_CODE
 
-		call isPaletteEditingEnabledInCurrentGameMode
+		call isPaletteEditingEnabledInCurrentState
 		cmp al, 0
 		je ORIG_CODE
 

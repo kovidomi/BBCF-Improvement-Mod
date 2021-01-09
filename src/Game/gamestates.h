@@ -55,8 +55,10 @@ enum GameMode
 	// GameMode_DCodeEdit = 18,
 };
 
-bool isPaletteEditingEnabledInCurrentGameMode();
-bool isHitboxOverlayEnabledInCurrentGameMode();
-bool isGameModeSelectorEnabledInCurrentGameState();
-bool isGameModeSelectorEnabledInCurrentGameMode();
-bool isStageSelectorEnabledInCurrentGameMode();
+bool isPaletteEditingEnabledInCurrentState();
+bool isHitboxOverlayEnabledInCurrentState();
+bool isGameModeSelectorEnabledInCurrentState();
+bool isStageSelectorEnabledInCurrentState();
+
+bool isInMatch();
+bool isOnCharacterSelectionScreen();
