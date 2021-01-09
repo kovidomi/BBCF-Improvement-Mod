@@ -1,8 +1,8 @@
 #include "UpdateNotifierWindow.h"
 
+#include "Core/info.h"
 #include "Overlay/imgui_utils.h"
 #include "Web/update_check.h"
-#include "Core/info.h"
 
 
 void UpdateNotifierWindow::BeforeDraw()
