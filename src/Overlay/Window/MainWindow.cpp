@@ -55,7 +55,8 @@ void MainWindow::Draw()
 
 	ImGui::VerticalSpacing(5);
 
-	ImGui::Text("P$"); ImGui::SameLine();
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextUnformatted("P$"); ImGui::SameLine();
 	if (g_gameVals.pGameMoney)
 	{
 		ImGui::InputInt("##P$", *&g_gameVals.pGameMoney);
@@ -67,6 +68,8 @@ void MainWindow::Draw()
 	{
 		m_pWindowContainer->GetWindow(WindowType_Room)->ToggleOpen();
 	}
+
+	ImGui::VerticalSpacing(5);
 
 	DrawGameplaySettingSection();
 	DrawCustomPalettesSection();
@@ -122,10 +125,10 @@ void MainWindow::DrawCustomPalettesSection() const
 	if (!ImGui::CollapsingHeader("Custom palettes"))
 		return;
 
-	if (*g_gameVals.pGameState != GameState_InMatch)
+	if (!isInMatch())
 	{
 		ImGui::HorizontalSpacing();
-		ImGui::TextDisabled("Not in match!");
+		ImGui::TextDisabled("YOU ARE NOT IN MATCH!");
 	}
 	else
 	{
@@ -136,16 +139,12 @@ void MainWindow::DrawCustomPalettesSection() const
 	ImGui::HorizontalSpacing();
 	m_pWindowContainer->GetWindow<PaletteEditorWindow>(WindowType_PaletteEditor)->ShowReloadAllPalettesButton();
 
-	ImGui::HorizontalSpacing();
-	bool pressed = ImGui::Button("Palette editor");
+	if (isPaletteEditingEnabledInCurrentState())
+	{
+		ImGui::HorizontalSpacing();
 
-	if (!isPaletteEditingEnabledInCurrentGameMode())
-	{
-		ImGui::SameLine(); ImGui::TextDisabled("Not in training or versus modes!");
-	}
-	else if (isPaletteEditingEnabledInCurrentGameMode() && pressed)
-	{
-		m_pWindowContainer->GetWindow(WindowType_PaletteEditor)->ToggleOpen();
+		if (ImGui::Button("Palette editor"))
+			m_pWindowContainer->GetWindow(WindowType_PaletteEditor)->ToggleOpen();
 	}
 }
 
@@ -154,17 +153,10 @@ void MainWindow::DrawHitboxOverlaySection() const
 	if (!ImGui::CollapsingHeader("Hitbox overlay"))
 		return;
 
-	if (*g_gameVals.pGameState != GameState_InMatch)
+	if (!isHitboxOverlayEnabledInCurrentState())
 	{
 		ImGui::HorizontalSpacing();
-		ImGui::TextDisabled("Not in match!");
-		return;
-	}
-
-	if (!isHitboxOverlayEnabledInCurrentGameMode())
-	{
-		ImGui::HorizontalSpacing();
-		ImGui::TextDisabled("Not in training or versus modes!");
+		ImGui::TextDisabled("YOU ARE NOT IN TRAINING, VERSUS, OR REPLAY!");
 		return;
 	}
 
@@ -186,7 +178,7 @@ void MainWindow::DrawHitboxOverlaySection() const
 
 	if (isOpen)
 	{
-		ImGui::VerticalSpacing();
+		ImGui::VerticalSpacing(10);
 
 		if (!g_interfaces.player1.IsCharDataNullPtr() && !g_interfaces.player2.IsCharDataNullPtr())
 		{
@@ -202,6 +194,8 @@ void MainWindow::DrawHitboxOverlaySection() const
 			ImGui::SameLine(); ImGui::HorizontalSpacing();
 			ImGui::TextUnformatted(g_interfaces.player2.GetData()->currentAction);
 		}
+
+		ImGui::VerticalSpacing(10);
 
 		ImGui::HorizontalSpacing();
 		m_pWindowContainer->GetWindow<HitboxOverlay>(WindowType_HitboxOverlay)->DrawRectThicknessSlider();
@@ -249,9 +243,18 @@ void MainWindow::DrawGameplaySettingSection() const
 	if (!ImGui::CollapsingHeader("Gameplay settings"))
 		return;
 
-	ImGui::HorizontalSpacing();
+	if (!isInMatch() && !isOnCharacterSelectionScreen())
+	{
+		ImGui::HorizontalSpacing();
+		ImGui::TextDisabled("YOU ARE NOT IN MATCH!");
 
-	if (isStageSelectorEnabledInCurrentGameMode() &&
+		ImGui::HorizontalSpacing();
+		ImGui::TextDisabled("YOU ARE NOT ON CHARACTER SELECTION SCREEN!");
+
+		return;
+	}
+
+	if (isStageSelectorEnabledInCurrentState() &&
 		g_gameVals.stageSelect_X != nullptr &&
 		g_gameVals.stageSelect_Y != nullptr)
 	{
@@ -269,63 +272,52 @@ void MainWindow::DrawGameplaySettingSection() const
 			}
 		}
 
-		if (ImGui::SliderByte("Stage", &selectedStage, 0, STAGES_COUNT - 1))
+		ImGui::HorizontalSpacing();
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted("Stage"); ImGui::SameLine();
+		if (ImGui::SliderByte("##Stage", &selectedStage, 0, STAGES_COUNT - 1))
 		{
 			*g_gameVals.stageSelect_X = stages[selectedStage][0];
 			*g_gameVals.stageSelect_Y = stages[selectedStage][1];
 		}
-	}
-	else
-	{
-		ImGui::TextDisabled("Stage selection not available");
-	}
 
-	if (*g_gameVals.pGameState == GameState_InMatch)
-	{
-		ImGui::HorizontalSpacing();
-		ImGui::Checkbox("Hide HUD", (bool*)g_gameVals.pIsHUDHidden);
+		ImGui::VerticalSpacing(10);
 	}
 
 	std::string selectedGameMode = g_interfaces.pGameModeManager->GetCurrentGameModeName();
 
-	if (!isGameModeSelectorEnabledInCurrentGameState())
+	ImGui::HorizontalSpacing();
+	ImGui::Text("ACTIVE GAME MODE: %s", selectedGameMode.c_str());
+
+	if (isGameModeSelectorEnabledInCurrentState())
 	{
-		ImGui::HorizontalSpacing(); ImGui::RadioButton(selectedGameMode.c_str(), true);
-		ImGui::HorizontalSpacing(); ImGui::TextDisabled("NOT ON CHARACTER SELECTION SCREEN");
-		ImGui::HorizontalSpacing(); ImGui::TextDisabled("NOT ON REPLAY MENU SCREEN");
-
-		return;
-	}
-
-	if (!isGameModeSelectorEnabledInCurrentGameMode())
-	{
-		ImGui::HorizontalSpacing(); ImGui::RadioButton(selectedGameMode.c_str(), true);
-		ImGui::HorizontalSpacing(); ImGui::TextDisabled("NOT IN ONLINE, TRAINING, OR VERSUS MODES");
-
-		return;
-	}
-
-	for (int i = 0; i < g_interfaces.pGameModeManager->GetGameModesCount(); i++)
-	{
-		ImGui::HorizontalSpacing();
-		std::string gameModeName = g_interfaces.pGameModeManager->GetGameModeName((CustomGameMode)i);
-		std::string gameModeDesc = g_interfaces.pGameModeManager->GetGameModeDesc((CustomGameMode)i);
-
-		if (ImGui::RadioButton(gameModeName.c_str(), (int*)&g_interfaces.pGameModeManager->GetActiveGameModeRef(), i))
+		for (int i = 0; i < g_interfaces.pGameModeManager->GetGameModesCount(); i++)
 		{
-			if (g_interfaces.pRoomManager->IsRoomFunctional())
+			ImGui::HorizontalSpacing();
+			std::string gameModeName = g_interfaces.pGameModeManager->GetGameModeName((CustomGameMode)i);
+			std::string gameModeDesc = g_interfaces.pGameModeManager->GetGameModeDesc((CustomGameMode)i);
+
+			if (ImGui::RadioButton(gameModeName.c_str(), (int*)&g_interfaces.pGameModeManager->GetActiveGameModeRef(), i))
 			{
-				g_interfaces.pOnlineGameModeManager->SetThisPlayerGameMode(g_interfaces.pGameModeManager->GetActiveGameMode());
-				g_interfaces.pOnlineGameModeManager->SendGameModePacket();
+				if (g_interfaces.pRoomManager->IsRoomFunctional())
+				{
+					g_interfaces.pOnlineGameModeManager->SetThisPlayerGameMode(g_interfaces.pGameModeManager->GetActiveGameMode());
+					g_interfaces.pOnlineGameModeManager->SendGameModePacket();
+				}
+			}
+
+			if (!gameModeDesc.empty())
+			{
+				ImGui::HoverTooltip(gameModeDesc.c_str());
 			}
 		}
+	}
 
-		if (ImGui::IsItemHovered() && !gameModeDesc.empty())
-		{
-			ImGui::BeginTooltip();
-			ImGui::TextUnformatted(gameModeDesc.c_str());
-			ImGui::EndTooltip();
-		}
+	if (isInMatch())
+	{
+		ImGui::VerticalSpacing(10);
+		ImGui::HorizontalSpacing();
+		ImGui::Checkbox("Hide HUD", (bool*)g_gameVals.pIsHUDHidden);
 	}
 }
 
