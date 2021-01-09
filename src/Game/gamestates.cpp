@@ -36,7 +36,8 @@ bool isGameModeSelectorEnabledInCurrentState()
 	bool isEnabledInCurrentMode =
 		*g_gameVals.pGameMode == GameMode_Versus ||
 		*g_gameVals.pGameMode == GameMode_Online ||
-		*g_gameVals.pGameMode == GameMode_Training;
+		*g_gameVals.pGameMode == GameMode_Training ||
+		*g_gameVals.pGameState == GameState_ReplayMenu;
 
 	return isEnabledInCurrentState && isEnabledInCurrentMode;
 }
@@ -49,6 +50,11 @@ bool isStageSelectorEnabledInCurrentState()
 bool isInMatch()
 {
 	return *g_gameVals.pGameState == GameState_InMatch;
+}
+
+bool isOnReplayMenuScreen()
+{
+	return *g_gameVals.pGameState == GameState_ReplayMenu;
 }
 
 bool isOnCharacterSelectionScreen()

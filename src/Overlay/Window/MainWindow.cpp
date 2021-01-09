@@ -7,8 +7,10 @@
 #include "Core/info.h"
 #include "Core/interfaces.h"
 #include "Game/gamestates.h"
-#include "Game/stages.h"
 #include "Overlay/imgui_utils.h"
+#include "Overlay/Widget/ActiveGameModeWidget.h"
+#include "Overlay/Widget/GameModeSelectWidget.h"
+#include "Overlay/Widget/StageSelectWidget.h"
 
 #include <sstream>
 
@@ -117,7 +119,6 @@ void MainWindow::DrawAvatarSection() const
 	ImGui::HorizontalSpacing(); ImGui::SliderInt("Color", g_gameVals.playerAvatarColAddr, 0, 0x3);
 	ImGui::HorizontalSpacing(); ImGui::SliderByte("Accessory 1", g_gameVals.playerAvatarAcc1, 0, 0xCF);
 	ImGui::HorizontalSpacing(); ImGui::SliderByte("Accessory 2", g_gameVals.playerAvatarAcc2, 0, 0xCF);
-	ImGui::Separator();
 }
 
 void MainWindow::DrawCustomPalettesSection() const
@@ -243,10 +244,13 @@ void MainWindow::DrawGameplaySettingSection() const
 	if (!ImGui::CollapsingHeader("Gameplay settings"))
 		return;
 
-	if (!isInMatch() && !isOnCharacterSelectionScreen())
+	if (!isInMatch() && !isOnReplayMenuScreen() && !isOnCharacterSelectionScreen())
 	{
 		ImGui::HorizontalSpacing();
 		ImGui::TextDisabled("YOU ARE NOT IN MATCH!");
+
+		ImGui::HorizontalSpacing();
+		ImGui::TextDisabled("YOU ARE NOT ON REPLAY MENU SCREEN!");
 
 		ImGui::HorizontalSpacing();
 		ImGui::TextDisabled("YOU ARE NOT ON CHARACTER SELECTION SCREEN!");
@@ -254,62 +258,24 @@ void MainWindow::DrawGameplaySettingSection() const
 		return;
 	}
 
-	if (isStageSelectorEnabledInCurrentState() &&
-		g_gameVals.stageSelect_X != nullptr &&
-		g_gameVals.stageSelect_Y != nullptr)
+	if (isStageSelectorEnabledInCurrentState())
 	{
-
-		static unsigned char selectedStage = 0;
-
-		// Sync slider with the selected stage
-		for (int i = 0; i < STAGES_COUNT; i++)
-		{
-			if (stages[i][0] == *g_gameVals.stageSelect_X &&
-				stages[i][1] == *g_gameVals.stageSelect_Y)
-			{
-				selectedStage = i;
-				break;
-			}
-		}
-
 		ImGui::HorizontalSpacing();
-		ImGui::AlignTextToFramePadding();
-		ImGui::TextUnformatted("Stage"); ImGui::SameLine();
-		if (ImGui::SliderByte("##Stage", &selectedStage, 0, STAGES_COUNT - 1))
-		{
-			*g_gameVals.stageSelect_X = stages[selectedStage][0];
-			*g_gameVals.stageSelect_Y = stages[selectedStage][1];
-		}
-
+		StageSelectWidget();
 		ImGui::VerticalSpacing(10);
 	}
 
-	std::string selectedGameMode = g_interfaces.pGameModeManager->GetCurrentGameModeName();
-
 	ImGui::HorizontalSpacing();
-	ImGui::Text("ACTIVE GAME MODE: %s", selectedGameMode.c_str());
+	ActiveGameModeWidget();
 
 	if (isGameModeSelectorEnabledInCurrentState())
 	{
-		for (int i = 0; i < g_interfaces.pGameModeManager->GetGameModesCount(); i++)
+		bool isThisPlayerSpectator = g_interfaces.pRoomManager->IsRoomFunctional() && g_interfaces.pRoomManager->IsThisPlayerSpectator();
+
+		if (!isThisPlayerSpectator)
 		{
 			ImGui::HorizontalSpacing();
-			std::string gameModeName = g_interfaces.pGameModeManager->GetGameModeName((CustomGameMode)i);
-			std::string gameModeDesc = g_interfaces.pGameModeManager->GetGameModeDesc((CustomGameMode)i);
-
-			if (ImGui::RadioButton(gameModeName.c_str(), (int*)&g_interfaces.pGameModeManager->GetActiveGameModeRef(), i))
-			{
-				if (g_interfaces.pRoomManager->IsRoomFunctional())
-				{
-					g_interfaces.pOnlineGameModeManager->SetThisPlayerGameMode(g_interfaces.pGameModeManager->GetActiveGameMode());
-					g_interfaces.pOnlineGameModeManager->SendGameModePacket();
-				}
-			}
-
-			if (!gameModeDesc.empty())
-			{
-				ImGui::HoverTooltip(gameModeDesc.c_str());
-			}
+			GameModeSelectWidget();
 		}
 	}
 
