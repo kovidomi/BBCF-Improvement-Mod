@@ -157,6 +157,7 @@ void PaletteEditorWindow::CharacterSelection()
 				m_selectedCharPalHandle = &m_playerHandles[i]->GetPalHandle();
 				m_selectedPalIndex = g_interfaces.pPaletteManager->GetCurrentCustomPalIndex(*m_selectedCharPalHandle);
 				CopyPalFileToEditorArray(m_selectedFile, *m_selectedCharPalHandle);
+				CopyImplDataToEditorFields(*m_selectedCharPalHandle);
 			}
 
 			ImGui::PopID();
@@ -742,17 +743,20 @@ void PaletteEditorWindow::CopyPalFileToEditorArray(PaletteFile palFile, CharPale
 
 void PaletteEditorWindow::UpdateHighlightArray(int selectedBoxIndex)
 {
-	static int selected_highlight_box = 0;
+	static int previousSelectedBoxIndex = 0;
+
+	if (previousSelectedBoxIndex == selectedBoxIndex)
+		return;
 
 	// Set previously pressed box back to black
-	((int*)m_highlightArray)[selected_highlight_box] = COLOR_BLACK;
-
-	selected_highlight_box = selectedBoxIndex;
+	((int*)m_highlightArray)[previousSelectedBoxIndex] = COLOR_BLACK;
 
 	// Set currently pressed box to white
-	((int*)m_highlightArray)[selected_highlight_box] = COLOR_WHITE;
+	((int*)m_highlightArray)[selectedBoxIndex] = COLOR_WHITE;
 
 	g_interfaces.pPaletteManager->ReplacePaletteFile(m_highlightArray, m_selectedFile, *m_selectedCharPalHandle);
+
+	previousSelectedBoxIndex = selectedBoxIndex;
 }
 
 void PaletteEditorWindow::CopyImplDataToEditorFields(CharPaletteHandle & charPalHandle)
