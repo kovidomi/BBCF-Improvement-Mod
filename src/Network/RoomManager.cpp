@@ -148,9 +148,14 @@ uint16_t RoomManager::GetPlayerMatchPlayerIndexByRoomMemberIndex(uint16_t index)
 {
 	LOG(7, "RoomManager::GetPlayerMatchPlayerIndexByRoomMemberIndex\n");
 
-	// Return other opponent's playerindex if room type is FFA
+	// Resolve playerindex via m_pFFAThisPlayerIndex if room type is FFA
 	if (m_pRoom->roomType == RoomType_FFA)
-		return *m_pFFAThisPlayerIndex == 0 ? 1 : 0;
+	{
+		if (index == GetThisPlayerRoomMemberIndex())
+			return *m_pFFAThisPlayerIndex;
+
+		return !*m_pFFAThisPlayerIndex;;
+	}
 
 	return GetRoomMemberEntryByIndex(index)->matchPlayerIndex;
 }
