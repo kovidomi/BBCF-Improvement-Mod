@@ -555,8 +555,9 @@ void PaletteEditorWindow::ShowPaletteSelectButton(Player & playerHandle, const c
 	int selected_pal_index = g_interfaces.pPaletteManager->GetCurrentCustomPalIndex(charPalHandle);
 	CharIndex charIndex = (CharIndex)playerHandle.GetData()->charIndex;
 
-	if (charIndex >= getCharactersCount())
+	if (charIndex >= getCharactersCount() || m_customPaletteVector[charIndex].size() <= selected_pal_index)
 	{
+		ImGui::TextUnformatted("Out of bounds");
 		return;
 	}
 
