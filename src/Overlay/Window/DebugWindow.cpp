@@ -1,6 +1,7 @@
 #include "DebugWindow.h"
 
 #include "Core/interfaces.h"
+#include "Core/Settings.h"
 #include "Core/utils.h"
 #include "Game/gamestates.h"
 #include "Overlay/NotificationBar/NotificationBar.h"
@@ -27,6 +28,25 @@ void DebugWindow::DrawImGuiSection()
 {
 	if (!ImGui::CollapsingHeader("ImGui"))
 		return;
+
+	if (ImGui::TreeNode("Display"))
+	{
+		static ImVec2 newDisplaySize = ImVec2(Settings::settingsIni.renderwidth, Settings::settingsIni.renderheight);
+
+		ImVec2 curDisplaySize = ImGui::GetIO().DisplaySize;
+
+		ImGui::Text("Current display size: %.f %.f", curDisplaySize.x, curDisplaySize.y);
+
+		ImGui::InputFloat2("Display size", (float*)&newDisplaySize, 0);
+
+		static bool isNewDisplaySet = false;
+		ImGui::Checkbox("Set value", &isNewDisplaySet);
+
+		if (isNewDisplaySet)
+			ImGui::GetIO().DisplaySize = newDisplaySize;
+
+		ImGui::TreePop();
+	}
 
 	if (ImGui::TreeNode("Unicode text"))
 	{
@@ -246,6 +266,21 @@ void DebugWindow::DrawRoomSection()
 	if (ImGui::Button("Send announce"))
 	{
 		g_interfaces.pRoomManager->SendAnnounce();
+	}
+
+	if (ImGui::Button("Set rich presence"))
+	{
+		g_interfaces.pSteamFriendsWrapper->SetRichPresence("status", "In Match / Spectate Room");
+		g_interfaces.pSteamFriendsWrapper->SetRichPresence("connect", "+connect_lobby 109775241036175527");
+
+		// In case of lobby or ranked we might have no lobbyId. Go with room owner's steamId instead.
+		g_interfaces.pSteamFriendsWrapper->SetRichPresence("steam_player_group", std::to_string(g_gameVals.pRoom->member1.steamId).c_str());
+		g_interfaces.pSteamFriendsWrapper->SetRichPresence("steam_player_group_size", std::to_string(g_gameVals.pRoom->memberCount).c_str());
+	}
+
+	if (ImGui::Button("Clear rich presence"))
+	{
+		g_interfaces.pSteamFriendsWrapper->ClearRichPresence();
 	}
 }
 
