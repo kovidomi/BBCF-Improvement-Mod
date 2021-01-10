@@ -23,7 +23,7 @@ static char palDescBuf[IMPL_DESC_LENGTH] = "";
 static char palCreatorBuf[IMPL_CREATOR_LENGTH] = "";
 static bool palBoolEffect = false;
 
-void PaletteEditorWindow::ShowAllPaletteSelections()
+void PaletteEditorWindow::ShowAllPaletteSelections(const std::string& windowID)
 {
 	if (HasNullPointer())
 	{
@@ -32,16 +32,18 @@ void PaletteEditorWindow::ShowAllPaletteSelections()
 
 	const char* p1BtnText = " Player1 ";
 	const char* p2BtnText = " Player2 ";
-	const char* p1PopupID = "select1-1";
-	const char* p2PopupID = "select2-1";
+	const std::string p1PopupID = "select1-1" + windowID;
+	const std::string p2PopupID = "select2-1" + windowID;
 
 	if (g_interfaces.pRoomManager->IsRoomFunctional())
 	{
 		uint16_t thisPlayerMatchPlayerIndex = g_interfaces.pRoomManager->GetThisPlayerMatchPlayerIndex();
 
+		ImGui::BeginGroup();
+
 		if (thisPlayerMatchPlayerIndex == 0)
 		{
-			ShowPaletteSelectButton(g_interfaces.player1, p1BtnText, p1PopupID);
+			ShowPaletteSelectButton(g_interfaces.player1, p1BtnText, p1PopupID.c_str());
 		}
 		else
 		{
@@ -50,18 +52,24 @@ void PaletteEditorWindow::ShowAllPaletteSelections()
 
 		if (thisPlayerMatchPlayerIndex == 1)
 		{
-			ShowPaletteSelectButton(g_interfaces.player2, p2BtnText, p2PopupID);
+			ShowPaletteSelectButton(g_interfaces.player2, p2BtnText, p2PopupID.c_str());
 		}
 		else
 		{
 			ShowOnlinePaletteResetButton(g_interfaces.player2, thisPlayerMatchPlayerIndex, p2BtnText);
 		}
 
+		ImGui::EndGroup();
+
 		return;
 	}
 
-	ShowPaletteSelectButton(g_interfaces.player1, p1BtnText, p1PopupID);
-	ShowPaletteSelectButton(g_interfaces.player2, p2BtnText, p2PopupID);
+	ImGui::BeginGroup();
+
+	ShowPaletteSelectButton(g_interfaces.player1, p1BtnText, p1PopupID.c_str());
+	ShowPaletteSelectButton(g_interfaces.player2, p2BtnText, p2PopupID.c_str());
+
+	ImGui::EndGroup();
 }
 
 void PaletteEditorWindow::ShowReloadAllPalettesButton()
@@ -517,10 +525,9 @@ void PaletteEditorWindow::ShowOnlinePaletteResetButton(Player& playerHandle, uin
 	CharPaletteHandle& charPalHandle = playerHandle.GetPalHandle();
 	CharIndex charIndex = (CharIndex)playerHandle.GetData()->charIndex;
 
-	char buf[16];
+	char buf[32];
 	sprintf_s(buf, " X ##%s", btnText);
 
-	ImGui::HorizontalSpacing();
 	if (ImGui::Button(buf))
 	{
 		g_interfaces.pPaletteManager->RestoreOrigPal(charPalHandle);
@@ -704,10 +711,9 @@ void PaletteEditorWindow::HandleHoveredPaletteSelection(CharPaletteHandle* charP
 void PaletteEditorWindow::ShowPaletteRandomizerButton(const char * btnID, Player& playerHandle)
 {
 	int charIndex = playerHandle.GetData()->charIndex;
-	char buf[16];
+	char buf[32];
 	sprintf_s(buf, " ? ##%s", btnID);
 	
-	ImGui::HorizontalSpacing();
 	if (ImGui::Button(buf) && m_customPaletteVector[charIndex].size() > 1)
 	{
 		CharPaletteHandle& charPalHandle = playerHandle.GetPalHandle();

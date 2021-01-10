@@ -19,7 +19,7 @@ public:
 		OnMatchInit();
 	}
 	~PaletteEditorWindow() override = default;
-	void ShowAllPaletteSelections();
+	void ShowAllPaletteSelections(const std::string& windowID);
 	void ShowReloadAllPalettesButton();
 	void OnMatchInit();
 protected:
