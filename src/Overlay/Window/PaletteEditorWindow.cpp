@@ -254,10 +254,6 @@ void PaletteEditorWindow::EditingModesSelection()
 		}
 	}
 
-	ImGui::SameLine();
-	ImGui::SetCursorPosX(nextLineColumnPosX);
-	ImGui::Checkbox("Show indexes", &m_showIndexes);
-
 	if (ImGui::Button("Gradient generator"))
 	{
 		ImGui::OpenPopup("gradient");
@@ -275,10 +271,7 @@ void PaletteEditorWindow::ShowPaletteBoxes()
 	ImGui::VerticalSpacing(10);
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
 
-	if (m_showIndexes)
-	{
-		ImGui::TextUnformatted("001 "); ImGui::SameLine();
-	}
+	ImGui::TextUnformatted("001 "); ImGui::SameLine();
 
 	for (int i = 0, col = 1; i < NUMBER_OF_COLOR_BOXES; i++)
 	{
@@ -286,7 +279,7 @@ void PaletteEditorWindow::ShowPaletteBoxes()
 
 		bool pressed = false;
 		int curColorBoxOffset = (i * sizeof(int));
-		int idx = m_showIndexes ? i + 1 : 0;
+		int idx = i + 1;
 
 		if (m_highlightMode)
 		{
@@ -320,9 +313,9 @@ void PaletteEditorWindow::ShowPaletteBoxes()
 		}
 		else
 		{
-			//start a new row
+			// Start a new row
 			col = 1;
-			if (m_showIndexes && i < NUMBER_OF_COLOR_BOXES - 1)
+			if (i < NUMBER_OF_COLOR_BOXES - 1)
 			{
 				ImGui::Text("%.3d ", i + 2);
 				ImGui::SameLine();

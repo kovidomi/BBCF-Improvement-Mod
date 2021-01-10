@@ -63,5 +63,4 @@ private:
 	int                 m_colorEditFlags;
 	bool                m_highlightMode;
 	bool                m_showAlpha;
-	bool                m_showIndexes;
 };
