@@ -1,6 +1,8 @@
 #pragma once
 #include "IWindow.h"
 
+#include <steamclientpublic.h>
+
 class RoomWindow : public IWindow
 {
 public:
@@ -18,11 +20,9 @@ protected:
 
 private:
 	void SetWindowTitleRoomType(const std::string& roomTypeName);
-
+	void ShowClickableSteamUser(const char* playerName, const CSteamID& steamId) const;
 	void DrawRoomImPlayers();
 	void DrawMatchImPlayers();
-	void DrawGameModeSelection();
-	void DrawPaletteSelection();
 
 	const std::string m_origWindowTitle;
 };

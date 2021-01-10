@@ -61,5 +61,7 @@ bool isGameModeSelectorEnabledInCurrentState();
 bool isStageSelectorEnabledInCurrentState();
 
 bool isInMatch();
+bool isInMenu();
+bool isOnVersusScreen();
 bool isOnReplayMenuScreen();
 bool isOnCharacterSelectionScreen();

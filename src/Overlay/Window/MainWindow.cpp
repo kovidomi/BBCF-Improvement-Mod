@@ -133,10 +133,11 @@ void MainWindow::DrawCustomPalettesSection() const
 	}
 	else
 	{
-		m_pWindowContainer->GetWindow<PaletteEditorWindow>(WindowType_PaletteEditor)->ShowAllPaletteSelections();
+		ImGui::HorizontalSpacing();
+		m_pWindowContainer->GetWindow<PaletteEditorWindow>(WindowType_PaletteEditor)->ShowAllPaletteSelections("Main");
 	}
 
-	ImGui::VerticalSpacing(10);
+	ImGui::VerticalSpacing(15);
 	ImGui::HorizontalSpacing();
 	m_pWindowContainer->GetWindow<PaletteEditorWindow>(WindowType_PaletteEditor)->ShowReloadAllPalettesButton();
 
@@ -244,16 +245,16 @@ void MainWindow::DrawGameplaySettingSection() const
 	if (!ImGui::CollapsingHeader("Gameplay settings"))
 		return;
 
-	if (!isInMatch() && !isOnReplayMenuScreen() && !isOnCharacterSelectionScreen())
+	if (!isInMatch() && !isOnVersusScreen() && !isOnReplayMenuScreen() && !isOnCharacterSelectionScreen())
 	{
 		ImGui::HorizontalSpacing();
 		ImGui::TextDisabled("YOU ARE NOT IN MATCH!");
 
 		ImGui::HorizontalSpacing();
-		ImGui::TextDisabled("YOU ARE NOT ON REPLAY MENU SCREEN!");
+		ImGui::TextDisabled("YOU ARE NOT IN REPLAY MENU!");
 
 		ImGui::HorizontalSpacing();
-		ImGui::TextDisabled("YOU ARE NOT ON CHARACTER SELECTION SCREEN!");
+		ImGui::TextDisabled("YOU ARE NOT IN CHARACTER SELECTION!");
 
 		return;
 	}

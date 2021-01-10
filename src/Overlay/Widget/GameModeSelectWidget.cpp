@@ -8,6 +8,10 @@ void GameModeSelectWidget()
 {
 	ImGui::BeginGroup();
 
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+	ImGui::BeginChild("GameModeSelection", ImVec2(200, 210), true);
+
+	ImGui::TextUnformatted("Select game mode:");
 	for (int i = 0; i < g_interfaces.pGameModeManager->GetGameModesCount(); i++)
 	{
 		std::string gameModeName = g_interfaces.pGameModeManager->GetGameModeName((CustomGameMode)i);
@@ -29,6 +33,9 @@ void GameModeSelectWidget()
 			ImGui::EndTooltip();
 		}
 	}
+
+	ImGui::EndChild();
+	ImGui::PopStyleVar();
 
 	ImGui::EndGroup();
 }

@@ -52,6 +52,16 @@ bool isInMatch()
 	return *g_gameVals.pGameState == GameState_InMatch;
 }
 
+bool isInMenu()
+{
+	return *g_gameVals.pGameState == GameState_MainMenu;
+}
+
+bool isOnVersusScreen()
+{
+	return *g_gameVals.pGameState == GameState_VersusScreen;
+}
+
 bool isOnReplayMenuScreen()
 {
 	return *g_gameVals.pGameState == GameState_ReplayMenu;
