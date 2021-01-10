@@ -23,9 +23,9 @@ struct Packet
 	uint16_t packetSize;
 	uint16_t version = IM_PACKET_VERSION;
 	PacketType packetType;
+	uint64_t steamID;
 	uint16_t part;
 	uint16_t roomMemberIndex;
-	uint64_t steamID;
 	uint32_t dataSize;
 	unsigned char data[MAX_DATA_SIZE];
 
