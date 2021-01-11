@@ -1,10 +1,12 @@
 #include "Settings.h"
 #include "logger.h"
 
-#include "Game/containers.h"
+#include "Core/interfaces.h"
 
 #include <atlstr.h>
 #include <ctime>
+
+#define VIEWPORT_DEFAULT 1
 
 settingsIni_t Settings::settingsIni = {};
 savedSettings_t Settings::savedSettings = {};
@@ -36,16 +38,7 @@ void Settings::applySettingsIni(D3DPRESENT_PARAMETERS* pPresentationParameters)
 
 	//pPresentationParameters->Windowed = !Settings::settingsIni.fullscreen;
 
-	switch (settingsIni.vsync)
-	{
-	case VSYNC_OFF:
-		pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-		break;
-	case VSYNC_ON:
-	default:
-		pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
-		break;
-	}
+	pPresentationParameters->PresentationInterval = settingsIni.vsync ? D3DPRESENT_INTERVAL_DEFAULT : D3DPRESENT_INTERVAL_IMMEDIATE;
 	
 	//pPresentationParameters->Windowed = !settingsIni.fullscreen;
 	//if (settingsIni.fullscreen)
@@ -106,12 +99,15 @@ bool Settings::loadSettingsFile()
 #include "settings.def"
 #undef SETTING
 
-//set buttons back to default if their values are incorrect
+	// Set buttons back to default if their values are incorrect
 	if (settingsIni.togglebutton.length() != 2 || settingsIni.togglebutton[0] != 'F')
 		settingsIni.togglebutton = "F1";
 
+	if (settingsIni.toggleOnlineButton.length() != 2 || settingsIni.toggleOnlineButton[0] != 'F')
+		settingsIni.toggleOnlineButton = "F2";
+
 	if (settingsIni.toggleHUDbutton.length() != 2 || settingsIni.toggleHUDbutton[0] != 'F')
-		settingsIni.toggleHUDbutton = "F2";
+		settingsIni.toggleHUDbutton = "F3";
 
 	return true;
 }
@@ -119,6 +115,7 @@ bool Settings::loadSettingsFile()
 void Settings::initSavedSettings()
 {
 	LOG(7, "initSavedSettings\n");
+
 	switch (settingsIni.viewport)
 	{
 	case 2:

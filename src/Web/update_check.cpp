@@ -1,18 +1,17 @@
 #include "update_check.h"
 
+#include "url_downloader.h"
+
 #include "Core/info.h"
 #include "Core/logger.h"
-#include "ImGui/ImGuiSystem.h"
+#include "Overlay/Logger/ImGuiLogger.h"
+#include "Overlay/WindowManager.h"
 
-#include <WinHttpClient.h>
+#include <handleapi.h>
+#include <processthreadsapi.h>
 #include <regex>
 
-
-//10 seconds timout
-#define TIMEOUT 10000
-
 std::string newVersionNum = "";
-std::string ingamePlayersNum = "<No data>";
 
 std::string GetNewVersionNum()
 {
@@ -20,84 +19,59 @@ std::string GetNewVersionNum()
 	{
 		return newVersionNum;
 	}
-	else
-		return "";
+
+	return "";
 }
 
 void CheckUpdate()
 {
-	LOG(2, "CheckUpdate\n");
-	//////////////////////////////////
-	// Set URL.
-	WinHttpClient client(L"http://steamcommunity.com/app/586140/discussions/0/1291817208497395528/");
-	client.SetTimeouts(TIMEOUT, TIMEOUT, TIMEOUT, TIMEOUT);
+	std::wstring wUrl = MOD_LINK_FORUM;
+	std::string data = DownloadUrl(wUrl);
 
-	// Send http request, a GET request by default.
-	client.SendHttpRequest();
-	
-	// The response header.
-	//wstring httpResponseHeader = client.GetResponseHeader();
+	if (strcmp(data.c_str(), "") == 0)
+	{
+		g_imGuiLogger->Log("[error] Update check failed. No data downloaded.\n");
+		LOG(2, "Update check failed.No data downloaded.\n");
+		return;
+	}
 
-	// The response content.
-	wstring httpResponseContent = client.GetResponseContent();
+	data = data.substr(0, 950).c_str();
 
-	//we only need the top part of head that contains the title
-	//const char* msg = (char *)_bstr_t(httpResponseContent.substr(0, 950).c_str());
-	std::string str = _bstr_t(httpResponseContent.substr(0, 950).c_str());
-	
-	//look for vx.xx , returning like v1.23 for example
-	std::regex r("<title>.+(v\\d\.\\d\\d)"); // entire match will be 2 numbers
+	// Fits on: <title>[BBCF IMPROVEMENT MOD] (v2.06
+	// and captures: v2.06
+	std::regex r("<title>.+(v\\d\.\\d\\d)");
 	std::smatch m;
-	std::regex_search(str, m, r);
+	std::regex_search(data, m, r);
 
-	//ImGuiSystem::AddLog("on site: ");
-	//ImGuiSystem::AddLog(m[1].str().c_str());
-	//ImGuiSystem::AddLog("\n");
-	//ImGuiSystem::AddLog("installed: ");
-	//ImGuiSystem::AddLog(MOD_VERSION_NUM);
-	
 	if (m[1].str() == "")
 	{
-		ImGuiSystem::AddLog("[error] Update check failed.\n");
+		g_imGuiLogger->Log("[error] Update check failed. Regex no match.\n");
 		return;
 	}
 
 	if (strcmp(m[1].str().c_str(), MOD_VERSION_NUM) != 0)
 	{
 		newVersionNum = m[1].str();
+
 		LOG(2, "New version found: %s\n", newVersionNum.c_str());
-		ImGuiSystem::AddLog("[system] Update available: BBCF Improvement Mod %s has been released!\n", newVersionNum.c_str());
-		ImGuiSystem::IsUpdateAvailable = true;
+		g_imGuiLogger->Log("[system] Update available: BBCF Improvement Mod %s has been released!\n",
+			newVersionNum.c_str());
+
+		WindowManager::GetInstance().GetWindowContainer()->GetWindow(WindowType_UpdateNotifier)->Open();
 	}
 	else
 	{
-		ImGuiSystem::AddLog("[system] BBCF Improvement Mod is up-to-date\n");
+		g_imGuiLogger->Log("[system] BBCF Improvement Mod is up-to-date\n");
 	}
 }
 
-void FetchTotalIngamePlayers()
+void StartAsyncUpdateCheck()
 {
-	WinHttpClient client(L"https://steamdb.info/app/586140/");
-	client.SetTimeouts(TIMEOUT, TIMEOUT, TIMEOUT, TIMEOUT);
+	if (MOD_FORCE_DISABLE_UPDATE_CHECK)
+		return;
 
-	client.SendHttpRequest();
-	
-	wstring httpResponseContent = client.GetResponseContent();
-
-	std::string str = _bstr_t(httpResponseContent.substr(12000, 18000).c_str());
-
-	std::regex r("><\\/span>\\s(\\d.*)\\sIn-Game");
-	std::smatch m;
-	std::regex_search(str, m, r);
-
-	//if(m[1].str() != "")
-	ingamePlayersNum = m[1].str();
-
-	LOG(2, "%s ingame players\n", ingamePlayersNum.c_str());
-	ImGuiSystem::AddLog("[system] Total players in-game: %s\n", ingamePlayersNum.c_str());
-}
-
-std::string GetIngamePlayersNum()
-{
-	return ingamePlayersNum;
+	if (Settings::settingsIni.checkupdates)
+	{
+		CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)CheckUpdate, nullptr, 0, nullptr));
+	}
 }

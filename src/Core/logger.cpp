@@ -9,8 +9,8 @@ bool hookSucceeded(PBYTE addr, const char* funcName)
 	{
 		LOG(2, "FAILED to hook %s\n", funcName);
 		return false;
-
 	}
+
 	LOG(2, "Successfully hooked %s at 0x%p\n", funcName, addr);
 	return true;
 }
@@ -23,6 +23,7 @@ char* getFullDate()
 	{
 		return NULL;
 	}
+
 	struct tm* tm_info;
 
 	time(&timer);
@@ -63,6 +64,7 @@ void openLogger()
 	{
 		LOG(1, "BBCF_FIX START - {Couldn't get the current time}\n");
 	}
+
 	LOG(1, "/////////////////////////////////////\n");
 	LOG(1, "/////////////////////////////////////\n\n");
 }
@@ -79,8 +81,11 @@ void closeLogger()
 	{
 		LOG(1, "BBCF_FIX STOP - {Couldn't get the current time}\n");
 	}
+
 	if (g_oFile)
+	{
 		fclose(g_oFile);
+	}
 }
 
 void logSettingsIni()
@@ -108,6 +113,7 @@ void logD3DPParams(D3DPRESENT_PARAMETERS* pPresentationParameters, bool isOrigin
 	{
 		LOG(1, "Modified D3D PresentationParameters:\n");
 	}
+
 	LOG(1, "\t- BackBufferWidth: %u\n", pPresentationParameters->BackBufferWidth);
 	LOG(1, "\t- BackBufferHeight: %u\n", pPresentationParameters->BackBufferHeight);
 	LOG(1, "\t- BackBufferFormat: %u\n", pPresentationParameters->BackBufferFormat);

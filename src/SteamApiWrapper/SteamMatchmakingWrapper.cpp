@@ -1,8 +1,8 @@
 #include "SteamMatchmakingWrapper.h"
 
+#include "Core/interfaces.h"
 #include "Core/logger.h"
 #include "Core/utils.h"
-#include "Game/containers.h"
 #include "Game/gamestates.h"
 
 SteamMatchmakingWrapper::SteamMatchmakingWrapper(ISteamMatchmaking** pSteamMatchmaking)
@@ -125,7 +125,7 @@ SteamAPICall_t SteamMatchmakingWrapper::CreateLobby(ELobbyType eLobbyType, int c
 SteamAPICall_t SteamMatchmakingWrapper::JoinLobby(CSteamID steamIDLobby)
 {
 	LOG(7, "SteamMatchmakingWrapper JoinLobby\n");
-	LOG(7, "\tsteamIDLobby: 0x%x\n", steamIDLobby);
+	LOG(7, "\t- steamIDLobby: %llu\n", steamIDLobby.ConvertToUint64());
 	return m_SteamMatchmaking->JoinLobby(steamIDLobby);
 }
 
@@ -153,23 +153,20 @@ CSteamID SteamMatchmakingWrapper::GetLobbyMemberByIndex(CSteamID steamIDLobby, i
 	return m_SteamMatchmaking->GetLobbyMemberByIndex(steamIDLobby, iMember);
 }
 
-uint32 totalGetPackets = 0;
 const char* SteamMatchmakingWrapper::GetLobbyData(CSteamID steamIDLobby, const char *pchKey)
 {
 	LOG(7, "SteamMatchmakingWrapper GetLobbyData\n");
+
 	const char* ret = m_SteamMatchmaking->GetLobbyData(steamIDLobby, pchKey);
-	//totalGetPackets++;
-	//LOG(7, "\tcount: %d\n", totalGetPackets);
-	//LOG(7, "\tpchKey: %s\n", pchKey);
+
+	LOG(7, "\t- steamIDLobby: %llu, pchKey: %s, ret: %s\n", steamIDLobby.ConvertToUint64(), pchKey, ret);
+
 	return ret;
 }
 
-uint32 totalSetPackets = 0;
 bool SteamMatchmakingWrapper::SetLobbyData(CSteamID steamIDLobby, const char *pchKey, const char *pchValue)
 {
 	LOG(7, "SteamMatchmakingWrapper SetLobbyData\n");
-	//totalSetPackets++;
-	//LOG(7, "\tcount: %d\n", totalSetPackets);
 	return m_SteamMatchmaking->SetLobbyData(steamIDLobby, pchKey, pchValue);
 }
 
@@ -207,7 +204,12 @@ const char* SteamMatchmakingWrapper::GetLobbyMemberData(CSteamID steamIDLobby, C
 
 	//opponentPlayer = new CSteamID(steamIDRemote);
 
-	return m_SteamMatchmaking->GetLobbyMemberData(steamIDLobby, steamIDUser, pchKey);
+	const char* ret = m_SteamMatchmaking->GetLobbyMemberData(steamIDLobby, steamIDUser, pchKey);
+
+	LOG(7, "\t- steamIDLobby: %llu, steamIDUser: %llu, pchKey: %s, ret: %s\n",
+		steamIDLobby.ConvertToUint64(), steamIDUser.ConvertToUint64(), pchKey, ret);
+
+	return ret;
 }
 
 void SteamMatchmakingWrapper::SetLobbyMemberData(CSteamID steamIDLobby, const char *pchKey, const char *pchValue)
@@ -273,13 +275,6 @@ bool SteamMatchmakingWrapper::SetLobbyJoinable(CSteamID steamIDLobby, bool bLobb
 CSteamID SteamMatchmakingWrapper::GetLobbyOwner(CSteamID steamIDLobby)
 {
 	LOG(7, "SteamMatchmakingWrapper GetLobbyOwner\n");
-
-	//for (int i = 0; i < m_SteamMatchmaking->GetNumLobbyMembers(steamIDLobby); i++)
-	//{
-	//	CSteamID member = m_SteamMatchmaking->GetLobbyMemberByIndex(steamIDLobby, i);
-	//	LOG(7, "SteamLobbyMemberByIndex %d: 0x%x\n", i ,member);
-	//}
-
 	return m_SteamMatchmaking->GetLobbyOwner(steamIDLobby);
 }
 

@@ -1,10 +1,10 @@
 #include "crashdump.h"
+#include "interfaces.h"
 #include "logger.h"
 #include "Settings.h"
 
 #include "Hooks/hooks_detours.h"
-#include "Game/containers.h"
-#include "ImGui/ImGuiSystem.h"
+#include "Overlay/WindowManager.h"
 
 #include <Windows.h>
 
@@ -17,30 +17,33 @@ DirectInput8Create_t orig_DirectInput8Create;
 HRESULT WINAPI DirectInput8Create(HINSTANCE hinstHandle, DWORD version, const IID& r_iid, LPVOID* outWrapper, LPUNKNOWN pUnk)
 {
 	LOG(1, "DirectInput8Create\n");
-	return orig_DirectInput8Create(hinstHandle, version, r_iid, outWrapper, pUnk);
+
+	HRESULT ret = orig_DirectInput8Create(hinstHandle, version, r_iid, outWrapper, pUnk);
+
+	LOG(1, "DirectInput8Create result: %d\n", ret);
+
+	return ret;
 }
 
 void CreateCustomDirectories()
 {
-	LOG(2, "CreateCustomDirectories\n");
+	LOG(1, "CreateCustomDirectories\n");
 
 	CreateDirectory(L"BBCF_IM", NULL);
 }
 
 void BBCF_IM_Shutdown()
 {
-	ImGuiSystem::WriteLogToFile();
+	LOG(1, "BBCF_IM_Shutdown\n");
 
-	ImGuiSystem::Shutdown();
-
-	Containers::Cleanup();
-
+	WindowManager::GetInstance().Shutdown();
+	CleanupInterfaces();
 	closeLogger();
 }
 
 bool LoadOriginalDinputDll()
 {
-	if (Settings::settingsIni.dinputDllWrapper.find("none") == 0 || Settings::settingsIni.dinputDllWrapper == "")
+	if (Settings::settingsIni.dinputDllWrapper == "none" || Settings::settingsIni.dinputDllWrapper == "")
 	{
 		char dllPath[MAX_PATH];
 		GetSystemDirectoryA(dllPath, MAX_PATH);
@@ -60,10 +63,12 @@ bool LoadOriginalDinputDll()
 	}
 
 	orig_DirectInput8Create = (DirectInput8Create_t)GetProcAddress(hOriginalDinput, "DirectInput8Create");
+
 	if (!orig_DirectInput8Create)
 	{
 		return false;
 	}
+
 	LOG(1, "orig_DirectInput8Create: 0x%p\n", orig_DirectInput8Create);
 
 	return true;
@@ -72,7 +77,9 @@ bool LoadOriginalDinputDll()
 DWORD WINAPI BBCF_IM_Start(HMODULE hModule)
 {
 	openLogger();
+
 	LOG(1, "Starting BBCF_IM_Start thread\n");
+
 	CreateCustomDirectories();
 	SetUnhandledExceptionFilter(UnhandledExFilter);
 
@@ -82,7 +89,6 @@ DWORD WINAPI BBCF_IM_Start(HMODULE hModule)
 	}
 	logSettingsIni();
 	Settings::initSavedSettings();
-	Containers::Init();
 
 	if (!LoadOriginalDinputDll())
 	{
@@ -95,6 +101,8 @@ DWORD WINAPI BBCF_IM_Start(HMODULE hModule)
 		MessageBoxA(nullptr, "Failed IAT hook", "BBCFIM", MB_OK);
 		ExitProcess(0);
 	}
+
+	g_interfaces.pPaletteManager = new PaletteManager();
 
 	return 0;
 }

@@ -1,41 +1,69 @@
 #include "characters.h"
 
-LPCWSTR ingame_chars[36]
+#include <vector>
+
+const std::vector<std::string> charNames
 {
-	L"Ragna",		//00
-	L"Jin",			//01
-	L"Noel",		//02
-	L"Rachel",		//03
-	L"Taokaka",		//04
-	L"Tager",		//05
-	L"Litchi",		//06
-	L"Arakune",		//07
-	L"Bang",		//08
-	L"Carl",		//09
-	L"Hakumen",		//10
-	L"Nu",			//11
-	L"Tsubaki",		//12
-	L"Hazama",		//13
-	L"Mu",			//14
-	L"Makoto",		//15
-	L"Valkenhayn",	//16
-	L"Platinum",	//17
-	L"Relius",		//18
-	L"Izayoi",		//19
-	L"Amane",		//20
-	L"Bullet",		//21
-	L"Azrael",		//22
-	L"Kagura",		//23
-	L"Kokonoe",		//24
-	L"Terumi",		//25
-	L"Celica",		//26
-	L"Lambda",		//27
-	L"Hibiki",		//28
-	L"Nine",		//29
-	L"Naoto",		//30
-	L"Izanami",		//31
-	L"Susanoo",		//32
-	L"Es",			//33
-	L"Mai",			//34
-	L"Jubei"		//35
+	"Ragna",		//00
+	"Jin",			//01
+	"Noel",			//02
+	"Rachel",		//03
+	"Taokaka",		//04
+	"Tager",		//05
+	"Litchi",		//06
+	"Arakune",		//07
+	"Bang",			//08
+	"Carl",			//09
+	"Hakumen",		//10
+	"Nu",			//11
+	"Tsubaki",		//12
+	"Hazama",		//13
+	"Mu",			//14
+	"Makoto",		//15
+	"Valkenhayn",	//16
+	"Platinum",		//17
+	"Relius",		//18
+	"Izayoi",		//19
+	"Amane",		//20
+	"Bullet",		//21
+	"Azrael",		//22
+	"Kagura",		//23
+	"Kokonoe",		//24
+	"Terumi",		//25
+	"Celica",		//26
+	"Lambda",		//27
+	"Hibiki",		//28
+	"Nine",			//29
+	"Naoto",		//30
+	"Izanami",		//31
+	"Susanoo",		//32
+	"Es",			//33
+	"Mai",			//34
+	"Jubei"			//35
 };
+
+int getCharactersCount()
+{
+	return charNames.size();
+}
+
+const std::string& getCharacterNameByIndexA(int charIndex)
+{
+	const static std::string UNKNOWN = "Unknown";
+
+	if (charIndex < getCharactersCount())
+		return charNames[charIndex];
+
+	return UNKNOWN;
+}
+
+std::wstring getCharacterNameByIndexW(int charIndex)
+{
+	const std::string& charName = getCharacterNameByIndexA(charIndex);
+	return std::wstring(charName.begin(), charName.end());
+}
+
+bool isCharacterIndexOutOfBound(int charIndex)
+{
+	return getCharactersCount() < charIndex;
+}
