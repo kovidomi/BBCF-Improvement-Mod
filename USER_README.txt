@@ -13,14 +13,6 @@ What this mod provides
 - Change avatars and accessories in online rooms/lobbies without going back into menu
 - Freely adjustable ingame currency value
 
-Where to place your custom palette files (.hpl and .cfpl files)
-==========================
-- The palette folders are created in the path "..\BlazBlue Centralfiction\BBCF_IM\Palettes\" upon the first launch of the mod.
-- Place your .hpl or .cfpl files into the character's corresponding palette folder (at "..\BlazBlue Centralfiction\BBCF_IM\Palettes\") to have the mod automatically load them upon start, and making them selectable ingame via the mod's menu.
-- Effect files for the .hpl format must end with the naming convention of "_effectXX.hpl". Where XX is the index of the effect file. 
-For example, if you have a custom palette file named "Nyx_Izanami.hpl", then in the same palette folder a file named "Nyx_Izanami_effect01.hpl" will be loaded as that palette's first effect, and a file named "Nyx_Izanami_effect06.hpl" will be loaded as sixth, etc.
-- A file created with its name ending with "_effectbloom.hpl" will turn on the bloom effect for that custom palette in the game. (Once activated, the bloom effect will keep the color it was first activated on, and can't be changed unless a new round is started)
-
 Requirements
 ==============
 The game must be up-to-date
@@ -36,9 +28,57 @@ Uninstall
 ==========================
 Delete or rename dinput8.dll. The mod makes no permanent changes to anything.
 
+How to use the mod's overlay
+==========================
+- By default the mod's main window can be toggled with the F1 key (can be changed in the settings.ini file).
+- Double-click on title bar to collapse windows.
+- Click and drag on any empty space to move the windows.
+- Click and drag on lower right corner to resize the palette editor window (double-click to auto fit window to its contents).
+- CTRL + Click on a slider or drag box to input value as text.
+- Mouse wheel to scroll.
+
+How to start a custom game mode
+==========================
+- The custom game mode selector can be accessed under the "Gameplay settings" section on the main window while you are on the character selection screen in the following modes: Training, Versus, Online.
+- The custom game mode selector is also available in the Replay Theater menu screen, so replays saved after after custom game modes can be replayed. (If a custom game mode that the replay's match was not played on is selected then the replay will desync)
+- Custom game modes can be played in online player rooms or lobbies with other Improvement Mod users as well. For this both player 1 and player 2 must select the same custom game mode while on the character selection screen. If the players have not settled on the same custom game mode, then it will default back to "Normal".
+
+How to access the palette editor
+==========================
+- The palette editor's button can be accessed under the "Custom palettes" section on the main window while you are in a match in the following modes: Training, Versus.
+- Custom palettes saved in the editor can be found at "..\BlazBlue Centralfiction\BBCF_IM\Palettes\"
+
+How to switch between custom palettes
+==========================
+- The palette switching buttons can be accessed under the "Custom palettes" section whenever you are in a match.
+- In online matches you can only switch your own character's palette. (You can reset your opponent's palette with the button found next to the palette switching button).
+- Using the "palettes.ini" file in the game's root folder you can assign custom palettes to the ingame palette slots.
+
+How to set a custom palette as default so it gets automatically switched to upon the start of a match
+==========================
+See "palettes.ini" file that you placed in the game's root folder.
+
+How to access the hitbox overlay
+==========================
+- The hitbox overlay can be accessed under the "Hitbox overlay" section on the main window while you are in a match in the following modes: Training, Versus, Replay.
+
+Where to place and find your custom palette files (.cfpl and .hpl files)
+==========================
+- The palette folders are created in the path "..\BlazBlue Centralfiction\BBCF_IM\Palettes\" upon the first launch of the mod.
+- Place your .cfpl or .hpl files into the character's corresponding palette folder (at "..\BlazBlue Centralfiction\BBCF_IM\Palettes\") to have the mod automatically load them upon start, and making them selectable ingame via the mod's menu.
+
+For legacy .hpl formats:
+- Effect files for the .hpl format must end with the naming convention of "_effectXX.hpl". Where XX is the index of the effect file. 
+(For example, if you have a custom palette file named "Nyx_Izanami.hpl", then in the same palette folder a file named "Nyx_Izanami_effect01.hpl" will be loaded as that palette's first effect, and a file named "Nyx_Izanami_effect06.hpl" will be loaded as sixth, etc.)
+- A file created with its name ending with "_effectbloom.hpl" will turn on the bloom effect for that custom palette in the game. (Once activated, the bloom effect will keep the color it was first activated on, and can't be changed unless a new round is started)
+
 Known issues
 ==========================
-Platinum keeps swapping between her default and the selected custom palette. To prevent this select the palette before the match starts, and do not change it during match.
+1. Platinum keeps swapping between her default and the selected custom palette whenever she has her drive active.
+	- To prevent this, assign her custom palette in palettes.ini before the match starts, and do not switch it during match.
+
+2. Hitbox overlay is not aligned properly or is off-screen when the game's window resolution mismatches the rendering resolution.
+	- To prevent this, open up the settings.ini file, and set Viewport to 2, while setting the RenderingWidth and RenderingHeight to the resolution values you have in the ingame display options.
 
 Troubleshooting
 ==========================
@@ -46,12 +86,12 @@ First make sure that your issue doesn't persist if you remove/rename dinput8.dll
 If the issue still persists, then it has nothing to do with the mod.
 
 1. The mod's UI is very small, unreadable:
-This happens if you run the game in windowed or full-window mode with a resolution that's higher than what your monitor supports.
+This might happen if you run the game in windowed or full-window mode with a resolution that's higher than what your monitor supports.
 Try changing your display setting to fullscreen, or lowering the resolution ingame.
 
 2. Blackscreen problem:
 Make sure that RenderingWidth and RenderingHeight values in the .ini file are correctly set to the resolution of your game. 
-If their values are higher than your monitor's native resolution, then you will get blackscreen.
+If their values are higher than your monitor's native resolution, then you might get blackscreen.
 
 3. Game crashes when launched:
 Make sure that the settings.ini file is present in the game's folder.
@@ -61,12 +101,15 @@ Make sure you are running both Steam and the game with administrator privileges,
 Restore the default settings in the settings.ini file.
 Reboot your system.
 
+4. The mod's windows are off-screen or have disappeared:
+Delete the "menus.ini" file found in the game's root folder to reset the positions of the mod's windows.
+
 Keep in mind that the mod may partially, or completely stop working whenever a new official patch of the game is released. (Though unlikely)
 
 Changelog
 ==========================
 
-??-??-???? -- version 3.00
+11-01-2021 -- version 3.00
 ===============================
 - Complete ground up rework of BBCFIM, online features are incompatible with previous versions
 - Added hitbox overlay in Training, Versus, and Replay modes
@@ -75,8 +118,9 @@ Changelog
 - Added dinput dll chaining to settings.ini to use other dinput8.dll wrappers together with BBCFIM
 - Added option to toggle the visibility of the ingame HUD
 - Added "Online window" for BBCFIM detection and quick access to certain features in online games
+- Added frame freezing option to the palette editor
 - Added gradient generator to the palette editor
-- Added indexing mode to the palette editor
+- Added color box indexing to the palette editor
 - Enabled palette editor in Versus mode
 - Palettes are now previewed when hovered over their selections
 - Custom palettes now use a new CFPL file format (.hpl format is still supported)
