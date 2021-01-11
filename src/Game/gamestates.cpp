@@ -34,9 +34,9 @@ bool isGameModeSelectorEnabledInCurrentState()
 		*g_gameVals.pGameState == GameState_ReplayMenu;
 
 	bool isEnabledInCurrentMode =
+		*g_gameVals.pGameMode == GameMode_Training ||
 		*g_gameVals.pGameMode == GameMode_Versus ||
 		*g_gameVals.pGameMode == GameMode_Online ||
-		*g_gameVals.pGameMode == GameMode_Training ||
 		*g_gameVals.pGameState == GameState_ReplayMenu;
 
 	return isEnabledInCurrentState && isEnabledInCurrentMode;
