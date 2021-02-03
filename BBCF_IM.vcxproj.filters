@@ -4,20 +4,11 @@
     <Filter Include="src">
       <UniqueIdentifier>{61c84107-6b51-4060-a4db-5e2a0d561d98}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include">
-      <UniqueIdentifier>{878e1651-7325-455c-bf8f-ddf54cb167ed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\D3D9EXWrapper">
       <UniqueIdentifier>{47bc1dd4-af74-4984-9738-82b0f64b4185}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\SteamApiWrapper">
       <UniqueIdentifier>{50817bf9-cade-4b23-833c-a007583b3029}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\D3D9ExWrapper">
-      <UniqueIdentifier>{c2416cd4-c017-4b4c-8bec-93704f174ca4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\SteamApiWrapper">
-      <UniqueIdentifier>{4f9c754a-38eb-4566-adeb-809e2bc217b5}</UniqueIdentifier>
     </Filter>
     <Filter Include="export">
       <UniqueIdentifier>{ed19ccf9-8a20-4df1-b194-47a4a16166f7}</UniqueIdentifier>
@@ -25,11 +16,56 @@
     <Filter Include="resource">
       <UniqueIdentifier>{f5201038-a6d3-432c-ac40-8613426749c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\ImGui">
-      <UniqueIdentifier>{672f7b61-63c2-4d06-8826-fdb75b5f3d19}</UniqueIdentifier>
+    <Filter Include="src\Core">
+      <UniqueIdentifier>{1163fcb0-0c94-4449-9496-326949751c31}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\ImGui">
-      <UniqueIdentifier>{6efb0560-dbe6-4ba8-b579-e08645068bf5}</UniqueIdentifier>
+    <Filter Include="src\CustomGameMode">
+      <UniqueIdentifier>{74c6b5bb-8c9b-4b26-a023-de8219aad04d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Game">
+      <UniqueIdentifier>{ddaa9683-52c2-4dcf-af27-91351268e8d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Game\Jonb">
+      <UniqueIdentifier>{4b894ce5-2910-496f-8b6f-30f21a304a72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Game\Room">
+      <UniqueIdentifier>{0d2889e2-89f9-4017-9123-1cbe4d42fb61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Hooks">
+      <UniqueIdentifier>{e9c9b34b-ad2a-467a-9064-e4eeae366a0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Network">
+      <UniqueIdentifier>{2264681d-cdfe-4f6f-8eaa-5c6cad440e0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Palette">
+      <UniqueIdentifier>{1d95c448-6225-4372-9f6e-4be00d40fd3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Web">
+      <UniqueIdentifier>{a8481e78-228e-4492-9375-dd1235943b79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Overlay">
+      <UniqueIdentifier>{c1d12353-7709-47b0-aab0-d52f359ca7bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Overlay\Logger">
+      <UniqueIdentifier>{af83ed41-88d7-4a56-a38d-002679f1b553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Overlay\NotificationBar">
+      <UniqueIdentifier>{f7ea822d-7e2e-487f-867b-949eeaab5b82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Overlay\Widget">
+      <UniqueIdentifier>{2b7d9460-dfee-4d88-8ad9-8158ad20b143}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Overlay\Window">
+      <UniqueIdentifier>{f554b8cb-462c-41c0-a2a9-74dec54bf165}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Overlay\WindowContainer">
+      <UniqueIdentifier>{d922debc-b84e-4339-9c09-8a7fa5fa92f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="depends">
+      <UniqueIdentifier>{cdfa5838-31c6-4c09-b0c2-546545fbd7b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="depends\imgui">
+      <UniqueIdentifier>{595beb38-dfc1-49f9-9ffb-824083d4aeaf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,192 +99,386 @@
     <ClCompile Include="src\SteamApiWrapper\SteamUtilsWrapper.cpp">
       <Filter>src\SteamApiWrapper</Filter>
     </ClCompile>
-    <ClCompile Include="depends\imgui\imgui.cpp" />
-    <ClCompile Include="depends\imgui\imgui_demo.cpp" />
-    <ClCompile Include="depends\imgui\imgui_draw.cpp" />
-    <ClCompile Include="depends\imgui\imgui_impl_dx9.cpp" />
-    <ClCompile Include="src\Core\utils.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\logger.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\crashdump.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Web\update_check.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\dllmain.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Settings.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Hooks\HookManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Hooks\hooks_detours.cpp" />
-    <ClCompile Include="src\Hooks\hooks_bbcf.cpp" />
     <ClCompile Include="src\D3D9EXWrapper\D3DXMath.cpp">
       <Filter>src\D3D9EXWrapper</Filter>
     </ClCompile>
-    <ClCompile Include="src\SteamApiWrapper\SteamApiHelper.cpp" />
-    <ClCompile Include="src\Hooks\hooks_customGameModes.cpp" />
-    <ClCompile Include="src\Game\characters.cpp" />
-    <ClCompile Include="src\Hooks\hooks_palette.cpp" />
-    <ClCompile Include="src\Overlay\fonts.cpp" />
-    <ClCompile Include="src\Overlay\imgui_utils.cpp" />
-    <ClCompile Include="src\Overlay\WindowManager.cpp" />
-    <ClCompile Include="src\Overlay\Window\DebugWindow.cpp" />
-    <ClCompile Include="src\Overlay\Window\LogWindow.cpp" />
-    <ClCompile Include="src\Overlay\Window\MainWindow.cpp" />
-    <ClCompile Include="src\Overlay\Window\PaletteEditorWindow.cpp" />
-    <ClCompile Include="src\Overlay\Window\UpdateNotifierWindow.cpp" />
-    <ClCompile Include="src\Core\interfaces.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="src\Core\crashdump.cpp">
+      <Filter>src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Jonb\JonbReader.cpp" />
-    <ClCompile Include="src\Overlay\Window\IWindow.cpp" />
-    <ClCompile Include="src\Overlay\WindowContainer\WindowContainer.cpp" />
-    <ClCompile Include="src\Game\Player.cpp" />
-    <ClCompile Include="src\Game\gamestates.cpp" />
-    <ClCompile Include="src\Game\MatchState.cpp" />
-    <ClCompile Include="src\Network\NetworkManager.cpp" />
-    <ClCompile Include="src\Overlay\Logger\ImGuiLogger.cpp" />
-    <ClCompile Include="src\Overlay\Window\HitboxOverlay.cpp" />
-    <ClCompile Include="src\Network\RoomManager.cpp" />
-    <ClCompile Include="src\Network\OnlinePaletteManager.cpp" />
-    <ClCompile Include="src\Palette\CharPaletteHandle.cpp" />
-    <ClCompile Include="src\Palette\PaletteManager.cpp" />
-    <ClCompile Include="src\CustomGameMode\customGameMode.cpp" />
-    <ClCompile Include="src\CustomGameMode\GameModeManager.cpp" />
-    <ClCompile Include="src\Network\OnlineGameModeManager.cpp" />
-    <ClCompile Include="src\Game\stages.cpp" />
-    <ClCompile Include="src\Overlay\Window\RoomWindow.cpp" />
-    <ClCompile Include="src\Overlay\NotificationBar\NotificationBar.cpp" />
-    <ClCompile Include="src\Web\url_downloader.cpp" />
-    <ClCompile Include="src\Palette\impl_templates.h" />
-    <ClCompile Include="src\Palette\impl_templates.cpp" />
-    <ClCompile Include="src\SteamApiWrapper\steamApiWrappers.cpp" />
-    <ClCompile Include="src\Overlay\Widget\StageSelectWidget.cpp" />
-    <ClCompile Include="src\Overlay\Widget\GameModeSelectWidget.cpp" />
-    <ClCompile Include="src\Overlay\Widget\ActiveGameModeWidget.cpp" />
+    <ClCompile Include="src\Core\dllmain.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\utils.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Settings.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\logger.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\interfaces.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CustomGameMode\customGameMode.cpp">
+      <Filter>src\CustomGameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CustomGameMode\GameModeManager.cpp">
+      <Filter>src\CustomGameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Jonb\JonbReader.cpp">
+      <Filter>src\Game\Jonb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\characters.cpp">
+      <Filter>src\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\gamestates.cpp">
+      <Filter>src\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\MatchState.cpp">
+      <Filter>src\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Player.cpp">
+      <Filter>src\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\stages.cpp">
+      <Filter>src\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hooks\HookManager.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hooks\hooks_bbcf.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hooks\hooks_customGameModes.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hooks\hooks_detours.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hooks\hooks_palette.cpp">
+      <Filter>src\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Network\NetworkManager.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Network\OnlineGameModeManager.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Network\OnlinePaletteManager.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Network\RoomManager.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Palette\CharPaletteHandle.cpp">
+      <Filter>src\Palette</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Palette\impl_templates.cpp">
+      <Filter>src\Palette</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Palette\impl_templates.h">
+      <Filter>src\Palette</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Palette\PaletteManager.cpp">
+      <Filter>src\Palette</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Web\update_check.cpp">
+      <Filter>src\Web</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Web\url_downloader.cpp">
+      <Filter>src\Web</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\fonts.cpp">
+      <Filter>src\Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\imgui_utils.cpp">
+      <Filter>src\Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\WindowManager.cpp">
+      <Filter>src\Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Widget\ActiveGameModeWidget.cpp">
+      <Filter>src\Overlay\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Widget\GameModeSelectWidget.cpp">
+      <Filter>src\Overlay\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Widget\StageSelectWidget.cpp">
+      <Filter>src\Overlay\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Logger\ImGuiLogger.cpp">
+      <Filter>src\Overlay\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\NotificationBar\NotificationBar.cpp">
+      <Filter>src\Overlay\NotificationBar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\WindowContainer\WindowContainer.cpp">
+      <Filter>src\Overlay\WindowContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Window\DebugWindow.cpp">
+      <Filter>src\Overlay\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Window\HitboxOverlay.cpp">
+      <Filter>src\Overlay\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Window\LogWindow.cpp">
+      <Filter>src\Overlay\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Window\MainWindow.cpp">
+      <Filter>src\Overlay\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Window\PaletteEditorWindow.cpp">
+      <Filter>src\Overlay\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Window\RoomWindow.cpp">
+      <Filter>src\Overlay\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Window\UpdateNotifierWindow.cpp">
+      <Filter>src\Overlay\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Overlay\Window\IWindow.cpp">
+      <Filter>src\Overlay\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SteamApiWrapper\SteamApiHelper.cpp">
+      <Filter>src\SteamApiWrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SteamApiWrapper\steamApiWrappers.cpp">
+      <Filter>src\SteamApiWrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="depends\imgui\imgui.cpp">
+      <Filter>depends\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="depends\imgui\imgui_demo.cpp">
+      <Filter>depends\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="depends\imgui\imgui_draw.cpp">
+      <Filter>depends\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="depends\imgui\imgui_impl_dx9.cpp">
+      <Filter>depends\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="depends\imgui\imgui.h" />
-    <ClInclude Include="depends\imgui\imgui_impl_dx9.h" />
-    <ClInclude Include="depends\imgui\imgui_internal.h" />
-    <ClInclude Include="depends\imgui\stb_rect_pack.h" />
-    <ClInclude Include="depends\imgui\stb_textedit.h" />
-    <ClInclude Include="depends\imgui\stb_truetype.h" />
-    <ClInclude Include="depends\imgui\imconfig.h" />
-    <ClInclude Include="src\D3D9EXWrapper\ID3D9EXWrapper.h">
-      <Filter>include\D3D9ExWrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="src\D3D9EXWrapper\ID3D9EXWrapper_Device.h">
-      <Filter>include\D3D9ExWrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="src\D3D9EXWrapper\ID3D9Wrapper_Sprite.h">
-      <Filter>include\D3D9ExWrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="src\D3D9EXWrapper\ID3DXWrapper_Effect.h">
-      <Filter>include\D3D9ExWrapper</Filter>
+    <ClInclude Include="src\SteamApiWrapper\SteamUtilsWrapper.h">
+      <Filter>src\SteamApiWrapper</Filter>
     </ClInclude>
     <ClInclude Include="src\SteamApiWrapper\SteamFriendsWrapper.h">
-      <Filter>include\SteamApiWrapper</Filter>
+      <Filter>src\SteamApiWrapper</Filter>
     </ClInclude>
     <ClInclude Include="src\SteamApiWrapper\SteamMatchmakingWrapper.h">
-      <Filter>include\SteamApiWrapper</Filter>
+      <Filter>src\SteamApiWrapper</Filter>
     </ClInclude>
     <ClInclude Include="src\SteamApiWrapper\SteamNetworkingWrapper.h">
-      <Filter>include\SteamApiWrapper</Filter>
+      <Filter>src\SteamApiWrapper</Filter>
     </ClInclude>
     <ClInclude Include="src\SteamApiWrapper\SteamUserStatsWrapper.h">
-      <Filter>include\SteamApiWrapper</Filter>
+      <Filter>src\SteamApiWrapper</Filter>
     </ClInclude>
     <ClInclude Include="src\SteamApiWrapper\SteamUserWrapper.h">
-      <Filter>include\SteamApiWrapper</Filter>
+      <Filter>src\SteamApiWrapper</Filter>
     </ClInclude>
-    <ClInclude Include="src\SteamApiWrapper\SteamUtilsWrapper.h">
-      <Filter>include\SteamApiWrapper</Filter>
+    <ClInclude Include="src\D3D9EXWrapper\D3DXMath.h">
+      <Filter>src\D3D9EXWrapper</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\utils.h">
-      <Filter>include</Filter>
+    <ClInclude Include="src\D3D9EXWrapper\ID3D9EXWrapper.h">
+      <Filter>src\D3D9EXWrapper</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\logger.h">
-      <Filter>include</Filter>
+    <ClInclude Include="src\D3D9EXWrapper\ID3D9EXWrapper_Device.h">
+      <Filter>src\D3D9EXWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D9EXWrapper\ID3D9Wrapper_Sprite.h">
+      <Filter>src\D3D9EXWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D9EXWrapper\ID3DXWrapper_Effect.h">
+      <Filter>src\D3D9EXWrapper</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\crashdump.h">
-      <Filter>include</Filter>
+      <Filter>src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Web\update_check.h">
-      <Filter>include</Filter>
+    <ClInclude Include="src\Core\utils.h">
+      <Filter>src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\D3D9EXWrapper\d3d9.h" />
-    <ClInclude Include="src\Core\info.h" />
     <ClInclude Include="src\Core\Settings.h">
-      <Filter>include</Filter>
+      <Filter>src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hooks\HookManager.h">
-      <Filter>include</Filter>
+    <ClInclude Include="src\Core\logger.h">
+      <Filter>src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hooks\hooks_detours.h" />
-    <ClInclude Include="src\Hooks\hooks_bbcf.h" />
-    <ClInclude Include="src\D3D9EXWrapper\D3DXMath.h">
-      <Filter>include\D3D9ExWrapper</Filter>
+    <ClInclude Include="src\Core\info.h">
+      <Filter>src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\SteamApiWrapper\SteamApiHelper.h" />
-    <ClInclude Include="src\Game\gamestates.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Hooks\hooks_customGameModes.h" />
-    <ClInclude Include="src\Game\characters.h" />
-    <ClInclude Include="src\Hooks\hooks_palette.h" />
-    <ClInclude Include="src\Overlay\WindowManager.h" />
-    <ClInclude Include="src\Overlay\fonts.h" />
-    <ClInclude Include="src\Overlay\imgui_utils.h" />
-    <ClInclude Include="src\Overlay\Logger\Logger.h" />
-    <ClInclude Include="src\Overlay\Logger\ImGuiLogger.h" />
-    <ClInclude Include="src\Overlay\Window\DebugWindow.h" />
-    <ClInclude Include="src\Overlay\Window\LogWindow.h" />
-    <ClInclude Include="src\Overlay\Window\MainWindow.h" />
-    <ClInclude Include="src\Overlay\Window\PaletteEditorWindow.h" />
-    <ClInclude Include="src\Overlay\Window\UpdateNotifierWindow.h" />
-    <ClInclude Include="src\Overlay\WindowContainer\WindowType.h" />
-    <ClInclude Include="src\Overlay\WindowContainer\WindowContainer.h" />
     <ClInclude Include="src\Core\interfaces.h">
-      <Filter>include</Filter>
+      <Filter>src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CustomGameMode\customGameMode.h">
+      <Filter>src\CustomGameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CustomGameMode\GameModeManager.h">
+      <Filter>src\CustomGameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3D9EXWrapper\d3d9.h">
+      <Filter>src\D3D9EXWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Jonb\JonbEntry.h">
+      <Filter>src\Game\Jonb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Jonb\JonbReader.h">
+      <Filter>src\Game\Jonb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Room\Room.h">
+      <Filter>src\Game\Room</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Room\RoomMemberEntry.h">
+      <Filter>src\Game\Room</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\characters.h">
+      <Filter>src\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\CharData.h">
-      <Filter>include</Filter>
+      <Filter>src\Game</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Jonb\JonbEntry.h" />
-    <ClInclude Include="src\Game\Jonb\JonbReader.h" />
-    <ClInclude Include="src\Overlay\Window\IWindow.h" />
-    <ClInclude Include="src\Game\Player.h" />
-    <ClInclude Include="src\Game\MatchState.h" />
-    <ClInclude Include="src\Network\NetworkManager.h" />
-    <ClInclude Include="src\Network\Packet.h" />
-    <ClInclude Include="src\Overlay\Window\HitboxOverlay.h" />
-    <ClInclude Include="src\Game\Room\Room.h" />
-    <ClInclude Include="src\Network\RoomManager.h" />
-    <ClInclude Include="src\Game\Room\RoomMemberEntry.h" />
-    <ClInclude Include="src\Network\OnlinePaletteManager.h" />
-    <ClInclude Include="src\Palette\CharPaletteHandle.h" />
-    <ClInclude Include="src\Palette\impl_format.h" />
-    <ClInclude Include="src\Palette\PaletteManager.h" />
-    <ClInclude Include="src\CustomGameMode\customGameMode.h" />
-    <ClInclude Include="src\Network\OnlineGameModeManager.h" />
-    <ClInclude Include="src\CustomGameMode\GameModeManager.h" />
-    <ClInclude Include="src\Game\stages.h" />
-    <ClInclude Include="src\Overlay\Window\RoomWindow.h" />
-    <ClInclude Include="src\Overlay\NotificationBar\NotificationBar.h" />
-    <ClInclude Include="src\Web\url_downloader.h" />
-    <ClInclude Include="src\SteamApiWrapper\steamApiWrappers.h" />
-    <ClInclude Include="src\Overlay\Widget\StageSelectWidget.h" />
-    <ClInclude Include="src\Overlay\Widget\GameModeSelectWidget.h" />
-    <ClInclude Include="src\Overlay\Widget\ActiveGameModeWidget.h" />
+    <ClInclude Include="src\Game\gamestates.h">
+      <Filter>src\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\MatchState.h">
+      <Filter>src\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Player.h">
+      <Filter>src\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\stages.h">
+      <Filter>src\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\HookManager.h">
+      <Filter>src\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\hooks_bbcf.h">
+      <Filter>src\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\hooks_customGameModes.h">
+      <Filter>src\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\hooks_detours.h">
+      <Filter>src\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hooks\hooks_palette.h">
+      <Filter>src\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Network\NetworkManager.h">
+      <Filter>src\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Network\OnlineGameModeManager.h">
+      <Filter>src\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Network\OnlinePaletteManager.h">
+      <Filter>src\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Network\Packet.h">
+      <Filter>src\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Network\RoomManager.h">
+      <Filter>src\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Palette\CharPaletteHandle.h">
+      <Filter>src\Palette</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Palette\impl_format.h">
+      <Filter>src\Palette</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Palette\PaletteManager.h">
+      <Filter>src\Palette</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Web\update_check.h">
+      <Filter>src\Web</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Web\url_downloader.h">
+      <Filter>src\Web</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\fonts.h">
+      <Filter>src\Overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\imgui_utils.h">
+      <Filter>src\Overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\WindowManager.h">
+      <Filter>src\Overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Widget\ActiveGameModeWidget.h">
+      <Filter>src\Overlay\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Widget\GameModeSelectWidget.h">
+      <Filter>src\Overlay\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Widget\StageSelectWidget.h">
+      <Filter>src\Overlay\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Logger\Logger.h">
+      <Filter>src\Overlay\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Logger\ImGuiLogger.h">
+      <Filter>src\Overlay\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\NotificationBar\NotificationBar.h">
+      <Filter>src\Overlay\NotificationBar</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\WindowContainer\WindowType.h">
+      <Filter>src\Overlay\WindowContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\WindowContainer\WindowContainer.h">
+      <Filter>src\Overlay\WindowContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Window\DebugWindow.h">
+      <Filter>src\Overlay\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Window\HitboxOverlay.h">
+      <Filter>src\Overlay\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Window\LogWindow.h">
+      <Filter>src\Overlay\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Window\MainWindow.h">
+      <Filter>src\Overlay\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Window\PaletteEditorWindow.h">
+      <Filter>src\Overlay\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Window\RoomWindow.h">
+      <Filter>src\Overlay\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Window\UpdateNotifierWindow.h">
+      <Filter>src\Overlay\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Overlay\Window\IWindow.h">
+      <Filter>src\Overlay\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SteamApiWrapper\steamApiWrappers.h">
+      <Filter>src\SteamApiWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SteamApiWrapper\SteamApiHelper.h">
+      <Filter>src\SteamApiWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\imgui\imconfig.h">
+      <Filter>depends\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\imgui\imgui.h">
+      <Filter>depends\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\imgui\imgui_impl_dx9.h">
+      <Filter>depends\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\imgui\imgui_internal.h">
+      <Filter>depends\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\imgui\stb_rect_pack.h">
+      <Filter>depends\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\imgui\stb_textedit.h">
+      <Filter>depends\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="depends\imgui\stb_truetype.h">
+      <Filter>depends\imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="export\dinput8.def">
@@ -257,7 +487,11 @@
     <None Include="resource\settings.ini">
       <Filter>resource</Filter>
     </None>
-    <None Include="src\Core\settings.def" />
-    <None Include="resource\palettes.ini" />
+    <None Include="src\Core\settings.def">
+      <Filter>src\Core</Filter>
+    </None>
+    <None Include="resource\palettes.ini">
+      <Filter>resource</Filter>
+    </None>
   </ItemGroup>
 </Project>
