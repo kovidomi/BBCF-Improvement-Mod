@@ -5,6 +5,7 @@
 
 #include "Game/characters.h"
 #include "Game/Player.h"
+#include <sstream>
 
 #include <vector>
 
